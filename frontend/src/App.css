@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  /* 🎨 Colors */
+  --color-primary: #9067C6;
+  --color-primary-dark: #242038;
+  --color-primary-light: #8D86C9;
+
+  --color-secondary: #CAC4CE;
+  --color-secondary-light: #F7ECE1;
+
+  --color-neutral-dark: #242038;
+  --color-neutral-light: #F7ECE1;
+
+  /* 🔤 Fonts */
+  --font-sans: "Poppins", sans-serif;
+}
