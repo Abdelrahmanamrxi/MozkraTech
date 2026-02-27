@@ -14,4 +14,8 @@
 
   /* 🔤 Fonts */
   --font-sans: "Poppins", sans-serif;
+  --font-blinker: "Blinker", sans-serif;
+}
+.main-background{
+  @apply bg-[linear-gradient(87.84deg,#242038_25.96%,#3A355A_92.07%,#8D86C9_123.1%)]
 }
