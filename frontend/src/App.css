@@ -2,20 +2,28 @@
 
 @theme {
   /* 🎨 Colors */
-  --color-primary: #9067C6;
+  --color-primary: #9067c6;
   --color-primary-dark: #242038;
-  --color-primary-light: #8D86C9;
+  --color-primary-light: #8d86c9;
 
-  --color-secondary: #CAC4CE;
-  --color-secondary-light: #F7ECE1;
+  --color-secondary: #cac4ce;
+  --color-secondary-light: #f7ece1;
 
   --color-neutral-dark: #242038;
-  --color-neutral-light: #F7ECE1;
+  --color-neutral-light: #f7ece1;
 
   /* 🔤 Fonts */
   --font-sans: "Poppins", sans-serif;
   --font-blinker: "Blinker", sans-serif;
 }
-.main-background{
-  @apply bg-[linear-gradient(87.84deg,#242038_25.96%,#3A355A_92.07%,#8D86C9_123.1%)]
+.main-background {
+  @apply bg-[linear-gradient(87.84deg,#242038_25.96%,#3A355A_92.07%,#8D86C9_123.1%)];
+}
+
+.cards-styling {
+  @apply absolute bg-white/20 backdrop-blur-md rounded-2xl px-6 py-8 text-white text-sm font-semibold;
+}
+
+.get-started-button {
+  @apply px-8 mt-8 py-2 px-12 cursor-pointer bg-linear-to-r from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-full transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 hover:bg-none hover:bg-[var(--color-primary-dark)];
 }
