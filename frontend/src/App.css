@@ -25,7 +25,7 @@
 }
 
 .get-started-button {
-  @apply px-8 mt-8 py-2 px-12 cursor-pointer bg-linear-to-r from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-full transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 hover:bg-none hover:bg-[var(--color-primary-dark)];
+  @apply  mt-8 py-3 px-12 cursor-pointer bg-linear-to-r from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-full transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 hover:bg-none hover:bg-[var(--color-primary-dark)];
 }
 
 .cards {
@@ -37,4 +37,14 @@
 
 .cards-icon {
   @apply w-12 h-12 flex items-center justify-center rounded-full bg-white/40 mb-4 text-white;
+}
+.ai-background{
+  background: linear-gradient(180deg, #3A355A 0%, #9067C6 100%);
+}
+.glassy-primary-background{
+  @apply  bg-primary/80 backdrop-blur-2xl  border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-white/10
+}
+.ready-background{
+
+  background: linear-gradient(89.71deg, #9067C6 0.29%, #242038 108.06%);
 }
