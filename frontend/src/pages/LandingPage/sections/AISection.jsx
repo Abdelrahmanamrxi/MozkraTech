@@ -90,7 +90,7 @@ const glassTap = { scale: 0.98 }
 
         {/* Top AI Suggestion card */}
         <motion.div
-          className="flex glassy-primary-background items-center gap-2 rounded-[30px] p-6 flex-row border border-white/15 ring-1 ring-white/10 cursor-default"
+          className="flex glassy-primary-background items-center gap-3 rounded-[30px] p-6 flex-row border border-white/15 ring-1 ring-white/10 cursor-default"
           variants={fadeLeft(0.1)}
           initial="hidden"
           whileInView="show"
@@ -100,7 +100,11 @@ const glassTap = { scale: 0.98 }
         >
           {/* SVG star icons */}
           <motion.svg
-            width="90" height="50" viewBox="0 0 90 50" fill="none"
+            className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0"
+            width="90"
+            height="50"
+            viewBox="0 0 90 50"
+            fill="none"
             xmlns="http://www.w3.org/2000/svg"
             animate={{ rotate: [0, 8, -8, 0] }}
             transition={{ duration: 6, ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }}
@@ -142,6 +146,7 @@ const glassTap = { scale: 0.98 }
             >
               {/* Icon subtle pulse on hover */}
               <motion.div
+                className="mr-3 flex items-center justify-center shrink-0 min-h-[48px] min-w-[48px]"
                 whileHover={{ scale: 1.15, rotate: 8 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 16 }}
               >
