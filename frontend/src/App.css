@@ -22,8 +22,8 @@
   background: linear-gradient(
     87.84deg,
     #242038 25.96%,
-    #3A355A 92.07%,
-    #8D86C9 123.1%
+    #3a355a 92.07%,
+    #8d86c9 123.1%
   );
 }
 
@@ -52,16 +52,49 @@
 }
 
 .ai-background {
-  background: linear-gradient(180deg, #3A355A 0%, #9067C6 100%);
+  background: linear-gradient(180deg, #3a355a 0%, #9067c6 100%);
 }
 
 .glassy-primary-background {
   @apply bg-primary/80 backdrop-blur-2xl border border-white/15 ring-1 ring-white/10;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 .ready-background {
+  background: linear-gradient(89.71deg, #9067c6 0.29%, #242038 108.06%);
+}
+.form-input {
+  @apply w-full rounded-full px-6 py-2.5 text-white outline-none border border-white/20;
 
-  background: linear-gradient(89.71deg, #9067C6 0.29%, #242038 108.06%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.15)
+  );
+
+  backdrop-filter: blur(8px);
+
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.35),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.15);
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+.form-input:focus {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.35)
+  );
+  border: 1px solid rgba(144, 103, 198, 0.8);
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.35),
+    0 0 10px rgba(144, 103, 198, 0.6);
+}
+
+.create-account-button {
+  @apply mt-8 py-3 px-12 cursor-pointer bg-primary rounded-full transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 hover:bg-[var(--color-primary-dark)];
 }

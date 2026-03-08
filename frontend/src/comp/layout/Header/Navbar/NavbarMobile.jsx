@@ -1,20 +1,30 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react'
-import { Menu, X, Home, LayoutDashboard, Calendar, Users, ChevronRight } from 'lucide-react'
-import Logo from '../../../logo/Logo'
+import React, { useState, useEffect } from "react";
+import {
+  Menu,
+  X,
+  Home,
+  LayoutDashboard,
+  Calendar,
+  Users,
+  ChevronRight,
+} from "lucide-react";
+import Logo from "../../../logo/Logo";
 const navLinks = [
-  { label: 'Home',      Icon: Home,            href: '#' },
-  { label: 'Dashboard', Icon: LayoutDashboard, href: '#' },
-  { label: 'Schedule',  Icon: Calendar,        href: '#' },
-  { label: 'Friends',   Icon: Users,           href: '#' },
-]
+  { label: "Home", Icon: Home, href: "#" },
+  { label: "Dashboard", Icon: LayoutDashboard, href: "#" },
+  { label: "Schedule", Icon: Calendar, href: "#" },
+  { label: "Friends", Icon: Users, href: "#" },
+];
 export default function NavbarMobile() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [open])
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   return (
     <>
@@ -34,7 +44,9 @@ export default function NavbarMobile() {
       <div
         onClick={() => setOpen(false)}
         className={`fixed inset-0 z-40 bg-primary-dark/65 backdrop-blur-sm transition-opacity duration-300 ${
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          open
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
       />
 
@@ -45,7 +57,7 @@ export default function NavbarMobile() {
           shadow-[-8px_0_40px_rgba(0,0,0,0.5)]
           transition-transform duration-400 ease-in-out
           font-sans
-          ${open ? 'translate-x-0' : 'translate-x-full'}`}
+          ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-primary/20">
@@ -76,7 +88,9 @@ export default function NavbarMobile() {
                 hover:bg-primary/20 hover:border-primary/50
                 transition-all duration-200"
               style={{
-                animation: open ? `fadeSlideIn 0.4s ease ${i * 0.07 + 0.1}s both` : 'none',
+                animation: open
+                  ? `fadeSlideIn 0.4s ease ${i * 0.07 + 0.1}s both`
+                  : "none",
               }}
             >
               <span className="flex items-center gap-3">
@@ -105,7 +119,7 @@ export default function NavbarMobile() {
 
           {/* Get Started */}
           <a
-            href="#"
+            href="/signup"
             className="block text-center py-3.5 rounded-xl text-neutral-light text-[0.95rem] font-semibold no-underline
               bg-linear-to-br from-primary to-[#7a4fb0]
               shadow-[0_4px_20px_rgba(144,103,198,0.4)]
@@ -124,5 +138,5 @@ export default function NavbarMobile() {
         }
       `}</style>
     </>
-  )
+  );
 }
