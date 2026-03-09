@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "./Navbar/Navbar";
-import NavbarMobile from "./Navbar/NavbarMobile";
+import NavbarMobile from "./Navbar/NavbarMobile/NavbarMobile";
 function Header({ navbarVariant = "landing" }) {
   return (
     <>

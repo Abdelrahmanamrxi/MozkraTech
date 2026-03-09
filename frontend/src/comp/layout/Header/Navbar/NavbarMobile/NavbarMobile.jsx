@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
+
 import {
   Menu,
   X,
@@ -9,20 +10,22 @@ import {
   Users,
   ChevronRight,
 } from "lucide-react";
-import Logo from "../../../logo/Logo";
+import Logo from "../../../../logo/Logo";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { NotificationsUtilityRow } from "./NavbarMobileParts";
+import {
+  NAV_LINKS,
+  DEMO_NOTIFICATIONS,
+  DEMO_UNREAD_COUNT,
+} from "./NavbarMobile.constants";
 
-const navLinks = [
-  { label: "Home", Icon: Home, href: "/home" },
-  { label: "Dashboard", Icon: LayoutDashboard, href: "/dashboard" },
-  { label: "Schedule", Icon: Calendar, href: "/dashboard/schedule" },
-  { label: "Friends", Icon: Users, href: "/dashboard/friends" },
-];
+const iconMap = { Home, LayoutDashboard, Calendar, Users };
 
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [notifOpen, setNotifOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -34,6 +37,7 @@ export default function NavbarMobile() {
 
   useEffect(() => {
     setOpen(false);
+    setNotifOpen(false);
   }, [location.pathname]);
 
   return (
@@ -160,9 +164,10 @@ export default function NavbarMobile() {
                 Navigation
               </p>
 
-              {navLinks.map(({ label, Icon, href }, i) => {
+              {NAV_LINKS.map(({ label, icon, href }, i) => {
                 const isActive = location.pathname === href;
                 const isHovered = hoveredIndex === i;
+                const Icon = iconMap[icon];
 
                 return (
                   <motion.div
@@ -216,19 +221,21 @@ export default function NavbarMobile() {
                                 "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
                             }}
                           />
-                          <Icon
-                            size={17}
-                            style={{
-                              color: isActive
-                                ? "#d4b8f8"
-                                : isHovered
-                                  ? "#b590e8"
-                                  : "#9067c6",
-                              position: "relative",
-                              zIndex: 1,
-                              transition: "color 0.15s ease",
-                            }}
-                          />
+                          {Icon ? (
+                            <Icon
+                              size={17}
+                              style={{
+                                color: isActive
+                                  ? "#d4b8f8"
+                                  : isHovered
+                                    ? "#b590e8"
+                                    : "#9067c6",
+                                position: "relative",
+                                zIndex: 1,
+                                transition: "color 0.15s ease",
+                              }}
+                            />
+                          ) : null}
                         </span>
 
                         <span
@@ -279,7 +286,7 @@ export default function NavbarMobile() {
             </nav>
 
             {/* CTA Buttons */}
-            <motion.div
+          <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -291,6 +298,26 @@ export default function NavbarMobile() {
               className="px-4 pt-4 pb-8 flex flex-col gap-2.5"
               style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
             >
+              {location.pathname!=='/'&&(
+                <>
+
+                  <NotificationsUtilityRow
+                    notifOpen={notifOpen}
+                    setNotifOpen={setNotifOpen}
+                    unreadCount={DEMO_UNREAD_COUNT}
+                    notifications={DEMO_NOTIFICATIONS}
+                  />
+                </>
+
+
+              )}
+
+
+
+
+             {location.pathname==='/' && (
+              <>
+              
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
@@ -346,6 +373,8 @@ export default function NavbarMobile() {
                   <span className="relative z-10">Get Started →</span>
                 </Link>
               </motion.div>
+              </>
+              )}
             </motion.div>
           </motion.div>
         )}
