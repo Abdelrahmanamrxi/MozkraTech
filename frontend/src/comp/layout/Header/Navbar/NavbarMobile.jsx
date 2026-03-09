@@ -1,12 +1,20 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import { Menu, X, Home, LayoutDashboard, Calendar, Users, ChevronRight } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home,
+  LayoutDashboard,
+  Calendar,
+  Users,
+  ChevronRight,
+} from "lucide-react";
 import Logo from "../../../logo/Logo";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { label: "Home", Icon: Home, href: "/" },
+  { label: "Home", Icon: Home, href: "/home" },
   { label: "Dashboard", Icon: LayoutDashboard, href: "/dashboard" },
   { label: "Schedule", Icon: Calendar, href: "/dashboard/schedule" },
   { label: "Friends", Icon: Users, href: "/dashboard/friends" },
@@ -19,10 +27,14 @@ export default function NavbarMobile() {
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
-  useEffect(() => { setOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   return (
     <>
@@ -85,10 +97,16 @@ export default function NavbarMobile() {
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 380, damping: 42, mass: 0.8 }}
+            transition={{
+              type: "spring",
+              stiffness: 380,
+              damping: 42,
+              mass: 0.8,
+            }}
             className="fixed top-0 right-0 bottom-0 z-50 w-3/4 flex flex-col"
             style={{
-              background: "linear-gradient(160deg, rgba(34,29,54,0.99) 0%, rgba(20,16,40,1) 100%)",
+              background:
+                "linear-gradient(160deg, rgba(34,29,54,0.99) 0%, rgba(20,16,40,1) 100%)",
               borderLeft: "1px solid rgba(255,255,255,0.07)",
               boxShadow: "-12px 0 40px rgba(0,0,0,0.55)",
               willChange: "transform",
@@ -96,14 +114,26 @@ export default function NavbarMobile() {
             }}
           >
             {/* Glow accents */}
-            <div className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
-              style={{ background: "radial-gradient(circle at top right, rgba(144,103,198,0.18) 0%, transparent 60%)" }} />
-            <div className="absolute bottom-0 left-0 w-48 h-48 pointer-events-none"
-              style={{ background: "radial-gradient(circle at bottom left, rgba(144,103,198,0.09) 0%, transparent 60%)" }} />
+            <div
+              className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(circle at top right, rgba(144,103,198,0.18) 0%, transparent 60%)",
+              }}
+            />
+            <div
+              className="absolute bottom-0 left-0 w-48 h-48 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(circle at bottom left, rgba(144,103,198,0.09) 0%, transparent 60%)",
+              }}
+            />
 
             {/* Drawer Header */}
-            <div className="flex items-center justify-between px-6 py-5"
-              style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+            <div
+              className="flex items-center justify-between px-6 py-5"
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+            >
               <Logo />
               <motion.button
                 onClick={() => setOpen(false)}
@@ -123,8 +153,10 @@ export default function NavbarMobile() {
 
             {/* Nav links */}
             <nav className="flex-1 px-4 pt-6 pb-4 flex flex-col gap-1.5 overflow-y-auto">
-              <p className="text-[0.63rem] font-semibold tracking-[0.15em] uppercase mb-3 pl-2"
-                style={{ color: "rgba(141,134,201,0.5)" }}>
+              <p
+                className="text-[0.63rem] font-semibold tracking-[0.15em] uppercase mb-3 pl-2"
+                style={{ color: "rgba(141,134,201,0.5)" }}
+              >
                 Navigation
               </p>
 
@@ -137,7 +169,12 @@ export default function NavbarMobile() {
                     key={label}
                     initial={{ opacity: 0, x: 16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04 + 0.03, type: "spring", stiffness: 450, damping: 32 }}
+                    transition={{
+                      delay: i * 0.04 + 0.03,
+                      type: "spring",
+                      stiffness: 450,
+                      damping: 32,
+                    }}
                   >
                     <Link
                       to={href}
@@ -145,48 +182,95 @@ export default function NavbarMobile() {
                       onMouseLeave={() => setHoveredIndex(null)}
                       className="flex items-center justify-between px-4 py-3.5 rounded-2xl no-underline"
                       style={{
-                        background: isActive ? "rgba(144,103,198,0.2)" : isHovered ? "rgba(144,103,198,0.09)" : "rgba(255,255,255,0.03)",
-                        border: isActive ? "1px solid rgba(144,103,198,0.42)" : isHovered ? "1px solid rgba(144,103,198,0.22)" : "1px solid rgba(255,255,255,0.05)",
-                        transition: "background 0.15s ease, border-color 0.15s ease",
+                        background: isActive
+                          ? "rgba(144,103,198,0.2)"
+                          : isHovered
+                            ? "rgba(144,103,198,0.09)"
+                            : "rgba(255,255,255,0.03)",
+                        border: isActive
+                          ? "1px solid rgba(144,103,198,0.42)"
+                          : isHovered
+                            ? "1px solid rgba(144,103,198,0.22)"
+                            : "1px solid rgba(255,255,255,0.05)",
+                        transition:
+                          "background 0.15s ease, border-color 0.15s ease",
                       }}
                     >
                       <span className="flex items-center gap-3.5">
                         <span
                           className="flex items-center justify-center w-9 h-9 rounded-[11px] relative overflow-hidden"
                           style={{
-                            background: isActive ? "rgba(144,103,198,0.38)" : isHovered ? "rgba(144,103,198,0.22)" : "rgba(144,103,198,0.12)",
+                            background: isActive
+                              ? "rgba(144,103,198,0.38)"
+                              : isHovered
+                                ? "rgba(144,103,198,0.22)"
+                                : "rgba(144,103,198,0.12)",
                             border: "1px solid rgba(144,103,198,0.18)",
                             transition: "background 0.15s ease",
                           }}
                         >
-                          <span className="absolute top-0 left-0 right-0 h-1/2 rounded-t-[10px]"
-                            style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)" }} />
-                          <Icon size={17} style={{
-                            color: isActive ? "#d4b8f8" : isHovered ? "#b590e8" : "#9067c6",
-                            position: "relative", zIndex: 1,
-                            transition: "color 0.15s ease",
-                          }} />
+                          <span
+                            className="absolute top-0 left-0 right-0 h-1/2 rounded-t-[10px]"
+                            style={{
+                              background:
+                                "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
+                            }}
+                          />
+                          <Icon
+                            size={17}
+                            style={{
+                              color: isActive
+                                ? "#d4b8f8"
+                                : isHovered
+                                  ? "#b590e8"
+                                  : "#9067c6",
+                              position: "relative",
+                              zIndex: 1,
+                              transition: "color 0.15s ease",
+                            }}
+                          />
                         </span>
 
-                        <span className="font-blinker text-[1rem] font-medium"
+                        <span
+                          className="font-blinker text-[1rem] font-medium"
                           style={{
-                            color: isActive ? "white" : isHovered ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.58)",
+                            color: isActive
+                              ? "white"
+                              : isHovered
+                                ? "rgba(255,255,255,0.88)"
+                                : "rgba(255,255,255,0.58)",
                             transition: "color 0.15s ease",
-                          }}>
+                          }}
+                        >
                           {label}
                         </span>
                       </span>
 
                       <span className="flex items-center gap-2">
                         {isActive && (
-                          <span className="w-1.5 h-1.5 rounded-full"
-                            style={{ background: "#9067c6", boxShadow: "0 0 6px 2px rgba(144,103,198,0.6)" }} />
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{
+                              background: "#9067c6",
+                              boxShadow: "0 0 6px 2px rgba(144,103,198,0.6)",
+                            }}
+                          />
                         )}
-                        <ChevronRight size={15} style={{
-                          color: isActive ? "rgba(196,168,240,0.9)" : isHovered ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.18)",
-                          transition: "color 0.15s ease, transform 0.15s ease",
-                          transform: isHovered ? "translateX(2px)" : "translateX(0)",
-                        }} />
+                        <ChevronRight
+                          size={15}
+                          style={{
+                            color: isActive
+                              ? "rgba(196,168,240,0.9)"
+                              : isHovered
+                                ? "rgba(255,255,255,0.45)"
+                                : "rgba(255,255,255,0.18)",
+                            transition:
+                              "color 0.15s ease, transform 0.15s ease",
+                            transform: isHovered
+                              ? "translateX(2px)"
+                              : "translateX(0)",
+                          }}
+                        />
                       </span>
                     </Link>
                   </motion.div>
@@ -198,13 +282,22 @@ export default function NavbarMobile() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.22, type: "spring", stiffness: 340, damping: 30 }}
+              transition={{
+                delay: 0.22,
+                type: "spring",
+                stiffness: 340,
+                damping: 30,
+              }}
               className="px-4 pt-4 pb-8 flex flex-col gap-2.5"
               style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
             >
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 22 }}>
-                <Link to="/login"
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 22 }}
+              >
+                <Link
+                  to="/login"
                   className="block text-center py-3.5 rounded-2xl text-[0.95rem] font-medium no-underline font-blinker"
                   style={{
                     color: "rgba(255,255,255,0.68)",
@@ -212,8 +305,14 @@ export default function NavbarMobile() {
                     border: "1px solid rgba(255,255,255,0.09)",
                     transition: "background 0.15s ease, color 0.15s ease",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; e.currentTarget.style.color = "white"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.68)"; }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.09)";
+                    e.currentTarget.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.68)";
+                  }}
                 >
                   Sign In
                 </Link>
@@ -225,17 +324,25 @@ export default function NavbarMobile() {
                 transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 style={{ borderRadius: 16 }}
               >
-                <Link to="/signup"
+                <Link
+                  to="/signup"
                   className="relative block text-center py-3.5 rounded-2xl text-[0.95rem] font-semibold no-underline font-blinker overflow-hidden"
                   style={{
                     color: "white",
-                    background: "linear-gradient(135deg, #9067c6 0%, #7a4fb0 100%)",
+                    background:
+                      "linear-gradient(135deg, #9067c6 0%, #7a4fb0 100%)",
                     border: "1px solid rgba(144,103,198,0.38)",
-                    boxShadow: "0 4px 18px rgba(144,103,198,0.38), 0 1px 0 rgba(255,255,255,0.1) inset",
+                    boxShadow:
+                      "0 4px 18px rgba(144,103,198,0.38), 0 1px 0 rgba(255,255,255,0.1) inset",
                   }}
                 >
-                  <span className="absolute top-0 left-[10%] right-[10%] h-[45%] rounded-b-full pointer-events-none"
-                    style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 100%)" }} />
+                  <span
+                    className="absolute top-0 left-[10%] right-[10%] h-[45%] rounded-b-full pointer-events-none"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 100%)",
+                    }}
+                  />
                   <span className="relative z-10">Get Started →</span>
                 </Link>
               </motion.div>

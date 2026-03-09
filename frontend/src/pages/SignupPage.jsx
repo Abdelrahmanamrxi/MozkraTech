@@ -8,7 +8,6 @@ import { ArrowLeftIcon } from "lucide-react";
 function SignupPage() {
   return (
     <div className="flex flex-col main-background relative">
-
       {/* Back link - absolute so it doesn't shift content */}
       <Link
         to=".."
@@ -22,8 +21,7 @@ function SignupPage() {
       <div className="min-h-screen  flex lg:flex-row flex-col items-center justify-between lg:px-14 px-6 py-20 text-white ">
         {/* LEFT TEXT */}
         <div className="lg:w-1/2 space-y-6 text-center lg:text-left">
-
-        <Logo />
+          <Logo />
 
           <motion.h1
             className="text-5xl flex flex-col  gap-3 lg:flex-col text-white lg:text-6xl font-sans font-bold"
@@ -101,7 +99,11 @@ function SignupPage() {
           {/* Inputs */}
 
           <div className="space-y-4">
-            <input type="text" placeholder="Full Name" className="form-input " />
+            <input
+              type="text"
+              placeholder="Full Name"
+              className="form-input "
+            />
 
             <input type="email" placeholder="Email" className="form-input" />
 
@@ -120,9 +122,9 @@ function SignupPage() {
 
           <div className="text-center text-sm text-secondary mt-5">
             <p>
-              Already Have an Account? 
-              <Link className="text-primary ml-2 hover:underline" href="">
-                 Login here
+              Already Have an Account?
+              <Link className="text-primary ml-2 hover:underline" to="/login">
+                Login here
               </Link>
             </p>
           </div>
@@ -131,13 +133,16 @@ function SignupPage() {
             className="create-account-button mx-auto block"
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.44 }}
+            transition={{
+              duration: 0.7,
+              ease: [0.22, 1, 0.36, 1],
+              delay: 0.44,
+            }}
             whileTap={{ scale: 0.96 }}
           >
             Create Account →
           </motion.button>
         </motion.div>
-
       </div>
       <Footer />
     </div>

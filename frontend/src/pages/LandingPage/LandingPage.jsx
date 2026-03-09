@@ -16,7 +16,7 @@ import TransformSection from "./sections/TransformSection.jsx";
 function LandingPage() {
   const featureRef = useRef(null);
   return (
-    <Body>
+    <Body navbarVariant="landing">
       <div className="main-background pb-0 flex flex-col ">
         {/* ══════════ HERO ══════════ */}
         <Hero />

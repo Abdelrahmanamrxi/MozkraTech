@@ -4,9 +4,9 @@ import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../logo/Logo";
 import { useState, useEffect } from "react";
 
-function Navbar() {
+function Navbar({ variant = "landing" }) {
   const links = [
-    { name: "Home", to: "/" },
+    { name: "Home", to: "/home" },
     { name: "Dashboard", to: "/dashboard" },
     { name: "Schedule", to: "/dashboard/schedule" },
     { name: "Friends", to: "/dashboard/friends" },
@@ -46,9 +46,10 @@ function Navbar() {
       }}
       className={`hidden lg:flex flex-row w-full justify-between items-center
         transition-colors duration-500
-        ${scrolled
-          ? "bg-primary-dark/60 border border-white/10 shadow-2xl shadow-black/40 backdrop-blur-2xl"
-          : "bg-transparent"
+        ${
+          scrolled
+            ? "bg-primary-dark/60 border border-white/10 shadow-2xl shadow-black/40 backdrop-blur-2xl"
+            : "bg-transparent"
         }`}
     >
       {/* Logo */}
@@ -123,35 +124,93 @@ function Navbar() {
       </nav>
 
       {/* CTA Buttons */}
-      <div className="flex items-center gap-1.5 xl:gap-2 text-white font-semibold font-blinker md:text-sm lg:text-base xl:text-lg shrink-0">
-        <Link to="/login">
-          <motion.button
-            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.12)" }}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="md:px-3 lg:px-4 xl:px-6 py-1.5 border border-white/25 rounded-full cursor-pointer
+      {variant === "landing" && (
+        <div className="flex items-center gap-1.5 xl:gap-2 text-white font-semibold font-blinker md:text-sm lg:text-base xl:text-lg shrink-0">
+          <Link to="/login">
+            <motion.button
+              whileHover={{
+                scale: 1.05,
+                backgroundColor: "rgba(255,255,255,0.12)",
+              }}
+              whileTap={{ scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="md:px-3 lg:px-4 xl:px-6 py-1.5 border border-white/25 rounded-full cursor-pointer
               bg-white/6 backdrop-blur-md text-white
               hover:border-white/40 transition-colors duration-300"
-          >
-            Sign In
-          </motion.button>
-        </Link>
+            >
+              Sign In
+            </motion.button>
+          </Link>
 
-        <Link to="/signup">
-          <motion.button
-            whileHover={{ scale: 1.05, boxShadow: "0 4px 22px rgba(144,103,198,0.6)" }}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="relative py-1.5 md:px-3 lg:px-4 xl:px-5 cursor-pointer bg-primary rounded-full
+          <Link to="/signup">
+            <motion.button
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 4px 22px rgba(144,103,198,0.6)",
+              }}
+              whileTap={{ scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="relative py-1.5 md:px-3 lg:px-4 xl:px-5 cursor-pointer bg-primary rounded-full
               overflow-hidden border border-primary-light/30
               shadow-[0_2px_14px_rgba(144,103,198,0.4)]"
+            >
+              <span
+                className="absolute top-0 left-[10%] right-[10%] h-[45%] rounded-b-full
+              bg-gradient-to-b from-white/20 to-transparent pointer-events-none"
+              />
+              <span className="relative z-10">Get Started</span>
+            </motion.button>
+          </Link>
+        </div>
+      )}
+
+      {variant === "dashboard" && (
+        <div className="flex items-center gap-4">
+          {/* Notification */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-10 h-10 flex items-center justify-center rounded-full
+            bg-white/10 border border-white/20 backdrop-blur-md"
           >
-            <span className="absolute top-0 left-[10%] right-[10%] h-[45%] rounded-b-full
-              bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
-            <span className="relative z-10">Get Started</span>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12.0201 2.91C8.71009 2.91 6.02009 5.6 6.02009 8.91V11.8C6.02009 12.41 5.76009 13.34 5.45009 13.86L4.30009 15.77C3.59009 16.95 4.08009 18.26 5.38009 18.7C9.69009 20.14 14.3401 20.14 18.6501 18.7C19.8601 18.3 20.3901 16.87 19.7301 15.77L18.5801 13.86C18.2801 13.34 18.0201 12.41 18.0201 11.8V8.91C18.0201 5.61 15.3201 2.91 12.0201 2.91Z"
+                stroke="white"
+                stroke-width="1.5"
+                stroke-miterlimit="10"
+                stroke-linecap="round"
+              />
+              <path
+                d="M13.8699 3.2C13.5599 3.11 13.2399 3.04 12.9099 3C11.9499 2.88 11.0299 2.95 10.1699 3.2C10.4599 2.46 11.1799 1.94 12.0199 1.94C12.8599 1.94 13.5799 2.46 13.8699 3.2Z"
+                stroke="white"
+                stroke-width="1.5"
+                stroke-miterlimit="10"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M15.02 19.06C15.02 20.71 13.67 22.06 12.02 22.06C11.2 22.06 10.44 21.72 9.90002 21.18C9.36002 20.64 9.02002 19.88 9.02002 19.06"
+                stroke="white"
+                stroke-width="1.5"
+                stroke-miterlimit="10"
+              />
+            </svg>
           </motion.button>
-        </Link>
-      </div>
+
+          {/* Profile */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="w-10 h-10 rounded-full bg-gray-300 cursor-pointer"
+          />
+        </div>
+      )}
     </motion.div>
   );
 }
