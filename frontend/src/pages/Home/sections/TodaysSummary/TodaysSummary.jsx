@@ -13,7 +13,7 @@ export default function TodaysSummary({mockUserData}) {
   return (
     <section className="mt-15">
 
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-20">
+    <div className="grid font-blinker grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-20">
 
       <TopCard variant="purple" delay={0} icon={<FireIcon />} value={streak} sub="Days" label="Current Streak" />
 
