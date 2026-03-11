@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import useTypewriter from '../../../hooks/useTypewriter'
+import useTypewriter from '../../../hooks/useTypewriter.jsx'
 import { motion } from 'framer-motion'
 const TransformSection = () => {
   const { displayed, done } = useTypewriter('Ready To Transform Your Study Routine?', 70, 700)

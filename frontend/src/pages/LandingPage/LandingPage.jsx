@@ -1,16 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
 import Body from "../../comp/layout/Body";
-
-import { cards_data } from "../../data/data.jsx";
 import { motion } from "framer-motion";
 import { useRef } from "react";
-import { useInView } from "framer-motion";
 import Hero from "./sections/Hero";
 import Features from "./sections/Features";
-import { ai_cards } from "../../data/data.jsx";
 import AISection from "./sections/AISection.jsx";
-import useTypewriter from "../../hooks/useTypewriter.js";
 import TransformSection from "./sections/TransformSection.jsx";
 
 function LandingPage() {

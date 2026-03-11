@@ -2,6 +2,7 @@ import React from "react";
 import FormContainer from "../comp/containers/FormContainer";
 import { Link } from "react-router";
 import Logo from "../comp/logo/Logo";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Footer from "../comp/layout/Footer/Footer";
 import { ArrowLeftIcon } from "lucide-react";

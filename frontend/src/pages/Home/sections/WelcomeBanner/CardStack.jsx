@@ -8,7 +8,7 @@ const Gloss = () => (
     style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%)" }} />
 );
 
-const CardStack = ({ scale = 1, className = "" }) => {
+const CardStack = ({ scale = 1, className = "" ,mockUserData}) => {
 
 const glassBase = () => ({
   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12)",
@@ -47,28 +47,27 @@ const cardAnim = (delay = 0) => ({
             </span>
           </div>
           <div className="text-center py-2">
-            <p className="text-white text-xl font-semibold" style={{ fontFamily: "Blinker, sans-serif" }}>
-              {/* mockUserData passed via closure in parent — keep as-is */}
-              {/* {mockUserData.streak} days */}
-              13 days
+            <p className="text-white text-xl  font-semibold" style={{ fontFamily: "Blinker, sans-serif" }}>
+             
+            {mockUserData.streak} Days
             </p>
-            <p className="text-white/80 text-base mt-1" style={{ fontFamily: "Blinker, sans-serif" }}>Keep it going! 🔥</p>
+            <p className="text-white/80 text-base mb-3 " style={{ fontFamily: "Blinker, sans-serif" }}>Keep it going! 🔥</p>
           </div>
         </motion.div>
 
         {/* Card 2 — Next Up */}
         <motion.div
           {...cardAnim(0.14)}
-          className="absolute top-39 right-0 z-20 w-48 overflow-hidden rounded-3xl border border-white/10 p-5"
+          className="absolute top-34 right-0 z-20 w-48 overflow-hidden rounded-3xl border border-white/10 p-5"
           style={{ background: "rgba(141, 134, 201, 0.82)", ...glassBase() }}
         >
           <Gloss />
           <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1"
             style={{ fontFamily: "Blinker, sans-serif" }}>Next Up</p>
           <p className="text-white text-lg font-bold leading-tight" style={{ fontFamily: "Blinker, sans-serif" }}>
-            Data Algorithms
+            {mockUserData.upcomingSubject.subject} 
           </p>
-          <p className="text-white/60 text-sm mt-1" style={{ fontFamily: "Blinker, sans-serif" }}>In 45 minutes</p>
+          <p className="text-white/60 text-sm mt-1" style={{ fontFamily: "Blinker, sans-serif" }}>In {mockUserData.upcomingSubject.time} minutes</p>
         </motion.div>
 
         {/* Card 3 — Study Time */}
@@ -80,7 +79,7 @@ const cardAnim = (delay = 0) => ({
           <Gloss />
           <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1"
             style={{ fontFamily: "Blinker, sans-serif" }}>Study Time Today</p>
-          <p className="text-white text-3xl font-bold" style={{ fontFamily: "Blinker, sans-serif" }}>6 Hrs</p>
+          <p className="text-white text-3xl font-bold" style={{ fontFamily: "Blinker, sans-serif" }}>{mockUserData.studyTimeToday} hrs</p>
           <div className="mt-3 w-full h-2 rounded-full bg-white/10 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}

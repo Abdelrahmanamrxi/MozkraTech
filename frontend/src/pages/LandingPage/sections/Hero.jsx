@@ -1,8 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
 import { motion } from "framer-motion";
 import Image from "../../../assets/image1.jpeg";
-import useTypewriter from "../../../hooks/useTypewriter";
+import useTypewriter from "../../../hooks/useTypewriter.jsx";
 import { Link } from "react-router";
 function Hero() {
   const { displayed, done } = useTypewriter("potential", 45, 700);

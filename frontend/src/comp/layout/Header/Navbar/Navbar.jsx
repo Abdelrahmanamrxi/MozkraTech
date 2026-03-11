@@ -78,7 +78,7 @@ function Navbar({ variant = "landing" }) {
                 {(isHovered || isActive) && (
                   <motion.div
                     layoutId="nav-bg-pill"
-                    className="absolute inset-0 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md"
+                    className="absolute inset-0 rounded-full bg-white/10 border border-white/15 backdrop-blur-md"
                     initial={{ opacity: 0, scale: 0.88 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.88 }}
