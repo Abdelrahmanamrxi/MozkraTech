@@ -17,6 +17,7 @@ const mockUserData={
         doneTasks:14,
         totalTasks:20
     },
+    aiRecommendation:"Based on your schedule and energy levels, I recommend studying Algorithms for 45 minutes. You're most productive at this time!"
    
     
 

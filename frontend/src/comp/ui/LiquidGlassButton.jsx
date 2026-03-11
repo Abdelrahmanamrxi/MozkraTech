@@ -24,7 +24,7 @@ const sizeClasses = {
         relative inline-flex items-center rounded-full cursor-pointer overflow-hidden
         font-[Blinker] font-semibold tracking-wide
         border border-white/20
-        bg-[rgba(144,103,198,0.45)]
+        bg-[rgba(126,85,179,0.9)]
         backdrop-blur-xl
         shadow-[inset_0_1.5px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.15),0_8px_32px_rgba(144,103,198,0.4),0_2px_8px_rgba(0,0,0,0.2)]
         

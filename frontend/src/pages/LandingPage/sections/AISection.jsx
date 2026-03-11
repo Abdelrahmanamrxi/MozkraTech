@@ -2,6 +2,7 @@
 import React from 'react'
 import { ai_cards } from '../../../data/data'
 import { motion } from 'framer-motion'
+import GlassySection from '../../../comp/ui/GlassySection'
 const AISection = () => {
 
 const fadeUp = (delay = 0) => ({
@@ -134,16 +135,7 @@ const glassTap = { scale: 0.98 }
         {/* AI cards list */}
         <div className="flex flex-col mt-5 gap-5">
           {ai_cards.map((card, index) => (
-            <motion.div
-              key={index}
-              className="flex glassy-primary-background items-center gap-2 rounded-[30px] p-5 flex-row border border-white/15 ring-1 ring-white/10 cursor-default"
-              variants={fadeLeft(0.18 + index * 0.1)}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.2 }}
-              whileHover={glassHover}
-              whileTap={glassTap}
-            >
+           <GlassySection index={index}>
               {/* Icon subtle pulse on hover */}
               <motion.div
                 className="mr-3 flex items-center justify-center shrink-0 min-h-[48px] min-w-[48px]"
@@ -152,12 +144,11 @@ const glassTap = { scale: 0.98 }
               >
                 {card.icon}
               </motion.div>
-
               <div className="flex flex-col">
                 <p className="font-semibold text-lg">{card.header}</p>
                 <p className="font-blinker text-base">{card.paragraph}</p>
               </div>
-            </motion.div>
+            </GlassySection>
           ))}
         </div>
 
