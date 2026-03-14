@@ -1,7 +1,7 @@
 import React from 'react'
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion'
-function GlassySection({children,index}) {
+function GlassySection({children,index,classname}) {
 const fadeLeft = (delay = 0) => ({
   hidden: { opacity: 0, x: 28 },
   show:   { opacity: 1, x: 0,  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay } },
@@ -19,7 +19,7 @@ const glassTap = { scale: 0.98 }
     
                 <motion.div
                  key={index}
-                 className="flex glassy-primary-background items-center gap-2 rounded-[30px] p-5 flex-row border border-white/15 ring-1 ring-white/10 cursor-default"
+                 className={`${classname} flex glassy-primary-background items-center gap-2 rounded-[30px] p-5 flex-row border border-white/15 ring-1 ring-white/10 cursor-default`}
                  variants={fadeLeft(0.18 + index * 0.1)}
                  initial="hidden"
                  whileInView="show"

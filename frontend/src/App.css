@@ -105,3 +105,21 @@
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
+.glassy-easy-background {
+  @apply bg-green-700 backdrop-blur-2xl border border-white/15 ring-1 ring-white/10;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.glassy-hard-background {
+  @apply bg-red-800 backdrop-blur-2xl border border-white/15 ring-1 ring-white/10;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.glassy-medium-background {
+  @apply bg-yellow-700 backdrop-blur-2xl border border-white/15 ring-1 ring-white/10;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
