@@ -16,6 +16,7 @@ function Home() {
         <WelcomeBanner mockUserData={mockUserData} />
         <TodaysSummary mockUserData={mockUserData} />
         <LearningOverview mockUserData={mockUserData} />
+        
 
       </div>
     </Body>
