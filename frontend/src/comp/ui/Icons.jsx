@@ -83,4 +83,42 @@ export const StartIcon=()=>(
 </svg>
 
 )
+export const AIIcon=()=>(
+  <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M33.25 28V24.5C33.25 19.5503 33.25 17.0754 31.7123 15.5377C30.1745 14 27.6997 14 22.75 14H19.25C14.3002 14 11.8254 14 10.2877 15.5377C8.75 17.0754 8.75 19.5503 8.75 24.5V28C8.75 32.9497 8.75 35.4245 10.2877 36.9623C11.8254 38.5 14.3002 38.5 19.25 38.5H22.75C27.6997 38.5 30.1745 38.5 31.7123 36.9623C33.25 35.4245 33.25 32.9497 33.25 28Z" stroke="white" stroke-width="3.125" stroke-linejoin="round"/>
+<path d="M33.25 31.5C35.7248 31.5 36.9623 31.5 37.7312 30.7312C38.5 29.9623 38.5 28.7248 38.5 26.25C38.5 23.7752 38.5 22.5377 37.7312 21.7688C36.9623 21 35.7248 21 33.25 21" stroke="white" stroke-width="3.125" stroke-linejoin="round"/>
+<path d="M8.75 31.5C6.27513 31.5 5.03769 31.5 4.26885 30.7312C3.5 29.9623 3.5 28.7248 3.5 26.25C3.5 23.7752 3.5 22.5377 4.26885 21.7688C5.03769 21 6.27513 21 8.75 21" stroke="white" stroke-width="3.125" stroke-linejoin="round"/>
+<path d="M23.625 6.125C23.625 7.57475 22.4497 8.75 21 8.75C19.5503 8.75 18.375 7.57475 18.375 6.125C18.375 4.67525 19.5503 3.5 21 3.5C22.4497 3.5 23.625 4.67525 23.625 6.125Z" stroke="white" stroke-width="3.125"/>
+<path d="M21 8.75V14" stroke="white" stroke-width="3.125" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M15.75 22.75V24.5" stroke="white" stroke-width="3.125" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M26.25 22.75V24.5" stroke="white" stroke-width="3.125" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.5 30.625C17.5 30.625 18.6667 31.5 21 31.5C23.3333 31.5 24.5 30.625 24.5 30.625" stroke="white" stroke-width="3.125" stroke-linecap="round"/>
+</svg>
+
+)
+
+export const RobotIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <rect x="3" y="8" width="18" height="13" rx="2" />
+    <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+    <circle cx="9" cy="14" r="1.5" fill="currentColor" />
+    <circle cx="15" cy="14" r="1.5" fill="currentColor" />
+    <path d="M9 18h6" />
+    <path d="M12 3v2" />
+  </svg>
+);
+
+export const SendIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+  </svg>
+);
+
+export const AttachIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+  </svg>
+);
+
+
 
