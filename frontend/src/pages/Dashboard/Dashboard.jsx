@@ -2,7 +2,7 @@
 import React from "react";
 import Body from "../../comp/layout/Body";
 import WelcomeBanner from "./sections/WelcomeBanner/WelcomeBanner";
-import mockUserData from './Home.constant'
+import mockUserData from './Dashboard.constant'
 import { motion } from "framer-motion";
 import TodaysSummary from "./sections/TodaysSummary/TodaysSummary";
 import LearningOverview from "./sections/LearningOverview/LearningOverview";

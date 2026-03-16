@@ -1,6 +1,6 @@
 export const NAV_LINKS = [
-  { label: "Home", icon: "Home", href: "/home" },
-  { label: "Dashboard", icon: "LayoutDashboard", href: "/dashboard" },
+  { label: "Dashboard", icon: "Home", href: "/home" },
+  { label: "Progress", icon: "ChartNoAxesCombined", href: "/dashboard/progress" },
   { label: "Schedule", icon: "Calendar", href: "/dashboard/schedule" },
   { label: "Friends", icon: "Users", href: "/dashboard/friends" },
 ];

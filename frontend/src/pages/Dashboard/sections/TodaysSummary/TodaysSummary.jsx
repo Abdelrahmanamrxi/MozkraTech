@@ -1,11 +1,11 @@
 
-import { AchievementIcon, CompletedIcon, FireIcon } from "../../../../comp/ui/Icons";
-import { NoteIcon, TimerIcon } from "../../../../comp/ui/Icons";
-import TopCard, { Card, T } from "../../../../comp/ui/TopCard";
-import useCountUp from "../../../../hooks/useCountUp";
-import Dots from "../../../../comp/ui/Dots";
-import Donut from "../../../../comp/ui/Donut";
-import ProgressBar from "../../../../comp/ui/ProgressBar";
+import { AchievementIcon, CompletedIcon, FireIcon } from "@/comp/ui/Icons";
+import { NoteIcon, TimerIcon } from "@/comp/ui/Icons";
+import TopCard, { Card, T } from "@/comp/ui/TopCard";
+import useCountUp from "@/hooks/useCountUp";
+import Dots from "@/comp/ui/Dots";
+import Donut from "@/comp/ui/Donut";
+import ProgressBar from "@/comp/ui/ProgressBar";
 
 export default function TodaysSummary({ mockUserData }) {
   const [streak, goals, achievements, hours] = [useCountUp(mockUserData.streak, 365), useCountUp(mockUserData.goals, 400), useCountUp(mockUserData.achievements, 500), useCountUp(mockUserData.hours.hoursThisWeek, 0)];

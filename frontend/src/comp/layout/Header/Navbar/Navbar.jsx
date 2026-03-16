@@ -6,8 +6,8 @@ import { useState, useEffect } from "react";
 
 function Navbar({ variant = "landing" }) {
   const links = [
-    { name: "Home", to: "/home" },
     { name: "Dashboard", to: "/dashboard" },
+    { name: "Progress", to: "/dashboard/progress" },
     { name: "Schedule", to: "/dashboard/schedule" },
     { name: "Friends", to: "/dashboard/friends" },
   ];

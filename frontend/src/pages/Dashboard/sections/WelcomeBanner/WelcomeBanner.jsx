@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import LiquidGlassButton from '../../../../comp/ui/LiquidGlassButton';
+import LiquidGlassButton from '@/comp/ui/LiquidGlassButton.jsx';
 import { motion } from 'framer-motion';
-import { CalenderIcon, WeeklyReportIcon, StreakIcon } from '../../../../comp/ui/Icons';
+import { CalenderIcon, WeeklyReportIcon, StreakIcon } from '@/comp/ui/Icons.jsx';
 import { Link } from 'react-router';
-import useTypewriter from '../../../../hooks/useTypewriter.jsx';
-import CardStack from './CardStack';
+import useTypewriter from '@/hooks/useTypewriter.jsx';
+import CardStack from './CardStack.jsx';
 
 
 function WelcomeBanner({ mockUserData }) {

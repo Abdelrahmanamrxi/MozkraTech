@@ -1,7 +1,7 @@
 // Single CardStack used for both mobile (scaled down) and desktop (full size)
 // eslint-disable-next-line no-unused-vars
 import {motion} from 'framer-motion'
-import { StreakIcon } from '../../../../comp/ui/Icons';
+import { StreakIcon } from '@/comp/ui/Icons';
 
 const Gloss = () => (
   <span aria-hidden className="absolute top-0 left-[8%] w-[84%] h-[35%] rounded-full pointer-events-none"

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import GlassySection from "@/comp/ui/GlassySection";
 import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
 import { StartIcon, CalenderIcon } from "@/comp/ui/Icons";

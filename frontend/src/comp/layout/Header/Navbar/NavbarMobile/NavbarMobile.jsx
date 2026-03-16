@@ -5,7 +5,7 @@ import {
   Menu,
   X,
   Home,
-  LayoutDashboard,
+  ChartNoAxesCombined, 
   Calendar,
   Users,
   ChevronRight,
@@ -20,7 +20,7 @@ import {
   DEMO_UNREAD_COUNT,
 } from "./NavbarMobile.constants";
 
-const iconMap = { Home, LayoutDashboard, Calendar, Users };
+const iconMap = { Home, ChartNoAxesCombined, Calendar, Users };
 
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
