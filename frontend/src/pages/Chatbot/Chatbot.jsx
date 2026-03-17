@@ -293,7 +293,7 @@ export default function Chatbot() {
               className="w-full h-full sm:max-w-7xl flex flex-col bg-[#3D3555] border border-[#9B7EDE33] rounded-none sm:rounded-3xl overflow-hidden shadow-2xl"
             >
               {/* Header with close button */}
-              <div className="flex items-center justify-between px-4 sm:px-8 py-3 sm:py-5 border-b border-violet-900/20 bg-[#3D3555]">
+              <div className="flex items-center justify-between px-4 sm:px-8 py-3 sm:py-5  bg-[#3D3555]">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                   <div
                     style={{
@@ -332,7 +332,7 @@ export default function Chatbot() {
                 {/* Chat section */}
                 <motion.div
                   layout
-                  className={`flex flex-col overflow-hidden ${uploadedFile && filePreview && showDocPreview ? 'w-full sm:w-1/2 border-b sm:border-b-0 sm:border-r border-violet-900/20' : 'w-full'}`}
+                  className={`flex flex-col overflow-hidden ${uploadedFile && filePreview && showDocPreview ? 'w-full sm:w-1/2 border-b sm:border-b-0  border-violet-900/20' : 'w-full'}`}
                 >
                   {/* Messages */}
                   <div
@@ -414,9 +414,9 @@ export default function Chatbot() {
                       }}
                       exit={{ opacity: 0, width: 0 }}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      className="hidden sm:flex sm:w-1/2 flex-col overflow-hidden bg-[#2d2447]"
+                      className="hidden sm:flex sm:w-1/2 flex-col overflow-hidden "
                     >
-                      <div className="flex font-Inter items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-violet-900/20 bg-[#2d2447]">
+                      <div className="flex font-Inter items-center justify-between px-4 sm:px-6 py-3 sm:py-4  ">
                         <h3 className="text-sm font-semibold text-white truncate">Document Preview</h3>
                         <motion.button
                           whileHover={{ scale: 1.1 }}

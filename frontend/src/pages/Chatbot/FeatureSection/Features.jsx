@@ -38,11 +38,14 @@ function Features() {
        initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25 + i * 0.07 }}
-                  className="flex-1 bg-[#231d33] border border-violet-900/20 rounded-2xl p-4 flex flex-col gap-2"
+                  style={{
+                    background: '#9B7EDE1A',
+                  }}
+                  className="flex-1 border-t border-[#9B7EDE4D] opacity-80 rounded-2xl p-4 flex flex-col gap-2"
                 >
                   <div className="text-violet-400">{f.icon}</div>
-                  <p className="text-sm font-semibold text-white">{f.title}</p>
-                  <p className="text-xs text-violet-400/70 leading-relaxed">{f.desc}</p>
+                  <p className="text-sm font-Inter font-semibold text-white">{f.title}</p>
+                  <p className="text-xs text-[#B8A7E5] leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
                   </>
