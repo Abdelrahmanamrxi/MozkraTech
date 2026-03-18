@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import Home from "./pages/Dashboard/Dashboard.jsx";
 import Chatbot from "./pages/Chatbot/Chatbot";
 import "./App.css";
+import Schedule from "./pages/Schedule/Schedule.jsx";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<Home />} />
         <Route path="/dashboard/ai" element={<Chatbot/>}/>
+        <Route path="/dashboard/schedule" element={<Schedule/>}/>
       </Routes>
     </BrowserRouter>
   );

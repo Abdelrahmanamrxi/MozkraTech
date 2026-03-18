@@ -3,10 +3,10 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SendIcon, AttachIcon, RobotIcon } from "../../comp/ui/Icons";
 import Body from "../../comp/layout/Body";
-import Message from "./Message/Message";
-import Features from "./FeatureSection/Features";
-import TypingIndicator from "./TypingIndicator/TypingIndicator";
-import Suggestions from "./Suggestions/Suggestions";
+import Message from "./sections/Message";
+import Features from "./sections/Features";
+import TypingIndicator from "./sections/TypingIndicator";
+import Suggestions from "./sections/Suggestions";
 
 function getTime() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

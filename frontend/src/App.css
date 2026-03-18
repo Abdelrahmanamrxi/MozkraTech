@@ -131,3 +131,45 @@
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
+ /* Label */
+.label {
+  @apply text-xs font-medium text-[#B8A7E5] mb-2 block;
+}
+
+/* Remove number arrows */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Better time input */
+input[type="time"] {
+  color-scheme: dark;
+}
+
+/* Style time text */
+input[type="time"]::-webkit-datetime-edit-hour-field,
+input[type="time"]::-webkit-datetime-edit-minute-field {
+  color: white;
+  font-weight: 500;
+}
+
+input[type="time"]::-webkit-datetime-edit-text {
+  color: #B8A7E5;
+}
+
+/* Style icon */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.2);
+  cursor: pointer;
+}
+
+/* Select dropdown fix */
+select {
+  color-scheme: dark;
+}
