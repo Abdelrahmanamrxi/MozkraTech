@@ -53,7 +53,7 @@ const Schedule = () => {
       <section className="min-h-screen p-7 lg:p-14 pt-12 lg:pt-20 ">
          <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
           <div className="flex flex-col font-Inter gap-2">
-            <p className="text-3xl font-semibold text-white font-bold">My Schedule</p>
+            <p className="text-3xl font-semibold text-white ">My Schedule</p>
             <p className="text-xs text-[#B8A7E5]">Plan and manage your study sessions</p>
           </div>
           <div className="flex flex-row gap-3 mt-4 text-white relative">

@@ -6,6 +6,7 @@ import Home from "./pages/Dashboard/Dashboard.jsx";
 import Chatbot from "./pages/Chatbot/Chatbot";
 import "./App.css";
 import Schedule from "./pages/Schedule/Schedule.jsx";
+import Friends from "./pages/Friends/Friends.jsx";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/dashboard" element={<Home />} />
         <Route path="/dashboard/ai" element={<Chatbot/>}/>
         <Route path="/dashboard/schedule" element={<Schedule/>}/>
+        <Route path="/dashboard/friends" element={<Friends/>}/>
       </Routes>
     </BrowserRouter>
   );

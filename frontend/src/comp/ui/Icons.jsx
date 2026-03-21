@@ -147,5 +147,30 @@ export const TipBackgroundIcon=()=>(
 </svg>
 
 )
+export const AnalyticsIcon=()=>(
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2.5 2.5V15.8333C2.5 16.2754 2.67559 16.6993 2.98816 17.0118C3.30072 17.3244 3.72464 17.5 4.16667 17.5H17.5" stroke="white" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M15 14.1667V7.5" stroke="white" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.834 14.1667V4.16667" stroke="white" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M6.66602 14.1667V11.6667" stroke="white" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
 
+)
+export const TrophyIcon=()=>(
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.99935 12H5.99935C5.11529 12 4.26745 11.6488 3.64233 11.0237C3.01721 10.3986 2.66602 9.55072 2.66602 8.66667C2.66602 7.78261 3.01721 6.93476 3.64233 6.30964C4.26745 5.68452 5.11529 5.33333 5.99935 5.33333H7.99935" stroke="white" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 12H26C26.8841 12 27.7319 11.6488 28.357 11.0237C28.9821 10.3986 29.3333 9.55072 29.3333 8.66667C29.3333 7.78261 28.9821 6.93476 28.357 6.30964C27.7319 5.68452 26.8841 5.33333 26 5.33333H24" stroke="white" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5.33398 29.3333H26.6673" stroke="white" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.334 19.5467V22.6667C13.334 23.4 12.7073 23.9733 12.0407 24.28C10.4673 25 9.33398 26.9867 9.33398 29.3333" stroke="white" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18.666 19.5467V22.6667C18.666 23.4 19.2927 23.9733 19.9593 24.28C21.5327 25 22.666 26.9867 22.666 29.3333" stroke="white" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 2.66667H8V12C8 14.1217 8.84286 16.1566 10.3431 17.6569C11.8434 19.1571 13.8783 20 16 20C18.1217 20 20.1566 19.1571 21.6569 17.6569C23.1571 16.1566 24 14.1217 24 12V2.66667Z" stroke="white" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+)
+export const YellowFireIcon=()=>(
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M5.66732 9.66667C6.10935 9.66667 6.53327 9.49107 6.84583 9.17851C7.15839 8.86595 7.33398 8.44203 7.33398 8C7.33398 7.08 7.00065 6.66667 6.66732 6C5.95265 4.57133 6.51798 3.29733 8.00065 2C8.33398 3.66667 9.33398 5.26667 10.6673 6.33333C12.0007 7.4 12.6673 8.66667 12.6673 10C12.6673 10.6128 12.5466 11.2197 12.3121 11.7859C12.0776 12.352 11.7338 12.8665 11.3005 13.2998C10.8671 13.7332 10.3527 14.0769 9.78651 14.3114C9.22032 14.546 8.61349 14.6667 8.00065 14.6667C7.38782 14.6667 6.78098 14.546 6.21479 14.3114C5.64861 14.0769 5.13416 13.7332 4.70082 13.2998C4.26748 12.8665 3.92374 12.352 3.68921 11.7859C3.45469 11.2197 3.33398 10.6128 3.33398 10C3.33398 9.23133 3.62265 8.47067 4.00065 8C4.00065 8.44203 4.17625 8.86595 4.48881 9.17851C4.80137 9.49107 5.22529 9.66667 5.66732 9.66667Z" stroke="#FF6900" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+)
 
