@@ -2,8 +2,8 @@ import React from 'react'
 
 const FriendsMessages = () => {
   return (
-    <div>
-      <h1>Message Section</h1>
+    <div className='mt-2 font-Inter'>
+      <h1 className='text-white'>Message Section</h1>
     </div>
   )
 }
