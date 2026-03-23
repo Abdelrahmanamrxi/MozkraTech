@@ -7,6 +7,7 @@ import Chatbot from "./pages/Chatbot/Chatbot";
 import "./App.css";
 import Schedule from "./pages/Schedule/Schedule.jsx";
 import Friends from "./pages/Friends/Friends.jsx";
+import Timer from "./pages/Timer/Timer.jsx";
 
 function App() {
   return (
@@ -16,9 +17,10 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<Home />} />
-        <Route path="/dashboard/ai" element={<Chatbot/>}/>
-        <Route path="/dashboard/schedule" element={<Schedule/>}/>
-        <Route path="/dashboard/friends" element={<Friends/>}/>
+        <Route path="/dashboard/ai" element={<Chatbot />} />
+        <Route path="/dashboard/schedule" element={<Schedule />} />
+        <Route path="/dashboard/friends" element={<Friends />} />
+        <Route path="/dashboard/timer" element={<Timer />} />
       </Routes>
     </BrowserRouter>
   );
