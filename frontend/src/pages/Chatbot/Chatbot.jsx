@@ -7,7 +7,7 @@ import Message from "./sections/Message";
 import Features from "./sections/Features";
 import TypingIndicator from "./sections/TypingIndicator";
 import Suggestions from "./sections/Suggestions";
-
+import { useNavigate } from "react-router";
 function getTime() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
@@ -96,10 +96,19 @@ export default function Chatbot() {
       }
     });
   }, [messages, isTyping]);
+  const navigate=useNavigate()
 
   return (
-    <Body>
+    <div className="min-h-screen relative main-background p-3">
+           <button
+        onClick={() => navigate(-1)}
+        className="lg:absolute lg:top-6 lg:left-6 flex w-fit mb-6 m-3 lg:mb-0 bg-[#52466B] text-white px-4 py-2 rounded-xl hover:scale-105 transition cursor-pointer"
+      >
+        ← Back
+      </button>
         <div className={`${!isExpanded ?'pb-10 px-3':''}`}>
+       
+
 
       {/* Background blur overlay */}
       <AnimatePresence>
@@ -469,6 +478,6 @@ export default function Chatbot() {
       </AnimatePresence>
 
                   </div>
-    </Body>
+    </div>
   );
 }

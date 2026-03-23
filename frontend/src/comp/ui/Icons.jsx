@@ -201,3 +201,55 @@ export const EmptyStarIcon=()=>(
 </svg>
 
 )
+
+export const PhoneIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+    <path d="M18.3334 14.1V16.6C18.3343 16.8321 18.2868 17.0618 18.1938 17.2745C18.1008 17.4871 17.9645 17.678 17.7934 17.8349C17.6224 17.9918 17.4205 18.1112 17.2007 18.1856C16.9808 18.2599 16.7479 18.2876 16.5167 18.2667C13.9524 17.988 11.4892 17.1118 9.32505 15.7083C7.31157 14.4289 5.60449 12.7218 4.32505 10.7083C2.91669 8.53434 2.04025 6.05917 1.76671 3.48334C1.74589 3.25289 1.77328 3.02064 1.84713 2.80136C1.92098 2.58208 2.03969 2.38058 2.19568 2.20969C2.35168 2.0388 2.54155 1.90226 2.75321 1.80877C2.96486 1.71528 3.19366 1.66689 3.42505 1.66667H5.92505C6.32947 1.66269 6.72154 1.8059 7.02818 2.06962C7.33482 2.33333 7.53511 2.69954 7.59171 3.1C7.69723 3.90006 7.89292 4.68561 8.17505 5.44167C8.28717 5.73994 8.31143 6.0641 8.24497 6.37574C8.17851 6.68738 8.0241 6.97343 7.80005 7.2L6.74171 8.25834C7.92801 10.3446 9.65542 12.072 11.7417 13.2583L12.8 12.2C13.0266 11.976 13.3127 11.8215 13.6243 11.7551C13.9359 11.6886 14.2601 11.7129 14.5584 11.825C15.3144 12.1071 16.1 12.3028 16.9 12.4083C17.3049 12.4654 17.6745 12.6693 17.9388 12.9812C18.2031 13.2932 18.3435 13.6913 18.3334 14.1Z" stroke="#B8A7E5" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const VideoIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+    <path d="M13.3333 10.8333L17.6858 13.735C17.8133 13.8214 18 13.7285 18 13.575V6.425C18 6.2715 17.8133 6.1786 17.6858 6.265L13.3333 9.16667" stroke="#B8A7E5" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M11.6667 5H3.33333C2.41286 5 1.66667 5.74619 1.66667 6.66667V13.3333C1.66667 14.2538 2.41286 15 3.33333 15H11.6667C12.5871 15 13.3333 14.2538 13.3333 13.3333V6.66667C13.3333 5.74619 12.5871 5 11.6667 5Z" stroke="#B8A7E5" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const DotsIcon = () => (
+  <svg width="4" height="16" viewBox="0 0 4 16" fill="none">
+    <circle cx="2" cy="2" r="2" fill="#B8A7E5"/>
+    <circle cx="2" cy="8" r="2" fill="#B8A7E5"/>
+    <circle cx="2" cy="14" r="2" fill="#B8A7E5"/>
+  </svg>
+);
+
+
+
+export const SearchIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+    <path d="M9.16667 15.8333C12.8486 15.8333 15.8333 12.8486 15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333Z" stroke="#B8A7E5" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M17.5 17.5L13.9167 13.9167" stroke="#B8A7E5" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const ChevronLeft = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M15 18l-6-6 6-6"/>
+  </svg>
+);
+
+export const ChevronRight = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M9 18l6-6-6-6"/>
+  </svg>
+);
+
+export const EmojiIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8A7E5" strokeWidth="1.5" strokeLinecap="round">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M8 13s1.5 2 4 2 4-2 4-2"/>
+    <line x1="9" y1="9" x2="9.01" y2="9"/>
+    <line x1="15" y1="9" x2="15.01" y2="9"/>
+  </svg>
+);
+
