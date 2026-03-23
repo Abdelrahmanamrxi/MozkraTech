@@ -8,6 +8,7 @@ import "./App.css";
 import Schedule from "./pages/Schedule/Schedule.jsx";
 import Friends from "./pages/Friends/Friends.jsx";
 import Timer from "./pages/Timer/Timer.jsx";
+import Progress from "./pages/Progress/Progress.jsx";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/dashboard/schedule" element={<Schedule />} />
         <Route path="/dashboard/friends" element={<Friends />} />
         <Route path="/dashboard/timer" element={<Timer />} />
+        <Route path="/dashboard/progress" element={<Progress />} />
       </Routes>
     </BrowserRouter>
   );
