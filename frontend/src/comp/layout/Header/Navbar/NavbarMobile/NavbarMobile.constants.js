@@ -1,9 +1,3 @@
-export const NAV_LINKS = [
-  { label: "Dashboard", icon: "Home", href: "/home" },
-  { label: "Progress", icon: "ChartNoAxesCombined", href: "/dashboard/progress" },
-  { label: "Schedule", icon: "Calendar", href: "/dashboard/schedule" },
-  { label: "Friends", icon: "Users", href: "/dashboard/friends" },
-];
 
 // Replace these with real data when you connect notifications to your API/store.
 export const DEMO_UNREAD_COUNT = 5;

@@ -1,0 +1,20 @@
+{
+  "navbar": {
+    "home": "الرئيسية",
+    "features": "المميزات",
+    "pricing": "الأسعار",
+    "about": "من نحن",
+    "dashboard": "لوحة التحكم",
+    "progress": "التقدم",
+    "schedule": "الجدول",
+    "friends": "الأصدقاء",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "notifications":{
+        "title": "الإشعارات",
+        "close": "إغلاق",
+        "recent": "الأحدث"
+    }
+  }
+}

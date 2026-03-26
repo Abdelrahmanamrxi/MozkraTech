@@ -1,6 +1,7 @@
 import React from "react";
 import { Bell, UserCircle2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export function NotificationsUtilityRow({
   notifOpen,
@@ -8,6 +9,8 @@ export function NotificationsUtilityRow({
   unreadCount,
   notifications,
 }) {
+
+  const {t}=useTranslation(['common'])
   return (
     <>
       {/* Utility row: Notifications + Profile */}
@@ -53,7 +56,7 @@ export function NotificationsUtilityRow({
               className="font-blinker text-[0.95rem] font-medium"
               style={{ color: "rgba(255,255,255,0.82)" }}
             >
-              Notifications
+              {t('navbar.notifications.title')}
             </span>
           </span>
 
@@ -106,7 +109,7 @@ export function NotificationsUtilityRow({
                 className="text-[0.75rem] font-semibold tracking-[0.12em] uppercase"
                 style={{ color: "rgba(141,134,201,0.65)" }}
               >
-                Recent
+                {t('navbar.notifications.recent')}
               </span>
               <button
                 type="button"
@@ -114,7 +117,7 @@ export function NotificationsUtilityRow({
                 style={{ color: "rgba(255,255,255,0.55)" }}
                 onClick={() => setNotifOpen(false)}
               >
-                Close
+                {t('navbar.notifications.close')}
               </button>
             </div>
 

@@ -2,8 +2,11 @@
 import React from 'react'
 import useTypewriter from '../../../hooks/useTypewriter.jsx'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 const TransformSection = () => {
-  const { displayed, done } = useTypewriter('Ready To Transform Your Study Routine?', 70, 700)
+    const { t } = useTranslation()
+  const headingText = t('transform_section.heading')
+  const { displayed, done } = useTypewriter(headingText, 70, 700)
   return (
     <div className="ready-background lg:p-20 p-14 mx-4 lg:mx-20 mt-16 mb-28 lg:mt-24 lg:mb-40 gap-7 text-white flex flex-col lg:items-center rounded-[48px] lg:rounded-[72px]">
       <h6 className="font-sans font-bold text-xl lg:text-3xl">{displayed}
@@ -15,7 +18,7 @@ const TransformSection = () => {
           />
         )}
       </h6>
-      <p className="font-blinker text-base lg:text-xl">Join students who are studying smarter, not harder. Start your free today — no credit card required.</p>
+      <p className="font-blinker text-base lg:text-xl"> {t('transform_section.description')}</p>
       <motion.button
         className="relative overflow-hidden bg-primary transition-all hover:bg-primary-dark flex flex-row gap-2 items-center px-6 lg:px-12 cursor-pointer py-3 rounded-[19px] border border-white/20"
         whileHover="hover"
@@ -30,7 +33,7 @@ const TransformSection = () => {
           }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         >
-          Start Free Today
+         {t('transform_section.button')}
         </motion.span>
 
         <motion.svg

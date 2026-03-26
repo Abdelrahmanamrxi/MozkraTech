@@ -10,20 +10,25 @@ import {
   Users,
   ChevronRight,
 } from "lucide-react";
+import i18n from 'i18next'
 import Logo from "../../../../logo/Logo";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotificationsUtilityRow } from "./NavbarMobileParts";
+import {useTranslation} from "react-i18next"
 import {
-  NAV_LINKS,
   DEMO_NOTIFICATIONS,
   DEMO_UNREAD_COUNT,
 } from "./NavbarMobile.constants";
 
 const iconMap = { Home, ChartNoAxesCombined, Calendar, Users };
 
+
+
+
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
+  const {t}=useTranslation(['common'])
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const location = useLocation();
@@ -39,6 +44,13 @@ export default function NavbarMobile() {
     setOpen(false);
     setNotifOpen(false);
   }, [location.pathname]);
+  
+const NAV_LINKS = [
+  { label: t("navbar.dashboard"), icon: "Home", href: "/dashboard" },
+  { label:t("navbar.progress"), icon: "ChartNoAxesCombined", href: "/dashboard/progress" },
+  { label:t("navbar.schedule"), icon: "Calendar", href: "/dashboard/schedule" },
+  { label:t("navbar.friends"), icon: "Users", href: "/dashboard/friends" },
+];
 
   return (
     <>
@@ -98,38 +110,43 @@ export default function NavbarMobile() {
         {open && (
           <motion.div
             key="drawer"
-            initial={{ x: "100%" }}
+            initial={{ x: i18n.language === "en" ? "100%" : "-100%" }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            exit={{ x: i18n.language === "en" ? "100%" : "-100%" }}
             transition={{
               type: "spring",
               stiffness: 380,
               damping: 42,
               mass: 0.8,
             }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-3/4 flex flex-col"
+            className={`fixed top-0 bottom-0 ${i18n.language === "en" ? "right-0" : "left-0"} z-50 w-3/4 flex flex-col`}
             style={{
               background:
                 "linear-gradient(160deg, rgba(34,29,54,0.99) 0%, rgba(20,16,40,1) 100%)",
-              borderLeft: "1px solid rgba(255,255,255,0.07)",
-              boxShadow: "-12px 0 40px rgba(0,0,0,0.55)",
+              borderLeft: i18n.language === "en" ? "1px solid rgba(255,255,255,0.07)" : "none",
+              borderRight: i18n.language === "ar" ? "1px solid rgba(255,255,255,0.07)" : "none",
+              boxShadow: i18n.language === "en" 
+                ? "-12px 0 40px rgba(0,0,0,0.55)" 
+                : "12px 0 40px rgba(0,0,0,0.55)",
               willChange: "transform",
               transform: "translateZ(0)",
             }}
           >
-            {/* Glow accents */}
+            {/* Glow accents - RTL aware */}
             <div
-              className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
+              className={`absolute top-0 ${i18n.language === "en" ? "right-0" : "left-0"} w-48 h-48 pointer-events-none`}
               style={{
-                background:
-                  "radial-gradient(circle at top right, rgba(144,103,198,0.18) 0%, transparent 60%)",
+                background: i18n.language === "en"
+                  ? "radial-gradient(circle at top right, rgba(144,103,198,0.18) 0%, transparent 60%)"
+                  : "radial-gradient(circle at top left, rgba(144,103,198,0.18) 0%, transparent 60%)",
               }}
             />
             <div
-              className="absolute bottom-0 left-0 w-48 h-48 pointer-events-none"
+              className={`absolute bottom-0 ${i18n.language === "en" ? "left-0" : "right-0"} w-48 h-48 pointer-events-none`}
               style={{
-                background:
-                  "radial-gradient(circle at bottom left, rgba(144,103,198,0.09) 0%, transparent 60%)",
+                background: i18n.language === "en"
+                  ? "radial-gradient(circle at bottom left, rgba(144,103,198,0.09) 0%, transparent 60%)"
+                  : "radial-gradient(circle at bottom right, rgba(144,103,198,0.09) 0%, transparent 60%)",
               }}
             />
 
@@ -139,20 +156,84 @@ export default function NavbarMobile() {
               style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
             >
               <Logo />
-              <motion.button
-                onClick={() => setOpen(false)}
-                whileTap={{ scale: 0.88 }}
-                whileHover={{ backgroundColor: "rgba(255,255,255,0.1)" }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                aria-label="Close menu"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-                className="rounded-xl p-1.5 flex items-center cursor-pointer"
-              >
-                <X className="text-white/60" size={20} />
-              </motion.button>
+              
+              {/* Language Switcher & Close Button */}
+              <div className="flex items-center gap-2">
+                {/* Language Switcher */}
+                <div className="flex items-center gap-1 p-1 rounded-full bg-white/5 border border-white/15 backdrop-blur-md">
+                  <motion.button
+                    onClick={() => {
+                      i18n.changeLanguage("en");
+                      document.documentElement.dir = 'ltr';
+                    }}
+                    className={`relative px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200
+                      ${i18n.language === 'en' 
+                        ? 'text-white' 
+                        : 'text-white/50 hover:text-white/80'
+                      }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <AnimatePresence>
+                      {i18n.language === 'en' && (
+                        <motion.div
+                          layoutId="lang-active-mobile"
+                          className="absolute inset-0 rounded-full bg-white/20 border border-white/20 backdrop-blur-sm"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        />
+                      )}
+                    </AnimatePresence>
+                    <span className="relative z-10">EN</span>
+                  </motion.button>
+                  
+                  <motion.button
+                    onClick={() => {
+                      i18n.changeLanguage("ar");
+                      document.documentElement.dir = 'rtl';
+                    }}
+                    className={`relative px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200
+                      ${i18n.language === 'ar' 
+                        ? 'text-white' 
+                        : 'text-white/50 hover:text-white/80'
+                      }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <AnimatePresence>
+                      {i18n.language === 'ar' && (
+                        <motion.div
+                          layoutId="lang-active-mobile"
+                          className="absolute inset-0 rounded-full bg-white/20 border border-white/20 backdrop-blur-sm"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        />
+                      )}
+                    </AnimatePresence>
+                    <span className="relative z-10">AR</span>
+                  </motion.button>
+                </div>
+                
+                {/* Close Button */}
+                <motion.button
+                  onClick={() => setOpen(false)}
+                  whileTap={{ scale: 0.88 }}
+                  whileHover={{ backgroundColor: "rgba(255,255,255,0.1)" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  aria-label="Close menu"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}
+                  className="rounded-xl p-1.5 flex items-center cursor-pointer"
+                >
+                  <X className="text-white/60" size={20} />
+                </motion.button>
+              </div>
             </div>
 
             {/* Nav links */}
@@ -161,7 +242,7 @@ export default function NavbarMobile() {
                 className="text-[0.63rem] font-semibold tracking-[0.15em] uppercase mb-3 pl-2"
                 style={{ color: "rgba(141,134,201,0.5)" }}
               >
-                Navigation
+                {i18n.language === "en" ? 'Navigation' : 'القائمة'}
               </p>
 
               {NAV_LINKS.map(({ label, icon, href }, i) => {
@@ -286,7 +367,7 @@ export default function NavbarMobile() {
             </nav>
 
             {/* CTA Buttons */}
-          <motion.div
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -298,82 +379,73 @@ export default function NavbarMobile() {
               className="px-4 pt-4 pb-8 flex flex-col gap-2.5"
               style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
             >
-              {location.pathname!=='/'&&(
-                <>
-
-                  <NotificationsUtilityRow
-                    notifOpen={notifOpen}
-                    setNotifOpen={setNotifOpen}
-                    unreadCount={DEMO_UNREAD_COUNT}
-                    notifications={DEMO_NOTIFICATIONS}
-                  />
-                </>
-
-
+              {location.pathname !== '/' && (
+                <NotificationsUtilityRow
+                  notifOpen={notifOpen}
+                  setNotifOpen={setNotifOpen}
+                  unreadCount={DEMO_UNREAD_COUNT}
+                  notifications={DEMO_NOTIFICATIONS}
+                />
               )}
 
+              {location.pathname === '/' && (
+                <>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                  >
+                    <Link
+                      to="/login"
+                      className="block text-center py-3.5 rounded-2xl text-[0.95rem] font-medium no-underline font-blinker"
+                      style={{
+                        color: "rgba(255,255,255,0.68)",
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.09)",
+                        transition: "background 0.15s ease, color 0.15s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.09)";
+                        e.currentTarget.style.color = "white";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                        e.currentTarget.style.color = "rgba(255,255,255,0.68)";
+                      }}
+                    >
+                      {t('navbar.login')}
+                    </Link>
+                  </motion.div>
 
-
-
-             {location.pathname==='/' && (
-              <>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 22 }}
-              >
-                <Link
-                  to="/login"
-                  className="block text-center py-3.5 rounded-2xl text-[0.95rem] font-medium no-underline font-blinker"
-                  style={{
-                    color: "rgba(255,255,255,0.68)",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.09)",
-                    transition: "background 0.15s ease, color 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.09)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.68)";
-                  }}
-                >
-                  Sign In
-                </Link>
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                style={{ borderRadius: 16 }}
-              >
-                <Link
-                  to="/signup"
-                  className="relative block text-center py-3.5 rounded-2xl text-[0.95rem] font-semibold no-underline font-blinker overflow-hidden"
-                  style={{
-                    color: "white",
-                    background:
-                      "linear-gradient(135deg, #9067c6 0%, #7a4fb0 100%)",
-                    border: "1px solid rgba(144,103,198,0.38)",
-                    boxShadow:
-                      "0 4px 18px rgba(144,103,198,0.38), 0 1px 0 rgba(255,255,255,0.1) inset",
-                  }}
-                >
-                  <span
-                    className="absolute top-0 left-[10%] right-[10%] h-[45%] rounded-b-full pointer-events-none"
-                    style={{
-                      background:
-                        "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 100%)",
-                    }}
-                  />
-                  <span className="relative z-10">Get Started →</span>
-                </Link>
-              </motion.div>
-              </>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                    style={{ borderRadius: 16 }}
+                  >
+                    <Link
+                      to="/signup"
+                      className="relative block text-center py-3.5 rounded-2xl text-[0.95rem] font-semibold no-underline font-blinker overflow-hidden"
+                      style={{
+                        color: "white",
+                        background:
+                          "linear-gradient(135deg, #9067c6 0%, #7a4fb0 100%)",
+                        border: "1px solid rgba(144,103,198,0.38)",
+                        boxShadow:
+                          "0 4px 18px rgba(144,103,198,0.38), 0 1px 0 rgba(255,255,255,0.1) inset",
+                      }}
+                    >
+                      <span
+                        className="absolute top-0 left-[10%] right-[10%] h-[45%] rounded-b-full pointer-events-none"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 100%)",
+                        }}
+                      />
+                      <span className="relative z-10">{t('navbar.signup')} →</span>
+                    </Link>
+                  </motion.div>
+                </>
               )}
             </motion.div>
           </motion.div>

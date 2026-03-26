@@ -1,0 +1,78 @@
+{
+  "hero": {
+    "left":"Weekly Updates",
+    "right":"AI Schedule",
+    "title": "Unlock your {{word}}",
+    "word": "potential",
+    "description": "The intelligent scheduling platform that adapts to your learning style. Plan smarter, study better, and achieve more with AI-powered insights.",
+    "cta": "Get Started Free →"
+  },
+  "features":{
+    "title": "Everything You Need to Succeed",
+    "description": "Powerful features designed to help you plan better, study smarter, and achieve your academic goals.",
+    "cards": [
+      {
+        "header": "AI-Powered Planning",
+        "paragraph": "Smart algorithms analyze your learning patterns and suggest optimal study schedules."
+      },
+      {
+        "header": "Smart Timer",
+        "paragraph": "Pomodoro-style timer with automatic breaks and productivity tracking."
+      },
+      {
+        "header": "Visual Schedule",
+        "paragraph": "Beautiful calendar views with drag-and-drop scheduling and color-coded tasks."
+      },
+      {
+        "header": "Study Groups",
+        "paragraph": "Collaborate with friends, share progress, and stay motivated together."
+      },
+      {
+        "header": "Progress Analytics",
+        "paragraph": "Detailed insights and charts to track your productivity and improvement."
+      },
+      {
+        "header": "Quick Actions",
+        "paragraph": "Access your most-used features instantly with smart shortcuts and widgets."
+      }
+    ]
+  },
+  "ai_section":{
+  "title": "AI Assistant",
+  "mainHeading": "Master Your Time,",
+  "mainHeadingHighlight": "Ace Your Goals",
+  "mainCard": {
+    "title": "Your Personal Study Coach",
+    "description": "Our advanced AI learns from your habits, energy levels, and performance to create personalized study plans that actually work for you"
+  },
+  "aiSuggestion": {
+    "label": "AI Suggestion",
+    "message": "You're most productive in the morning. I've scheduled your hardest subjects between 9-11 AM."
+  },
+  "secondaryCard":{
+    "title":"AI Suggestion",
+    "description": "You're most productive in the morning. I've scheduled your hardest subjects between 9-11 AM."
+  },
+  "cards": [
+    {
+      "header": "Weekly Insight",
+      "paragraph": "Your focus time increased by 23% this week! Keep up the momentum. 🎉"
+    },
+    {
+      "header": "Smart Reminder",
+      "paragraph": "Your Algorithms exam is in 3 days. Want to add extra review sessions?"
+    },
+    {
+      "header": "Adaptive Learning",
+      "paragraph": "Adjusts difficulty and timing based on your progress"
+    }
+  ]
+  },
+  "transform_section": {
+    "heading": "Ready To Transform Your Study Routine?",
+    "description": "Join students who are studying smarter, not harder. Start your free today — no credit card required.",
+    "button": "Start Free Today"
+  }
+
+
+}

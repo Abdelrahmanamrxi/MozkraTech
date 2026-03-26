@@ -1,5 +1,21 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+/* Hide scrollbar for nav links */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari, Opera */
+}
+
+/* Optional: iPad Pro specific adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .hide-scrollbar {
+    max-width: 400px; /* Adjust based on your needs */
+  }
+}
 @theme {
   /* 🎨 Colors */
   --color-primary: #9067c6;
@@ -27,6 +43,14 @@
     #8d86c9 123.1%
   );
 }
+
+
+
+
+[dir="rtl"] body {
+  font-family: 'Cairo', sans-serif;
+}
+
 
 .cards-styling {
   @apply absolute bg-white/20 backdrop-blur-md rounded-2xl px-6 py-8 text-white text-sm font-semibold;

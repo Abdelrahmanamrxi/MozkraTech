@@ -3,8 +3,12 @@ import { motion } from "framer-motion";
 import Image from "../../../assets/image1.jpeg";
 import useTypewriter from "../../../hooks/useTypewriter.jsx";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 function Hero() {
-  const { displayed, done } = useTypewriter("potential", 45, 700);
+  const{t,i18n}=useTranslation()
+  const word=t("hero.word")
+
+  const { displayed, done } = useTypewriter(word, 45, 700);
   return (
     <div className="flex lg:flex-row flex-col items-center justify-center py-20 lg:py-0 lg:h-screen">
       <div className="lg:text-start lg:items-start text-center items-center lg:w-2/5 px-4 py-2 text-white">
@@ -15,7 +19,7 @@ function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
         >
-          Unlock your{" "}
+          {t("hero.title", { word: "" })}{" "}
           <span className="text-primary mt-4 inline-block min-w-[4px]">
             {displayed}
             {/* blinking cursor — disappears when typing is done */}
@@ -39,9 +43,7 @@ function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.28 }}
         >
-          The intelligent scheduling platform that adapts to your learning
-          style. Plan smarter, study better, and achieve more with AI-powered
-          insights.
+         {t("hero.description")}
         </motion.p>
 
         <Link to="/signup">
@@ -60,7 +62,7 @@ function Hero() {
             }}
             whileTap={{ scale: 0.96 }}
           >
-            Get Started Free →
+             {t("hero.cta")}
           </motion.button>
         </Link>
       </div>
@@ -73,8 +75,8 @@ function Hero() {
             alt="Image 1"
             className="w-full h-auto object-cover rounded-4xl"
           />
-          <div className="-bottom-4 -left-2 cards-styling">AI Schedule</div>
-          <div className="-top-4 -right-2 cards-styling">Weekly updates</div>
+          <div className="-bottom-4 -left-2 cards-styling">{t("hero.right")}</div>
+          <div className="-top-4 -right-2 cards-styling">{t("hero.left")}</div>
         </div>
       </div>
     </div>

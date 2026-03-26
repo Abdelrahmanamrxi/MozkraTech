@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import { ai_cards } from '../../../data/data'
+import { AiSuggestionIcon,WeeklyInsightIcon,InfinityIcon } from '@/comp/ui/Icons'
 import { motion } from 'framer-motion'
 import GlassySection from '../../../comp/ui/GlassySection'
+import { useTranslation } from 'react-i18next'
 const AISection = () => {
 
 const fadeUp = (delay = 0) => ({
@@ -28,8 +29,14 @@ const glassHover = {
   backgroundColor: 'rgba(144,103,198,0.28)',
   transition: { type: 'spring', stiffness: 280, damping: 20 },
 }
-
 const glassTap = { scale: 0.98 }
+const {t}=useTranslation()
+const icons=[AiSuggestionIcon,WeeklyInsightIcon,InfinityIcon]
+const ai_cards=t("ai_section.cards",{returnObjects:true})
+
+
+
+
   return (
       
  <section className="ai-background m-6 mt-6 lg:gap-8 lg:items-center  gap-9 flex lg:flex-row flex-col lg:p-14  p-8 text-white font-sans rounded-[60px]">
@@ -44,7 +51,7 @@ const glassTap = { scale: 0.98 }
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
         >
-          AI Assistant
+        {t("ai_section.title")}
         </motion.h3>
 
         <motion.div
@@ -55,10 +62,10 @@ const glassTap = { scale: 0.98 }
           viewport={{ once: true, amount: 0.3 }}
         >
           <h4 className="font-bold lg:w-1/2 w-full lg:text-start text-center text-xl lg:text-2xl">
-            Master Your Time,
+            {t("ai_section.mainHeading")},
           </h4>
           <p className="text-primary font-bold lg:w-1/2 lg:text-start text-center text-xl lg:text-2xl">
-            Ace Your Goals
+           {t("ai_section.mainHeadingHighlight")}
           </p>
         </motion.div>
 
@@ -77,11 +84,10 @@ const glassTap = { scale: 0.98 }
           }}
         >
           <h5 className="font-bold text-2xl lg:text-3xl w-3/4 mb-3">
-            Your Personal Study Coach
+            {t("ai_section.mainCard.title")}
           </h5>
           <p className="text-base">
-            Our advanced AI learns from your habits, energy levels, and performance
-            to create personalized study plans that actually work for you
+           {t("ai_section.mainCard.description")}
           </p>
         </motion.div>
       </div>
@@ -125,9 +131,9 @@ const glassTap = { scale: 0.98 }
           </motion.svg>
 
           <div className="flex flex-col">
-            <p className="font-semibold text-lg">AI Suggestion</p>
+            <p className="font-semibold text-lg"> {t("ai_section.secondaryCard.title")}</p>
             <p className="font-blinker text-base">
-              You're most productive in the morning. I've scheduled your hardest subjects between 9-11 AM.
+              {t("ai_section.secondaryCard.description")}
             </p>
           </div>
         </motion.div>
@@ -142,7 +148,7 @@ const glassTap = { scale: 0.98 }
                 whileHover={{ scale: 1.15, rotate: 8 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 16 }}
               >
-                {card.icon}
+                {React.createElement(icons[index])}
               </motion.div>
               <div className="flex flex-col">
                 <p className="font-semibold text-lg">{card.header}</p>

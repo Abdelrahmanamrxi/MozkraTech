@@ -1,0 +1,21 @@
+{
+  "navbar": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "about": "About",
+    "dashboard": "Dashboard",
+    "progress": "Progress",
+    "schedule": "Schedule",
+    "friends": "Friends",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "notifications":{
+      "title":"Notifications",
+      "recent":"Recent",
+      "close":"Close"
+       
+    }
+  }
+}

@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
@@ -8,9 +10,17 @@ import "./App.css";
 import Schedule from "./pages/Schedule/Schedule.jsx";
 import Friends from "./pages/Friends/Friends.jsx";
 import Timer from "./pages/Timer/Timer.jsx";
+
 import Progress from "./pages/Progress/Progress.jsx";
 
 function App() {
+  const { i18n } = useTranslation();
+  useEffect(()=>{
+    document.dir=i18n.language === "ar" ? "rtl" : 'ltr'
+  },[i18n.language])
+
+
+
   return (
     <BrowserRouter>
       <Routes>

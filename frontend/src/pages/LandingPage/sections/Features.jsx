@@ -1,10 +1,20 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import { cards_data } from '../../../data/data.jsx'
+
+import { useTranslation } from 'react-i18next';
 import { useInView } from 'framer-motion'
+import AiImage from "@/assets/ai.svg";
+import analytics from "@/assets/analytics.svg";
+import flash from "@/assets/flash.svg";
+import group from "@/assets/group.svg";
+import schedule from "@/assets/schedule.svg";
+import timer from "@/assets/timer.svg";
 import {motion} from 'framer-motion'
 function Features({featureRef}) {
+      const{t}=useTranslation()
+      const icons=[AiImage,analytics,flash,group,schedule,timer]
       const featureInView = useInView(featureRef, { once: true, amount: 0.2 })
+      const cards_data=t("features.cards",{returnObjects:true})
   return (
     <>
       <motion.div
@@ -13,7 +23,7 @@ function Features({featureRef}) {
                 transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
               >
                 <p className="lg:text-5xl text-3xl font-sans font-semibold text-center text-white">
-                  Everything You Need to Succeed
+                  {t('features.title')} !
                 </p>
               </motion.div>
     
@@ -24,8 +34,7 @@ function Features({featureRef}) {
                 transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.14 }}
               >
                 <p className="font-blinker text-center text-white">
-                  Powerful features designed to help you plan better, study smarter,
-                  and achieve your academic goals.
+                 {t("features.description")}
                 </p>
               </motion.div>
     
@@ -38,7 +47,7 @@ function Features({featureRef}) {
                       <div className="relative z-10">
                        
                         <div className="cards-icon">
-                          <img className="w-8 h-8" src={card.src} alt="AI" />
+                          <img className="w-8 h-8" src={icons[index]} alt="AI" />
                         </div>
                         <h2 className="text-white font-semibold text-lg">{card.header}</h2>
                         <p className="text-gray-300 mt-2 text-sm">{card.paragraph}</p>
