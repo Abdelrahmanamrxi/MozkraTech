@@ -3,8 +3,19 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 function SessionForm({setShowAddSessionPopup}) {
+      const { t } = useTranslation('schedule');
+      const dayMap = { 
+        'Monday': 'monday', 
+        'Tuesday': 'tuesday', 
+        'Wednesday': 'wednesday', 
+        'Thursday': 'thursday', 
+        'Friday': 'friday', 
+        'Saturday': 'saturday', 
+        'Sunday': 'sunday' 
+      };
       const [subject, setSubject] = useState("")
       const [hour, setHour] = useState("09")
       const [minute, setMinute] = useState("00")
@@ -29,7 +40,7 @@ function SessionForm({setShowAddSessionPopup}) {
                 className="bg-primary-dark/60 font-Inter backdrop-blur-2xl border border-white/20 rounded-[24px] p-8 max-w-md w-full shadow-2xl"
               >
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold text-white">Add New Session</h3>
+                  <h3 className="text-2xl font-bold text-white">{t('title')}</h3>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -40,19 +51,19 @@ function SessionForm({setShowAddSessionPopup}) {
                   </motion.button>
                 </div>
 <div>
-  <label className="text-sm text-[#B8A7E5] mb-2 block font-medium">Subject Name</label>
+  <label className="text-sm text-[#B8A7E5] mb-2 block font-medium">{t('subjectLabel')}</label>
   <input
     type="text"
     value={subject}
     onChange={(e) => setSubject(e.target.value)}
-    placeholder="e.g. Data Structures"
+    placeholder={t('subjectPlaceholder')}
     className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-4 py-3 text-white placeholder-white/40 focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all"
   />
 </div>
 
 {/* Time Picker */}
 <div className="mt-6">
-  <label className="text-sm text-[#B8A7E5] mb-3 block font-medium">Time</label>
+  <label className="text-sm text-[#B8A7E5] mb-3 block font-medium">{t('time')}</label>
   <div className="flex gap-3 items-center">
     <div className="flex-1 relative">
       <input
@@ -64,7 +75,7 @@ function SessionForm({setShowAddSessionPopup}) {
         max="12"
         className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-3 py-3 text-white text-center font-semibold focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all [appearance:textfield]"
       />
-      <span className="absolute -bottom-5 left-0 right-0 text-center text-xs text-[#B8A7E5]/60">Hour</span>
+      <span className="absolute -bottom-5 left-0 right-0 text-center text-xs text-[#B8A7E5]/60">{t('hour')}</span>
       
     </div>
 
@@ -81,7 +92,7 @@ function SessionForm({setShowAddSessionPopup}) {
         step="5"
         className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-3 py-3 text-white text-center font-semibold focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all [appearance:textfield]"
       />
-      <span className="absolute -bottom-5 left-0 right-0 text-center text-xs text-[#B8A7E5]/60">Min</span>
+      <span className="absolute -bottom-5 left-0 right-0 text-center text-xs text-[#B8A7E5]/60">{t('minute')}</span>
     </div>
 
     {/* AM/PM Toggle */}
@@ -115,7 +126,7 @@ function SessionForm({setShowAddSessionPopup}) {
 
 {/* Duration */}
 <div className="mt-6">
-  <label className="text-sm text-[#B8A7E5] mb-2 block font-medium">Duration (hours)</label>
+  <label className="text-sm text-[#B8A7E5] mb-2 block font-medium">{t('durationLabel')}</label>
   <div className="relative">
     <input
       type="number"
@@ -128,19 +139,19 @@ function SessionForm({setShowAddSessionPopup}) {
       placeholder="2"
       className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-4 py-3 text-white placeholder-white/40 focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all pr-12 [appearance:textfield]"
     />
-    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#B8A7E5]/50 text-sm font-medium">hrs</span>
+    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#B8A7E5]/50 text-sm font-medium">{t('hoursSuffix')}</span>
   </div>
 </div>
 
 {/* Day Selector - Custom Dropdown */}
 <div className="mt-6">
-  <label className="text-sm text-[#B8A7E5] mb-2 block font-medium">Day</label>
+  <label className="text-sm text-[#B8A7E5] mb-2 block font-medium">{t('dayLabel')}</label>
   <div className="relative">
     <button
       onClick={() => setDayDropdownOpen(!dayDropdownOpen)}
       className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-4 py-3 text-white font-medium focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all cursor-pointer flex justify-between items-center"
     >
-      <span>{day}</span>
+      <span>{t(dayMap[day])}</span>
       <svg
         className={`w-4 h-4 text-[#B8A7E5] transition-transform ${dayDropdownOpen ? 'rotate-180' : ''}`}
         fill="none"
@@ -168,7 +179,7 @@ function SessionForm({setShowAddSessionPopup}) {
             : 'text-white hover:bg-white/10'
         }`}
       >
-        {d}
+        {t(dayMap[d])}
       </button>
     ))}
   </div>
@@ -183,7 +194,7 @@ function SessionForm({setShowAddSessionPopup}) {
                     onClick={() => setShowAddSessionPopup(false)}
                     className="flex-1 px-4 py-2.5 bg-white/10 border border-white/20 text-[#B8A7E5] rounded-lg hover:bg-white/20 transition-all font-medium"
                   >
-                    Cancel
+                    {t('cancel')}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -191,7 +202,7 @@ function SessionForm({setShowAddSessionPopup}) {
                     onClick={() => setShowAddSessionPopup(false)}
                     className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-lg hover:shadow-lg transition-all font-medium"
                   >
-                    Add Session
+                    {t('submit')}
                   </motion.button>
                 </div>
               </motion.div>

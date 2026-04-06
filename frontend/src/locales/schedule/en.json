@@ -1,0 +1,20 @@
+{
+  "title": "Add New Task",
+  "subjectLabel": "Subject Name",
+  "subjectPlaceholder": "e.g. Data Structures",
+  "time": "Time",
+  "hour": "Hour",
+  "minute": "Min",
+  "durationLabel": "Duration (hours)",
+  "hoursSuffix": "hrs",
+  "dayLabel": "Day",
+  "cancel": "Cancel",
+  "submit": "Add Session",
+  "monday": "Monday",
+  "tuesday": "Tuesday",
+  "wednesday": "Wednesday",
+  "thursday": "Thursday",
+  "friday": "Friday",
+  "saturday": "Saturday",
+  "sunday": "Sunday"
+}

@@ -1,0 +1,20 @@
+{
+  "title": "ضيف مهمتك",
+  "subjectLabel": "اسم الموضوع",
+  "subjectPlaceholder": "مثال: هياكل بيانات",
+  "time": "الوقت",
+  "hour": "ساعة",
+  "minute": "دقيقة",
+  "durationLabel": "المدة (بالساعات)",
+  "hoursSuffix": "ساعات",
+  "dayLabel": "اليوم",
+  "cancel": "إلغاء",
+  "submit": "ضيف مهمة",
+  "monday": "الاثنين",
+  "tuesday": "الثلاثاء",
+  "wednesday": "الأربعاء",
+  "thursday": "الخميس",
+  "friday": "الجمعة",
+  "saturday": "السبت",
+  "sunday": "الأحد"
+}

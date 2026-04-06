@@ -9,6 +9,8 @@ import DashboardenTranslation from './locales/dashboard/en.json'
 import DashboardarTranslation from './locales/dashboard/ar.json'
 import ProgressenTranslation from './locales/progress/en.json'
 import ProgressarTranslation from './locales/progress/ar.json'
+import ScheduleenTranslation from './locales/schedule/en.json'
+import SchedulearTranslation from './locales/schedule/ar.json'
 
 i18n
   .use(initReactI18next)
@@ -21,13 +23,15 @@ i18n
         landing: LandingenTranslation,
         common:CommonenTranslation,
         dashboard:DashboardenTranslation,
-        progress:ProgressenTranslation
+        progress:ProgressenTranslation,
+        schedule:ScheduleenTranslation
       },
       ar: {
         landing: LandingarTranslation,
         common:CommonarTranslation,
         dashboard:DashboardarTranslation,
-        progress:ProgressarTranslation
+        progress:ProgressarTranslation,
+        schedule:SchedulearTranslation
       }
     },
     ns: ["landing"], // optional but explicit
