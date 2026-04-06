@@ -3,18 +3,32 @@ import React from "react";
 import { Card } from "@/comp/ui/TopCard";
 import { motion } from "framer-motion";
 import { TimerIcon } from "@/comp/ui/Icons";
+import {useTranslation} from 'react-i18next'
 
 export default function WeeklyActivity({ mockProgressData }) {
   const { days, totalHoursThisWeek } = mockProgressData.weeklyActivity;
   const maxHours = Math.max(...days.map((d) => d.hours));
-
+  const {i18n}=useTranslation()
+  const dayLabelsAr = {
+    Mon: "الاثنين",
+    Tue: "الثلاثاء",
+    Wed: "الأربعاء",
+    Thu: "الخميس",
+    Fri: "الجمعة",
+    Sat: "السبت",
+    Sun: "الأحد",
+  };
   return (
-    <Card variant="dark" className="p-6">
+    <div  className="p-8 bg-[#3D3555] bordr border-[#9B7EDE]/20 rounded-[24px]">
       <div className="flex flex-row items-center justify-between mb-6">
-        <p className="font-poppins text-lg font-semibold">Weekly Activity</p>
+        <p className="font-poppins text-lg font-semibold">
+          {i18n.language==="ar"? "النشاط الأسبوعي":"Weekly Activity"}</p>
         <div className="flex flex-row items-center gap-2 text-white/60 font-blinker text-sm">
           <TimerIcon />
-          <span>{totalHoursThisWeek} hours this week</span>
+          <span className="inline-flex items-center gap-1">
+            <span>{totalHoursThisWeek}</span>
+            <span>{i18n.language==="ar"?"ساعات هذا الأسبوع":"hours this week"}</span>
+          </span>
         </div>
       </div>
 
@@ -61,7 +75,9 @@ export default function WeeklyActivity({ mockProgressData }) {
             key={day.day}
             className="flex flex-col items-center flex-1 gap-1"
           >
-            <p className="font-blinker text-xs text-white/50">{day.day}</p>
+            <p className="font-blinker text-xs text-white/50">
+              {i18n.language === "ar" ? dayLabelsAr[day.day] || day.day : day.day}
+            </p>
           </div>
         ))}
       </div>
@@ -111,11 +127,11 @@ export default function WeeklyActivity({ mockProgressData }) {
               </svg>
             </div>
             <p className="font-blinker text-xs text-white/40">
-              {day.tasks} tasks
+              {day.tasks} {i18n.language==="ar"?"المهام":"tasks"}
             </p>
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 }

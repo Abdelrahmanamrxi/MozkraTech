@@ -52,7 +52,7 @@ function AchievementsCard({ mockProgressData }) {
   const total = mockProgressData.achievementBadges.length;
 const {i18n}=useTranslation()
   return (
-    <Card variant="dark" className="p-5">
+    <div  className="p-5 bg-[#3D3555] border border-[#9B7EDE]/30 rounded-[24px]">
       <div className="flex flex-row items-center justify-between mb-4">
         <p className="font-poppins font-semibold text-white">{i18n.language==="ar"?"الإنجازات":"Achievements"}</p>
         <span className="font-blinker text-sm text-white/50">
@@ -112,7 +112,7 @@ const {i18n}=useTranslation()
       >
         {i18n.language==="ar"?"عرض جميع الإنجازات":"View All Achievements"}
       </button>
-    </Card>
+    </div>
   );
 }
 
@@ -152,7 +152,7 @@ function StreakCard({ mockProgressData }) {
   const { dayStreak, personalBestStreak, streakDays } = mockProgressData;
   const {i18n}=useTranslation()
   return (
-    <Card variant="dark" className="p-5">
+    <div  className="p-5 bg-[#3D3555] border border-[#9B7EDE]/20 rounded-[24px]">
       <div className="flex flex-row items-center gap-3 mb-4">
         <div
           className="w-9 h-9 rounded-full flex items-center justify-center text-lg"
@@ -224,7 +224,7 @@ function StreakCard({ mockProgressData }) {
           </motion.div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -232,7 +232,7 @@ function StreakCard({ mockProgressData }) {
 function KeepGoingCard({ mockProgressData }) {
   const {i18n}=useTranslation()
   return (
-    <Card variant="dark" className="p-5">
+    <div  className="p-5 border-2 bg-[#9B7EDE]/20 border-[#9B7EDE]/30 rounded-[24px]">
       <div className="flex flex-col items-start gap-2 mb-2">
         <span className="text-xl">
           <svg
@@ -269,7 +269,7 @@ function KeepGoingCard({ mockProgressData }) {
       >
         {i18n.language==="ar"?"ابدأ المذاكرة":"Start Study Session"}
       </LiquidGlassButton>
-    </Card>
+    </div>
   );
 }
 

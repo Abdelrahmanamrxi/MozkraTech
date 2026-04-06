@@ -2,9 +2,16 @@
 import React from "react";
 import { Card } from "@/comp/ui/TopCard";
 import { motion } from "framer-motion";
-
+import { useTranslation } from "react-i18next";
 
 function SubjectRow({ subject, index }) {
+  const { i18n } = useTranslation();
+  const lang = i18n.language === "ar" ? "ar" : "en";
+  const labels = {
+    en: { hourUnit: "h" },
+    ar: { hourUnit: "س" },
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -26,8 +33,9 @@ function SubjectRow({ subject, index }) {
         </div>
 
         <div className="flex flex-row items-center gap-3">
-          <span className="font-blinker text-sm text-white/60">
-            {subject.hoursStudied}/{subject.totalHours}h
+          <span className="inline-flex items-center gap-2 font-blinker text-sm text-white/60">
+            <span>{subject.hoursStudied}/{subject.totalHours}</span>
+            <span>{labels[lang].hourUnit}</span>
           </span>
           {/* Grade badge */}
           <span
@@ -70,16 +78,23 @@ function SubjectRow({ subject, index }) {
 }
 
 export default function SubjectProgress({ mockProgressData }) {
+  const { i18n } = useTranslation();
+  const lang = i18n.language === "ar" ? "ar" : "en";
+  const labels = {
+    en: { title: "Subject Progress" },
+    ar: { title: "تقدم الموضوع" },
+  };
+
   return (
-    <Card variant="dark" className="p-6">
+    <div className="p-6 bg-[#3d3555] border border-[#9B7EDE]/20 rounded-[24px]">
       <p className="font-poppins text-lg font-semibold mb-5">
-        Subject Progress
+        {labels[lang].title}
       </p>
       <div className="flex flex-col gap-5">
         {mockProgressData.subjects.map((subject, index) => (
           <SubjectRow key={subject.name} subject={subject} index={index} />
         ))}
       </div>
-    </Card>
+    </div>
   );
 }

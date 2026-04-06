@@ -4,6 +4,7 @@ import { Card } from "@/comp/ui/TopCard";
 import GlassySection from "@/comp/ui/GlassySection";
 import { motion } from "framer-motion";
 import { AchievementIcon } from "@/comp/ui/Icons";
+import { useTranslation } from "react-i18next";
 
 const tagColors = {
   "Course Completion": { bg: "rgba(144, 103, 198, 0.2)", color: "#c4b5fd" },
@@ -13,10 +14,31 @@ const tagColors = {
 };
 
 export default function RecentMilestones({ mockProgressData }) {
+  const { i18n } = useTranslation();
+  const lang = i18n.language === "ar" ? "ar" : "en";
+  const labels = {
+    en: { title: "Recent Milestones" },
+    ar: { title: "أحدث الإنجازات" },
+  };
+  const tagLabels = {
+    en: {
+      "Course Completion": "Course Completion",
+      "Exam Success": "Exam Success",
+      "Milestone": "Milestone",
+      "Skill Achievement": "Skill Achievement",
+    },
+    ar: {
+      "Course Completion": "إكمال كورس",
+      "Exam Success": "نجاح الامتحان",
+      "Milestone": "إنجاز",
+      "Skill Achievement": "تحقيق المهارة",
+    },
+  };
+
   return (
     <Card variant="dark" className="p-6">
       <p className="font-poppins text-lg font-semibold mb-5">
-        Recent Milestones
+        {labels[lang].title}
       </p>
       <div className="flex flex-col gap-3">
         {mockProgressData.milestones.map((milestone, index) => {
@@ -68,7 +90,7 @@ export default function RecentMilestones({ mockProgressData }) {
                       className="font-blinker text-xs font-semibold px-2 py-0.5 rounded-full"
                       style={{ background: tagStyle.bg, color: tagStyle.color }}
                     >
-                      {milestone.tag}
+                      {tagLabels[lang][milestone.tag] || milestone.tag}
                     </span>
                   </div>
                 </div>
