@@ -5,7 +5,17 @@ import { StartIcon, CalenderIcon } from "@/comp/ui/Icons";
 import { Card } from "@/comp/ui/TopCard";
 import { Calendar, HandshakeIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next"; // Add this
+
 const LearningOverview = ({ mockUserData }) => {
+  const { t } = useTranslation(['dashboard']);
+  
+  const getDifficultyLabel = (difficulty) => {
+    if (difficulty === 'Easy') return t('learningOverview.todaysSchedule.difficulty.easy');
+    if (difficulty === 'Hard') return t('learningOverview.todaysSchedule.difficulty.hard');
+    if (difficulty === 'Medium') return t('learningOverview.todaysSchedule.difficulty.medium');
+  };
+
   return (
     <div>
       <div className="flex flex-col lg:flex-row gap-8 mt-10 items-start">
@@ -30,17 +40,17 @@ const LearningOverview = ({ mockUserData }) => {
             </motion.svg>
 
             <div className="flex font-poppins flex-col">
-              <p className="font-semibold text-lg">AI Suggestion</p>
+              <p className="font-semibold text-lg">{t('learningOverview.aiSuggestion.label')}</p>
               <p className="font-blinker text-base">{mockUserData.aiRecommendation}</p>
               <LiquidGlassButton icon={StartIcon} className="px-2 lg:w-1/5 w-1/2 mt-6 py-1">
-                Start Session
+                {t('learningOverview.aiSuggestion.button')}
               </LiquidGlassButton>
             </div>
           </GlassySection>
 
-          {/* Today's Schedule — sits directly under AI */}
+          {/* Today's Schedule */}
           <Card variant="dark" className="cursor-pointer p-4">
-            <p className="font-poppins text-lg">Today's Schedule Here</p>
+            <p className="font-poppins text-lg">{t('learningOverview.todaysSchedule.label')}</p>
             <div className="flex flex-col gap-4 items-center">
               {mockUserData.todaysSchedule.map((subj) => {
                 return (
@@ -59,7 +69,7 @@ const LearningOverview = ({ mockUserData }) => {
                     <div className={`${subj.difficulty === 'Easy' && "glassy-easy-background"}
                   ${subj.difficulty === 'Hard' && "glassy-hard-background"}
                   ${subj.difficulty === 'Medium' && "glassy-medium-background"}
-                  px-3 py-1 text-lg rounded-full font-blinker`}>{subj.difficulty}</div>
+                  px-3 py-1 text-lg rounded-full font-blinker`}>{getDifficultyLabel(subj.difficulty)}</div>
                   </GlassySection>
                 )
               })}
@@ -68,18 +78,18 @@ const LearningOverview = ({ mockUserData }) => {
 
         </div>
 
-        {/* Right column — Upcoming Schedule + XASDASD stacked */}
+        {/* Right column — Upcoming Schedule + Friends stacked */}
         <div className="flex flex-col gap-8 shrink-0 lg:w-1/4 w-full">
 
           <div className="glassy-secondary-background rounded-3xl p-5">
-            <p className="flex flex-row font-blinker font-semibold gap-5 items-center text-lg"><CalenderIcon />Upcoming Schedule</p>
+            <p className="flex flex-row font-blinker font-semibold gap-5 items-center text-lg"><CalenderIcon />{t('learningOverview.upcomingSchedule.label')}</p>
             {mockUserData.upComingSchedule.map((subj, index) => (
               <Card key={index} className="mt-5 p-8 relative overflow-hidden" variant="dark">
                 <div
                   className="glassy-secondary-background absolute top-2 right-3 px-2 py-1 rounded-full text-xs font-semibold font-blinker"
                   style={{ color: "#f7ece1" }}
                 >
-                  {subj.daysLeft} days
+                  {subj.daysLeft} {t('learningOverview.upcomingSchedule.daysLeft')}
                 </div>
                 <div className="flex flex-row justify-center">
                   <p className="font-blinker text-lg font-semibold">{subj.subject}</p>
@@ -93,31 +103,31 @@ const LearningOverview = ({ mockUserData }) => {
 
           {/* Friends Section  */}
           <div className="glassy-secondary-background rounded-3xl p-5 ">
-            <p className="font-blinker flex flex-row gap-3 items-center font-semibold text-lg"><HandshakeIcon />Friend's Progress</p>
+            <p className="font-blinker flex flex-row gap-3 items-center font-semibold text-lg"><HandshakeIcon />{t('learningOverview.friendsProgress.label')}</p>
             <div className="flex flex-row items-end justify-around mt-6 h-40 px-2">
-    {[
-      { name: "Mohamed", height: 112 },
-      { name: "Islam",   height: 88 },
-      { name: "Roshdy",  height: 144 },
-      { name: "Hoka",    height: 72},
-    ].map((friend) => (
-      <div key={friend.name} className="flex flex-col items-center gap-2 w-1/5">
-        <div
-          className="w-full rounded-t-2xl rounded-b-md"
-          style={{
-            height: friend.height,
-            background: "rgba(30, 20, 60, 0.75)",
-            minHeight: "24px",
-          }}
-        />
-        <p className="font-blinker text-xs text-center">{friend.name}</p>
-      </div>
-    ))}
-  </div>
-  <p className="font-blinker text-center text-sm mt-4">
-    You're ahead of 2 friends this week! 🎉
-  </p>
-  {/* Footer message */} </div>
+              {[
+                { name: "Mohamed", height: 112 },
+                { name: "Islam",   height: 88 },
+                { name: "Roshdy",  height: 144 },
+                { name: "Hoka",    height: 72},
+              ].map((friend) => (
+                <div key={friend.name} className="flex flex-col items-center gap-2 w-1/5">
+                  <div
+                    className="w-full rounded-t-2xl rounded-b-md"
+                    style={{
+                      height: friend.height,
+                      background: "rgba(30, 20, 60, 0.75)",
+                      minHeight: "24px",
+                    }}
+                  />
+                  <p className="font-blinker text-xs text-center">{friend.name}</p>
+                </div>
+              ))}
+            </div>
+            <p className="font-blinker text-center text-sm mt-4">
+              {t('learningOverview.friendsProgress.message')}
+            </p>
+          </div>
 
         </div>
 

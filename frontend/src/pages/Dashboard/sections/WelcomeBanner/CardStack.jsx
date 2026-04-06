@@ -2,6 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 import {motion} from 'framer-motion'
 import { StreakIcon } from '@/comp/ui/Icons';
+import { useTranslation } from 'react-i18next';
 
 const Gloss = () => (
   <span aria-hidden className="absolute top-0 left-[8%] w-[84%] h-[35%] rounded-full pointer-events-none"
@@ -26,7 +27,7 @@ const cardAnim = (delay = 0) => ({
 
   const W = Math.round(310 * scale);
   const H = Math.round(400 * scale);
-
+  const {i18n}=useTranslation()
   return (
     <div className={`relative flex-shrink-0 ${className}`} style={{ width: W, height: H }}>
       <div style={{ width: 310, height: 400, transform: `scale(${scale})`, transformOrigin: "top right" }}>
@@ -43,15 +44,15 @@ const cardAnim = (delay = 0) => ({
               <StreakIcon />
             </div>
             <span className="text-white font-bold text-lg" style={{ fontFamily: "Blinker, sans-serif" }}>
-              Weekly Streak
+             {i18n.language==="ar"?"سلسلة أسبوعية":"Weekly Streak"}
             </span>
           </div>
           <div className="text-center py-2">
             <p className="text-white text-xl  font-semibold" style={{ fontFamily: "Blinker, sans-serif" }}>
              
-            {mockUserData.streak} Days
+            {mockUserData.streak} {i18n.language==="ar" ?"أيام":"Days"}
             </p>
-            <p className="text-white/80 text-base mb-3 " style={{ fontFamily: "Blinker, sans-serif" }}>Keep it going! 🔥</p>
+            <p className="text-white/80 text-base mb-3 " style={{ fontFamily: "Blinker, sans-serif" }}>{i18n.language==="ar"?"استمر في ذلك":"Keep it going!"} 🔥</p>
           </div>
         </motion.div>
 
@@ -63,11 +64,11 @@ const cardAnim = (delay = 0) => ({
         >
           <Gloss />
           <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1"
-            style={{ fontFamily: "Blinker, sans-serif" }}>Next Up</p>
+            style={{ fontFamily: "Blinker, sans-serif" }}>{i18n.language==="ar"?"التالي":"Next Up"}</p>
           <p className="text-white text-lg font-bold leading-tight" style={{ fontFamily: "Blinker, sans-serif" }}>
             {mockUserData.upcomingSubject.subject} 
           </p>
-          <p className="text-white/60 text-sm mt-1" style={{ fontFamily: "Blinker, sans-serif" }}>In {mockUserData.upcomingSubject.time} minutes</p>
+          <p className="text-white/60 text-sm mt-1" style={{ fontFamily: "Blinker, sans-serif" }}>{i18n.language==="ar"?"في":'in'} {mockUserData.upcomingSubject.time} minutes</p>
         </motion.div>
 
         {/* Card 3 — Study Time */}
@@ -78,8 +79,8 @@ const cardAnim = (delay = 0) => ({
         >
           <Gloss />
           <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1"
-            style={{ fontFamily: "Blinker, sans-serif" }}>Study Time Today</p>
-          <p className="text-white text-3xl font-bold" style={{ fontFamily: "Blinker, sans-serif" }}>{mockUserData.studyTimeToday} hrs</p>
+            style={{ fontFamily: "Blinker, sans-serif" }}>{i18n.language==="ar"?"وقت الدراسة اليوم":"Study Time Today"}</p>
+          <p className="text-white text-3xl font-bold" style={{ fontFamily: "Blinker, sans-serif" }}>{mockUserData.studyTimeToday} {i18n.language==="ar"?"ساعات":"hrs"}</p>
           <div className="mt-3 w-full h-2 rounded-full bg-white/10 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}

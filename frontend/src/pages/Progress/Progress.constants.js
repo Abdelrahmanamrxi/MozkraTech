@@ -5,7 +5,6 @@ const mockProgressData = {
   achievements: 8,
 
   overallProgress: 78,
-  overallProgressLabel: "You're doing great! Keep up the momentum.",
   progressChangeThisMonth: "+12%",
 
   level: 8,
@@ -106,8 +105,7 @@ const mockProgressData = {
     { icon: "📅", color: "#16a34a", unlocked: true },
   ],
 
-  keepGoingMessage:
-    "You're on track to meet your weekly goal. Complete 2 more study sessions today!",
+ 
 };
 
 export default mockProgressData;

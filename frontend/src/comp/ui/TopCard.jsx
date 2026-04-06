@@ -15,7 +15,7 @@ export const T = {
 // Base glass card with 3 variants and a staggered entrance animation
 // variant: "purple" | "dark" | "light"
 // delay: ms before the card fades/slides in
-export const Card = ({ children, variant = "purple", delay = 0, className = "" }) => {
+export const Card = ({ children, variant, delay = 0, className  }) => {
   const [visible, setVisible] = useState(false);
     // Trigger visibility after `delay` ms — drives the entrance animation
   useEffect(() => { const t = setTimeout(() => setVisible(true), delay); return () => clearTimeout(t); }, [delay]);
@@ -23,6 +23,8 @@ export const Card = ({ children, variant = "purple", delay = 0, className = "" }
     purple: { background: "rgba(144,103,198,0.45)",                                                  border: "1px solid rgba(141,134,201,0.3)" },
     dark:   { background: "linear-gradient(180deg, rgba(36,32,56,0.9), rgba(144,103,198,0.75))",     border: "1px solid rgba(141,134,201,0.25)" },
     light:  { background: "linear-gradient(135deg, rgba(220,214,230,0.65), rgba(180,170,220,0.45))", border: "1px solid rgba(255,255,255,0.3)" },
+    progressDark: { background: "rgba(36,32,56,0.9)", border: "1px solid rgba(155,126,222,0.3)" },
+    progressSecondDark: { background: "rgba(36,32,56,0.9)", border: "1px solid rgba(124,95,189,0.3)" }
   };
   return (
     <div className={`rounded-3xl p-5 flex flex-col gap-1 ${className}`} style={{

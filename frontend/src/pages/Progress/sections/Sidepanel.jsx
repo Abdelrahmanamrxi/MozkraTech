@@ -5,16 +5,19 @@ import { motion } from "framer-motion";
 import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
 import { StartIcon } from "@/comp/ui/Icons";
 import { TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import ProgressBar from "@/comp/ui/ProgressBar";
+
 
 /* ── Overall Progress card ── */
 function OverallProgressCard({ mockProgressData }) {
+  const {i18n}=useTranslation()
   return (
     <Card variant="purple" className="p-5">
       <div className="flex flex-row items-center gap-2 mb-2">
         <TrendingUp size={18} className="text-white/70" />
         <p className="font-blinker font-semibold text-white/80 text-sm uppercase tracking-widest">
-          Overall Progress
+          {i18n.language==="ar"?"التقدم الشامل":"Overall Progress"}
         </p>
       </div>
       <motion.p
@@ -26,10 +29,10 @@ function OverallProgressCard({ mockProgressData }) {
         {mockProgressData.overallProgress}%
       </motion.p>
       <p className="font-blinker text-white/70 text-sm mt-1">
-        {mockProgressData.overallProgressLabel}
+        {i18n.language==="ar"?"إنت ماشي كويس جدًا  !   كمل بنفس الحماس":"You're doing great! Keep up the momentum."}
       </p>
       <div className="mt-4 flex flex-row items-center justify-between">
-        <p className="font-blinker text-xs text-white/50">This Month</p>
+        <p className="font-blinker text-xs text-white/50">{i18n.language==="ar"?"هذا الشهر":"This Month"}</p>
         <span
           className="font-blinker text-xs font-semibold px-2 py-0.5 rounded-full"
           style={{ background: "rgba(255,255,255,0.15)", color: "white" }}
@@ -47,11 +50,11 @@ function AchievementsCard({ mockProgressData }) {
     (b) => b.unlocked,
   ).length;
   const total = mockProgressData.achievementBadges.length;
-
+const {i18n}=useTranslation()
   return (
     <Card variant="dark" className="p-5">
       <div className="flex flex-row items-center justify-between mb-4">
-        <p className="font-poppins font-semibold text-white">Achievements</p>
+        <p className="font-poppins font-semibold text-white">{i18n.language==="ar"?"الإنجازات":"Achievements"}</p>
         <span className="font-blinker text-sm text-white/50">
           {unlocked}/{total}
         </span>
@@ -107,7 +110,7 @@ function AchievementsCard({ mockProgressData }) {
           border: "1px solid rgba(255,255,255,0.1)",
         }}
       >
-        View All Achievements
+        {i18n.language==="ar"?"عرض جميع الإنجازات":"View All Achievements"}
       </button>
     </Card>
   );
@@ -147,7 +150,7 @@ function LevelProgressCard({ mockProgressData }) {
 /* ── Streak card ── */
 function StreakCard({ mockProgressData }) {
   const { dayStreak, personalBestStreak, streakDays } = mockProgressData;
-
+  const {i18n}=useTranslation()
   return (
     <Card variant="dark" className="p-5">
       <div className="flex flex-row items-center gap-3 mb-4">
@@ -173,10 +176,10 @@ function StreakCard({ mockProgressData }) {
         </div>
         <div>
           <p className="font-poppins font-semibold text-white">
-            {dayStreak} Day Streak
+            {dayStreak} {i18n.language==="ar"?"عدد الأيام المتتالية":"Day Streak"}
           </p>
-          <p className="font-blinker text-xs text-white/50">
-            Personal best: {personalBestStreak} days
+          <p className="font-blinker text-xs flex flex-row gap-3 text-white/50">
+            {i18n.language==="ar"?"أفضل إنجاز شخصي":"Personal Best"} : {personalBestStreak} {i18n.language==="ar"?"ايام":"Days"}
           </p>
         </div>
       </div>
@@ -227,6 +230,7 @@ function StreakCard({ mockProgressData }) {
 
 /* ── Keep Going card ── */
 function KeepGoingCard({ mockProgressData }) {
+  const {i18n}=useTranslation()
   return (
     <Card variant="dark" className="p-5">
       <div className="flex flex-col items-start gap-2 mb-2">
@@ -254,16 +258,16 @@ function KeepGoingCard({ mockProgressData }) {
             />
           </svg>
         </span>
-        <p className="font-poppins font-semibold text-white">Keep Going!</p>
+        <p className="font-poppins font-semibold text-white">{i18n.language==="ar"? "استمر في التقدم":"Keep Going"}!</p>
       </div>
       <p className="font-blinker text-sm text-white/60 mb-4">
-        {mockProgressData.keepGoingMessage}
+        {i18n.language==="ar"?"إنت ماشي صح عشان تحقق هدفك الأسبوعي. كمل جلستين مذاكرة كمان النهارده!":"You're on track to meet your weekly goal. Complete 2 more study sessions today!"}
       </p>
       <LiquidGlassButton
         icon={StartIcon}
         className="w-full py-2 justify-center"
       >
-        Start Study Session
+        {i18n.language==="ar"?"ابدأ المذاكرة":"Start Study Session"}
       </LiquidGlassButton>
     </Card>
   );

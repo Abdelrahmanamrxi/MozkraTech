@@ -1,0 +1,59 @@
+{
+"weekly":{
+    "morning":"صباح الخير",
+    "afternoon":"مساء الخير",
+    "schedule":"عرض الجدول الكامل",
+    "report":"التقرير الأسبوعي",
+    "text":"أنت تحرز تقدماً رائعاً! دعنا نستمر في رحلة التعلم الخاصة بك اليوم."
+},
+ "summary": {
+    "currentStreak": {
+      "label": "الانقطاع الحالي",
+      "sub": "أيام"
+    },
+    "goalsCompleted": {
+      "label": "الأهداف المكتملة",
+      "sub": "الأهداف",
+      "extra": "/ 10"
+    },
+    "achievements": {
+      "label": "الإنجازات",
+      "sub": "المكتسبة"
+    },
+    "studyHours": {
+      "label": "ساعات الدراسة",
+      "subLabel": "الساعات هذا الأسبوع"
+    },
+    "tasks": {
+      "label": "المهام",
+      "remaining": "مهام متبقية"
+    },
+    "donutChart": {
+      "label": "ساعات الدراسة",
+      "completed": "مكتمل",
+      "remaining": "متبقي"
+    }
+  },
+   "learningOverview": {
+    "aiSuggestion": {
+      "label": "اقتراح الذكاء الاصطناعي",
+      "button": "ابدأ الجلسة"
+    },
+    "todaysSchedule": {
+      "label": "جدول اليوم هنا",
+      "difficulty": {
+        "easy": "سهل",
+        "medium": "متوسط",
+        "hard": "صعب"
+      }
+    },
+    "upcomingSchedule": {
+      "label": "الجدول القادم",
+      "daysLeft": "أيام"
+    },
+    "friendsProgress": {
+      "label": "تقدم الأصدقاء",
+      "message": "أنت متقدم على صديقين هذا الأسبوع! 🎉"
+    }
+  }
+}

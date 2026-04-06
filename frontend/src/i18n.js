@@ -5,6 +5,10 @@ import LandingenTranslation from "./locales/Landing/en.json";
 import LandingarTranslation from "./locales/Landing/ar.json";
 import CommonenTranslation from './locales/common/en.json'
 import CommonarTranslation from './locales/common/ar.json'
+import DashboardenTranslation from './locales/dashboard/en.json'
+import DashboardarTranslation from './locales/dashboard/ar.json'
+import ProgressenTranslation from './locales/progress/en.json'
+import ProgressarTranslation from './locales/progress/ar.json'
 
 i18n
   .use(initReactI18next)
@@ -15,11 +19,15 @@ i18n
     resources: {
       en: {
         landing: LandingenTranslation,
-        common:CommonenTranslation
+        common:CommonenTranslation,
+        dashboard:DashboardenTranslation,
+        progress:ProgressenTranslation
       },
       ar: {
         landing: LandingarTranslation,
-        common:CommonarTranslation
+        common:CommonarTranslation,
+        dashboard:DashboardarTranslation,
+        progress:ProgressarTranslation
       }
     },
     ns: ["landing"], // optional but explicit

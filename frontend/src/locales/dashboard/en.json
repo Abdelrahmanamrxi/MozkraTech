@@ -1,0 +1,62 @@
+{
+"weekly":{
+     "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "schedule":"View Full Schedule",
+    "report":"Weekly Report",
+    "text":"You're making great progress! Let's continue your learning journey today."
+},
+  "summary": {
+    "currentStreak": {
+      "label": "Current Streak",
+      "sub": "Days"
+    },
+    "goalsCompleted": {
+      "label": "Goals Completed",
+      "sub": "Goals",
+      "extra": "/ 10"
+    },
+    "achievements": {
+      "label": "Achievements",
+      "sub": "earned"
+    },
+    "studyHours": {
+      "label": "Study Hours",
+      "subLabel": "Hours This Week"
+    },
+    "tasks": {
+      "label": "Tasks",
+      "remaining": "tasks remaining"
+    },
+    "donutChart": {
+      "label": "Study Hours",
+      "completed": "Completed",
+      "remaining": "Remaining"
+    }
+  },
+   "learningOverview": {
+    "aiSuggestion": {
+      "label": "AI Suggestion",
+      "button": "Start Session"
+    },
+    "todaysSchedule": {
+      "label": "Today's Schedule Here",
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      }
+    },
+    "upcomingSchedule": {
+      "label": "Upcoming Schedule",
+      "daysLeft": "days"
+    },
+    "friendsProgress": {
+      "label": "Friend's Progress",
+      "message": "You're ahead of 2 friends this week! 🎉"
+    }
+  }
+
+
+
+}
