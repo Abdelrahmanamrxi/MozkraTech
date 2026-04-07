@@ -1,0 +1,56 @@
+{
+  "title": "Friends and Progress",
+  "subtitle": "Track your progress and compete with study buddies",
+  "addFriends": "Add Friends",
+  "tabs": {
+    "progress": "Progress & Tracking",
+    "messages": "Messages"
+  },
+  "messages": {
+    "title": "Messages",
+    "unread": "unread",
+    "searchPlaceholder": "Search friends...",
+    "noFriends": "No friends found",
+    "inputPlaceholder": "Type a message...",
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    }
+  },
+  "progress": {
+    "compareTitle": "Compare Progress",
+    "searchPlaceholder": "Search friends to compare...",
+    "level": "Level",
+    "rank": "Rank",
+    "studyHours": "Study Hours",
+    "goals": "Goals",
+    "dayStreak": "Day Streak",
+    "achievements": "Achievements",
+    "overallProgress": "Overall Progress",
+    "you": "(You)"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "You're ranked",
+    "outOf": "out of",
+    "studyHours": "Study Hours",
+    "goals": "Goals",
+    "streak": "Streak",
+    "fullRankings": "Full Rankings"
+  },
+
+  "behind": "behind",
+
+  "subjectComparison": {
+    "title": "Top Subject Comparison"
+  },
+
+  "actions": {
+    "studyTogether": "Study Together",
+    "challengeFriend": "Challenge Friend",
+    "shareAchievement": "Share Achievement",
+    "studyDesc": "Schedule a group study session with friends",
+    "challengeDesc": "Create a study challenge and compete",
+    "shareDesc": "Celebrate your progress with friends"
+  }
+}
