@@ -5,14 +5,15 @@ import { TimerIcon } from "../ui/Icons";
 import { Bot } from "lucide-react";
 import { Card } from "../ui/TopCard";
 import { Link } from "react-router";
-export default function Body({ children, navbarVariant = "landing" }) {
+import { Outlet } from "react-router";
+export default function Body() {
   const location=useLocation()
   return (
     <div>
-      <Header navbarVariant={navbarVariant} />
+      <Header  />
       <div className="main-background">
 
-      {children}
+      <Outlet/>
 
     {location.pathname!=='/'&&(
       <>

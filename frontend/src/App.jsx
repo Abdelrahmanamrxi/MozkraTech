@@ -1,41 +1,76 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import ForgetPassword from "./pages/ForgetPassword";
 import Home from "./pages/Dashboard/Dashboard.jsx";
 import Chatbot from "./pages/Chatbot/Chatbot";
 import "./App.css";
 import Schedule from "./pages/Schedule/Schedule.jsx";
 import Friends from "./pages/Friends/Friends.jsx";
 import Timer from "./pages/Timer/Timer.jsx";
-
 import Progress from "./pages/Progress/Progress.jsx";
+import Body from "./comp/layout/Body.jsx";
+import ErrorFallback from "./comp/error/ErrorFallback.jsx";
+
+const router = createBrowserRouter([
+  {
+    element: <Body />,
+    errorElement:<ErrorFallback/>,
+    children: [
+      {
+        path: "/",
+        element: <LandingPage />,
+      },
+      {
+        path: "/dashboard",
+        element: <Home />,
+      },
+      {
+        path: "/dashboard/schedule",
+        element: <Schedule />,
+      },
+      {
+        path: "/dashboard/friends",
+        element: <Friends />,
+      },
+      {
+        path: "/dashboard/progress",
+        element: <Progress />,
+      },
+    ],
+  },
+  {
+    path:'/dashboard/timer',
+    element:<Timer/>
+  }
+  ,{
+    path:'/dashboard/ai',
+    element:<Chatbot/>
+  },
+  {
+    path: "/signup",
+    element: <SignupPage />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgetPassword />,
+  },
+]);
 
 function App() {
   const { i18n } = useTranslation();
-  useEffect(()=>{
-    document.dir=i18n.language === "ar" ? "rtl" : 'ltr'
-  },[i18n.language])
+  useEffect(() => {
+    document.dir = i18n.language === "ar" ? "rtl" : "ltr";
+  }, [i18n.language]);
 
-
-
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<Home />} />
-        <Route path="/dashboard/ai" element={<Chatbot />} />
-        <Route path="/dashboard/schedule" element={<Schedule />} />
-        <Route path="/dashboard/friends" element={<Friends />} />
-        <Route path="/dashboard/timer" element={<Timer />} />
-        <Route path="/dashboard/progress" element={<Progress />} />
-      </Routes>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

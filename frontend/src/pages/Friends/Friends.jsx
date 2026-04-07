@@ -13,7 +13,7 @@ function Friends() {
     const[showMessagesSection,setSection]=useState(false)
     console.log(showMessagesSection)
     return(
-       <Body>
+       
       <div className='min-h-screen p-8 lg:p-14 pt-12 lg:pt-20'>
   {/* Header */}
   <div className='flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between'>
@@ -95,8 +95,6 @@ function Friends() {
 
         </div>
    
-
-       </Body>
     )
 
 }

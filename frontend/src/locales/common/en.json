@@ -17,5 +17,72 @@
       "close":"Close"
        
     }
+  },
+  "loginPage": {
+    "back": "Back",
+    "heading": "Welcome ",
+    "headingAccent": "Back",
+    "description": "Join thousands of students who are mastering their schedules and achieving their academic goals with AI-powered planning.",
+    "logIn": "Log In",
+    "google": "Google",
+    "or": "Or",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "forgotPassword": "Forgot password?",
+    "signupPrompt": "Don't have an account?",
+    "loginButton": "Login"
+  },
+  "signupPage": {
+    "back": "Back",
+    "heading": "Start Your",
+    "accent": "Success Journey",
+    "description": "Join thousands of students who are mastering their schedules and achieving their academic goals with AI-powered planning.",
+    "createAccount": "Create Account",
+    "getStarted": "Get started with your free account",
+    "google": "Google",
+    "or": "Or",
+    "fullName": "Full Name",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "confirmPasswordPlaceholder": "Confirm Password",
+    "gender": {
+      "male": "M",
+      "female": "F",
+      "other": "Other"
+    },
+    "birthDate": {
+      "dayPlaceholder": "DD",
+      "monthPlaceholder": "MM",
+      "yearPlaceholder": "YYYY"
+    },
+    "alreadyHaveAccount": "Already have an account?",
+    "loginHere": "Login here",
+    "createAccountButton": "Create Account →"
+  },
+  "forgetPassword": {
+    "back": "Back",
+    "heading": "Reset Your",
+    "accent": "Password",
+    "description": "Enter your email address and we'll send you an OTP to reset your password and get back to your learning journey.",
+    "enterEmail": "Enter Your Email",
+    "enterEmailSubtitle": "We'll send an OTP to verify your account",
+    "emailPlaceholder": "Email",
+    "sendOtp": "Send OTP",
+    "sending": "Sending...",
+    "backToLogin": "Back to Login",
+    "enterOtp": "Enter OTP",
+    "otpSent": "We've sent a 6-digit code to",
+    "otpPlaceholder": "000000",
+    "verifyOtp": "Verify OTP",
+    "verifying": "Verifying...",
+    "didntReceiveCode": "Didn't receive code?",
+    "resend": "Resend",
+    "useDifferentEmail": "Use different email",
+    "errors": {
+      "emailRequired": "Email is required",
+      "validEmail": "Please enter a valid email",
+      "otpRequired": "OTP is required",
+      "otpDigits": "OTP must be 6 digits"
+    }
   }
 }

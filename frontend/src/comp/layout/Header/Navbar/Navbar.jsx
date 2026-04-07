@@ -6,7 +6,7 @@ import i18n from "i18next"
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 
-function Navbar({ variant = "landing" }) {
+function Navbar() {
   const {t}=useTranslation(['common'])
   
   const [currentLang, setCurrentLang] = useState(i18n.language || 'en');
@@ -194,7 +194,7 @@ function Navbar({ variant = "landing" }) {
         <div className="w-px h-6 bg-white/20" />
 
         {/* Login & Signup Buttons */}
-        {variant === "landing" && (
+        {!location.pathname.startsWith('/dashboard') && (
           <>
             <Link to="/login">
               <motion.button
@@ -234,7 +234,7 @@ function Navbar({ variant = "landing" }) {
           </>
         )}
 
-        {variant === "dashboard" && (
+        {location.pathname.startsWith('/dashboard') && (
           <>
             {/* Notification */}
             <motion.button

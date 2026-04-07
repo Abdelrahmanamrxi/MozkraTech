@@ -16,5 +16,72 @@
         "close": "إغلاق",
         "recent": "الأحدث"
     }
+  },
+  "loginPage": {
+    "back": "عودة",
+    "heading": "مرحبا بعودتك",
+    "headingAccent": "",
+    "description": "انضم إلى آلاف الطلاب الذين يتقنون جداولهم ويحققون أهدافهم الأكاديمية بخطة مدعومة بالذكاء الاصطناعي.",
+    "logIn": "تسجيل الدخول",
+    "google": "جوجل",
+    "or": "أو",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "passwordPlaceholder": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "signupPrompt": "ليس لديك حساب؟",
+    "loginButton": "تسجيل الدخول"
+  },
+  "signupPage": {
+    "back": "عودة",
+    "heading": "ابدأ",
+    "accent": "رحلة النجاح",
+    "description": "انضم إلى آلاف الطلاب الذين يتقنون جداولهم ويحققون أهدافهم الأكاديمية بخطة مدعومة بالذكاء الاصطناعي.",
+    "createAccount": "إنشاء حساب",
+    "getStarted": "ابدأ بحسابك المجاني",
+    "google": "جوجل",
+    "or": "أو",
+    "fullName": "الاسم الكامل",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "passwordPlaceholder": "كلمة المرور",
+    "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+    "gender": {
+      "male": "ذكر",
+      "female": "أنثى",
+      "other": "آخر"
+    },
+    "birthDate": {
+      "dayPlaceholder": "اليوم",
+      "monthPlaceholder": "الشهر",
+      "yearPlaceholder": "السنة"
+    },
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "loginHere": "تسجيل الدخول هنا",
+    "createAccountButton": "إنشاء الحساب →"
+  },
+  "forgetPassword": {
+    "back": "عودة",
+    "heading": "إعادة تعيين",
+    "accent": "كلمة المرور",
+    "description": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رمز تحقق لإعادة تعيين كلمة المرور.",
+    "enterEmail": "أدخل بريدك الإلكتروني",
+    "enterEmailSubtitle": "سنرسل رمز تحقق لتأكيد حسابك",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "sendOtp": "إرسال الرمز",
+    "sending": "جارٍ الإرسال...",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "enterOtp": "أدخل رمز التحقق",
+    "otpSent": "لقد أرسلنا رمزًا مكونًا من 6 أرقام إلى",
+    "otpPlaceholder": "000000",
+    "verifyOtp": "تحقق من الرمز",
+    "verifying": "جارٍ التحقق...",
+    "didntReceiveCode": "لم تستلم الرمز؟",
+    "resend": "إعادة الإرسال",
+    "useDifferentEmail": "استخدم بريدًا إلكترونيًا آخر",
+    "errors": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "validEmail": "يرجى إدخال بريد إلكتروني صحيح",
+      "otpRequired": "الرمز مطلوب",
+      "otpDigits": "يجب أن يكون الرمز مكونًا من 6 أرقام"
+    }
   }
 }

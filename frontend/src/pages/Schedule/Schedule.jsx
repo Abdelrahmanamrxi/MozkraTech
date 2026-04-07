@@ -88,7 +88,7 @@ const Schedule = () => {
   const [filterSubject, setFilterSubject] = useState("All")
 
   return (
-     <Body>
+  
       <section className="min-h-screen p-7 lg:p-14 pt-12 lg:pt-20 ">
          <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
           <div className="flex flex-col font-Inter gap-2">
@@ -253,7 +253,7 @@ const Schedule = () => {
             </div>
             </div>
       </section>
-    </Body>
+ 
   
   )
 }

@@ -11,7 +11,7 @@ import mockProgressData from "./Progress.constants";
 
 function Progress() {
   return (
-    <Body navbarVariant="dashboard">
+    
       <div className="text-white main-background lg:p-15 p-5 sm:p-8">
         <ProgressBanner mockProgressData={mockProgressData} />
         <StatsOverview mockProgressData={mockProgressData} />
@@ -28,7 +28,7 @@ function Progress() {
           <SidePanel mockProgressData={mockProgressData} />
         </div>
       </div>
-    </Body>
+   
   );
 }
 

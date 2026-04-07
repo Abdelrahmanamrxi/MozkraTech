@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import FormContainer from "../comp/containers/FormContainer";
 import { Link } from "react-router";
 import Logo from "../comp/logo/Logo";
@@ -7,19 +8,24 @@ import { motion } from "framer-motion";
 import Footer from "../comp/layout/Footer/Footer";
 import { ArrowLeftIcon } from "lucide-react";
 function LoginPage() {
+  const { t, i18n } = useTranslation("common");
+  const isRtl = i18n.language === "ar";
+  const backPositionClasses = isRtl ? "absolute top-6 right-6 lg:right-20" : "absolute top-6 left-6 lg:left-20";
+  const headingAccent = t("loginPage.headingAccent");
+
   return (
     <div className="flex flex-col relative ">
       <Link
         to=".."
-        className="absolute top-6 left-6 lg:left-20 z-10 flex items-center gap-2 text-white/90 hover:text-white transition-colors"
-        aria-label="Go back"
+        className={`${backPositionClasses} z-10 flex items-center gap-2 text-white/90 hover:text-white transition-colors ${isRtl ? "flex-row-reverse" : ""}`}
+        aria-label={t("loginPage.back")}
       >
         <ArrowLeftIcon className="w-5 h-5" />
-        Back
+        {t("loginPage.back")}
       </Link>
-      <div className="min-h-screen flex flex-col gap-3  lg:flex-row main-background items-center lg:justify-between relative lg:px-14 px-6 py-20">
+      <div className={`min-h-screen flex flex-col gap-3 ${isRtl ? "lg:flex-row-reverse" : "lg:flex-row"} main-background items-center lg:justify-between relative lg:px-14 px-6 py-20`}>
         {/* LEFT SIDE */}
-        <div className="lg:w-1/2 w-full space-y-6 text-center lg:text-left">
+        <div className={`lg:w-1/2 w-full space-y-6 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
           <Logo />
 
           <motion.h1
@@ -28,24 +34,23 @@ function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            Welcome
-            <span className="text-primary">Back</span>
+            {t("loginPage.heading")}
+            {headingAccent ? <span className="text-primary">{headingAccent}</span> : null}
           </motion.h1>
 
           <motion.p
-            className="font-blinker text-center  lg:text-start text-secondary text-base lg:text-lg"
+            className={`font-blinker text-center ${isRtl ? "lg:text-right" : "lg:text-left"} text-secondary text-base lg:text-lg`}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7 }}
           >
-            Join thousands of students who are mastering their schedules and
-            achieving their academic goals with AI-powered planning.
+            {t("loginPage.description")}
           </motion.p>
         </div>
 
         <FormContainer>
           <h2 className="text-3xl text-white font-sans font-semibold text-center mb-2">
-            Log In
+            {t("loginPage.logIn")}
           </h2>
 
           <button className="w-full text-white mt-3 flex items-center justify-center gap-2 bg-white/20 hover:bg-white/40 transition rounded-full py-2 mb-6">
@@ -67,26 +72,31 @@ function LoginPage() {
                 />
               </svg>
             </span>
-            Google
+            {t("loginPage.google")}
           </button>
           <div className="space-y-10">
             <div className="flex items-center gap-3 text-sm text-secondary mb-6">
               <div className="h-px bg-white/20 flex-1"></div>
-              Or
+              {t("loginPage.or")}
               <div className="h-px bg-white/20 flex-1"></div>
             </div>
 
-            <input type="email" placeholder="Email" className="form-input" />
+            <input type="email" placeholder={t("loginPage.emailPlaceholder")} className="form-input" />
 
             <input
               type="password"
-              placeholder="Password"
+              placeholder={t("loginPage.passwordPlaceholder")}
               className="form-input"
             />
           </div>
+          <div className="text-right mt-3">
+            <Link to="/forgot-password" className="text-sm  text-secondary hover:text-white transition-colors">
+              {t("loginPage.forgotPassword")}
+            </Link>
+          </div>
           <div className="text-center text-sm text-secondary mt-5">
             <Link to="/signup" className="underline underline-offset-4">
-              Don't have an account?
+              {t("loginPage.signupPrompt")}
             </Link>
           </div>
           <Link to="/home">
@@ -101,7 +111,7 @@ function LoginPage() {
               }}
               whileTap={{ scale: 0.96 }}
             >
-              Login
+              {t("loginPage.loginButton")}
             </motion.button>
           </Link>
         </FormContainer>

@@ -1,13 +1,13 @@
 import React from "react";
 import Navbar from "./Navbar/Navbar";
 import NavbarMobile from "./Navbar/NavbarMobile/NavbarMobile";
-function Header({ navbarVariant = "landing" }) {
+function Header() {
   return (
     <>
       {/* Desktop navbar + line */}
       <div className="hidden lg:block">
         <div className="flex font-sans bg-primary-dark justify-between items-center px-8 pt-5 pb-0">
-          <Navbar variant={navbarVariant} />
+          <Navbar  />
         </div>
         <div
           style={{
