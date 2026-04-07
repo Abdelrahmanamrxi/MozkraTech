@@ -1,0 +1,55 @@
+{
+  "title": "الأصدقاء والتقدم",
+  "subtitle": "تابع تقدمك وتنافس مع أصدقاء الدراسة",
+  "addFriends": "إضافة أصدقاء",
+  "tabs": {
+    "progress": "التقدم والتتبع",
+    "messages": "الرسائل"
+  },
+  "messages": {
+    "title": "الرسائل",
+    "unread": "غير مقروءة",
+    "searchPlaceholder": "ابحث عن أصدقاء...",
+    "noFriends": "لم يتم العثور على أصدقاء",
+    "inputPlaceholder": "اكتب رسالة...",
+    "status": {
+      "online": "متصل",
+      "offline": "غير متصل"
+    }
+  },
+  "progress": {
+    "compareTitle": "مقارنة التقدم",
+    "searchPlaceholder": "ابحث عن أصدقاء للمقارنة...",
+    "level": "المستوى",
+    "rank": "الترتيب",
+    "studyHours": "ساعات الدراسة",
+    "goals": "الأهداف",
+    "dayStreak": "السلسلة اليومية",
+    "achievements": "الإنجازات",
+    "overallProgress": "التقدم الإجمالي",
+    "you": "(أنت)"
+  },
+  "leaderboard": {
+    "title": "لوحة المتصدرين",
+    "subtitle": "ترتيبك",
+    "outOf": "من أصل",
+    "studyHours": "ساعات الدراسة",
+    "goals": "الأهداف",
+    "streak": "السلسلة",
+    "fullRankings": "الترتيب الكامل"
+  },
+  "behind": "متأخر",
+
+  "subjectComparison": {
+    "title": "مقارنة أفضل المواد"
+  },
+
+  "actions": {
+    "studyTogether": "ذاكر مع الأصدقاء",
+    "challengeFriend": "تحدي صديق",
+    "shareAchievement": "مشاركة إنجاز",
+    "studyDesc": "حدد جلسة مذاكرة جماعية مع أصدقائك",
+    "challengeDesc": "اعمل تحدي مذاكرة ونافس أصحابك",
+    "shareDesc": "احتفل بتقدمك مع أصدقائك"
+  }
+}

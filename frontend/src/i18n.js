@@ -3,14 +3,16 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import LandingenTranslation from "./locales/Landing/en.json";
 import LandingarTranslation from "./locales/Landing/ar.json";
-import CommonenTranslation from './locales/common/en.json'
-import CommonarTranslation from './locales/common/ar.json'
-import DashboardenTranslation from './locales/dashboard/en.json'
-import DashboardarTranslation from './locales/dashboard/ar.json'
-import ProgressenTranslation from './locales/progress/en.json'
-import ProgressarTranslation from './locales/progress/ar.json'
-import ScheduleenTranslation from './locales/schedule/en.json'
-import SchedulearTranslation from './locales/schedule/ar.json'
+import CommonenTranslation from "./locales/common/en.json";
+import CommonarTranslation from "./locales/common/ar.json";
+import DashboardenTranslation from "./locales/dashboard/en.json";
+import DashboardarTranslation from "./locales/dashboard/ar.json";
+import ProgressenTranslation from "./locales/progress/en.json";
+import ProgressarTranslation from "./locales/progress/ar.json";
+import ScheduleenTranslation from "./locales/schedule/en.json";
+import SchedulearTranslation from "./locales/schedule/ar.json";
+import FriendsenTranslation from "./locales/friends/en.json";
+import FriendsarTranslation from "./locales/friends/ar.json";
 
 i18n
   .use(initReactI18next)
@@ -21,24 +23,26 @@ i18n
     resources: {
       en: {
         landing: LandingenTranslation,
-        common:CommonenTranslation,
-        dashboard:DashboardenTranslation,
-        progress:ProgressenTranslation,
-        schedule:ScheduleenTranslation
+        common: CommonenTranslation,
+        dashboard: DashboardenTranslation,
+        progress: ProgressenTranslation,
+        schedule: ScheduleenTranslation,
+        friends: FriendsenTranslation,
       },
       ar: {
         landing: LandingarTranslation,
-        common:CommonarTranslation,
-        dashboard:DashboardarTranslation,
-        progress:ProgressarTranslation,
-        schedule:SchedulearTranslation
-      }
+        common: CommonarTranslation,
+        dashboard: DashboardarTranslation,
+        progress: ProgressarTranslation,
+        schedule: SchedulearTranslation,
+        friends: FriendsarTranslation,
+      },
     },
     ns: ["landing"], // optional but explicit
     defaultNS: "landing",
     react: {
-      useSuspense: true
-    }
+      useSuspense: true,
+    },
   });
 
 export default i18n;
