@@ -8,7 +8,6 @@ import jwt from "jsonwebtoken";
 
 
 //----------------------------------signUp-------------------------------------------
-
 export const signUp = asyncHandler(async (req, res, next) => {
     const { fullName, email, location, password, gender, confirmPassword, birthDate } = req.body;
 
@@ -25,7 +24,6 @@ export const signUp = asyncHandler(async (req, res, next) => {
     // hashing password
     const hashedPassword = await bcrypt.hashSync(password, +process.env.SALT_ROUNDS);
 
-
     // create user
     const user = await userModel.create({
         fullName,
@@ -35,11 +33,9 @@ export const signUp = asyncHandler(async (req, res, next) => {
         gender,
         birthDate
     });
-
     
     // send email
     eventEmitter.emit("sendEmail", { email });
-
     return res.status(201).json({ message: "Sign up success", user });
 });
 
@@ -126,9 +122,9 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
     else {
         return next(new Error("Invalid authorization token prefix"));
         // return res.status(401).json({message: "token not found"});
-     }
-     const decoded = jwt.verify(token, SIGNATURE_TOKEN);
-     console.log(decoded);
+    }
+    const decoded = jwt.verify(token, SIGNATURE_TOKEN);
+    console.log(decoded);
 
         if (!decoded?.id) {
             return next(new Error("token invalid payload"));
@@ -154,7 +150,6 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 
 
 // ----------------------------------forget password-------------------------------------------
-
 export const forgetPassword = asyncHandler(async (req, res, next) => {
     const { email } = req.body;
     const user = await userModel.findOne({ email, isDeleted: false });
@@ -167,7 +162,6 @@ export const forgetPassword = asyncHandler(async (req, res, next) => {
 
 
 // ----------------------------------reset password-------------------------------------------
-
 export const resetPassword = asyncHandler(async (req, res, next) => {
     const { email, code, newPassword, confirmPassword } = req.body;
     const user = await userModel.findOne({ email, isDeleted: false });
@@ -188,5 +182,3 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     await userModel.updateOne({email}, { $unset: {OTPPassword: 0}});
     return res.status(200).json({ message: "password reset success" });
 }); 
-
-    
