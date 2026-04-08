@@ -10,7 +10,6 @@ export const customId = (value, helper) => {
 
 export const generalRules = {
     id: joi.string().custom(customId),
-
     headers:  joi.object({
         authorization: joi.string().required(),
         'cache-control': joi.string().required(),
