@@ -41,7 +41,7 @@ export const signUp = asyncHandler(async (req, res, next) => {
     setImmediate(() => {
         eventEmitter.emit("sendEmail", { email });
     });
-    return res.status(201).json({ message: "Sign up Sucessful", user });
+    return res.status(201).json({ message: "Sign up Successful", user });
 });
 
 
@@ -73,9 +73,9 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
 // ----------------------------------login-------------------------------------------
 export const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
-    const user = await userModel.findOne({email, isVerified: true});
+    const user = await userModel.findOne({email, isVerified: true, isDeleted: false, provider: "system"});
     if(!user) {
-        return next(new HttpException("User Doesn't Exist",401));
+        return next(new HttpException("User Doesn't Exist or not verified yet or logged in with google",401));
     }
 
     //compare password
@@ -161,9 +161,9 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 // ----------------------------------forget password-------------------------------------------
 export const forgetPassword = asyncHandler(async (req, res, next) => {
     const { email } = req.body;
-    const user = await userModel.findOne({ email, isDeleted: false });
+    const user = await userModel.findOne({ email, isDeleted: false, isVerified: true, provider: "system" });
     if (!user) {
-        return next(new HttpException("Email Doesn't exist",400));
+        return next(new HttpException("Email Doesn't exist or not verified or logged in with google",400));
     }
     setImmediate(() => {
         eventEmitter.emit("forgetPassword", { email });
@@ -198,8 +198,8 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     return res.status(200).json({ message: "password reset success" });
 }); 
 
-// ----------------------------------loginOrSignUpWithGoogle-------------------------------------------
-export const loginWithGoogle = asyncHandler(async (req, res, next) => {
+// ----------------------------------signUpWithGoogle-------------------------------------------
+export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
 const { idToken, birthDate, location } = req.body;
 const client = new OAuth2Client();
     async function verify() {
@@ -211,10 +211,13 @@ const client = new OAuth2Client();
         return payload;
 }
     const { name, email, email_verified, picture } = await verify();
-    
-    let user = await userModel.findOne({email});
-    if (!user) {
-        user = await userModel.create({
+
+     // check email 
+    const emailExist = await userModel.findOne({ email });
+    if (emailExist) {
+        return next(new HttpException("Email Already Exists", 404));
+    }
+        const user = await userModel.create({
             fullName:name,
             email: email,
             isVerified: email_verified,
@@ -222,8 +225,29 @@ const client = new OAuth2Client();
             birthDate,
             location
         })
-    }
+    return res.status(200).json({message: "login with google success", user});
+})
 
+
+// ----------------------------------loginWithGoogle-------------------------------------------
+export const loginWithGoogle = asyncHandler(async (req, res, next) => {
+
+const client = new OAuth2Client();
+    async function verify() {
+        const { idToken} = req.body;
+        const ticket = await client.verifyIdToken({
+        idToken: idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,  
+    });
+        const payload = ticket.getPayload();
+        return payload;
+}
+    const {email} = await verify();
+    
+    let user = await userModel.findOne({email});
+    if (!user) {
+        return next(new HttpException("email not exist Please sign up"),400);
+    }
     if (user.provider != 'google') {
         return next(new Error("login with google failed login with system "));
     }
@@ -245,6 +269,7 @@ const client = new OAuth2Client();
     });
     return res.status(200).json({message: "login with google success", accessToken, refreshToken});
 })
+
 
 {/** RE SEND OTP */}
 export const resendOTP=asyncHandler(async(req,res,next)=>{

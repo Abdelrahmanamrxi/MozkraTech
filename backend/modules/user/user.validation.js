@@ -1,5 +1,6 @@
 import joi from "joi";
 
+
 const minAge = 10;
 
 const maxDate = new Date();
@@ -55,7 +56,11 @@ export const resetPasswordSchema = joi.object({
 
 export const loginWithGoogleSchema = joi.object({
     idToken: joi.string().required(),
-    birthDate: joi
+})
+
+export const signUpWithGoogleSchema = joi.object({
+    idToken: joi.string().required(),
+       birthDate: joi
         .date()
         .less('now')  
         .max(maxDate)
