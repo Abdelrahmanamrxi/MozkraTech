@@ -49,3 +49,17 @@ export const resetPasswordSchema = joi.object({
     newPassword: joi.string().required().min(8).pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/),
     confirmPassword: joi.string().valid(joi.ref('newPassword')).required()
 })
+
+export const loginWithGoogleSchema = joi.object({
+    idToken: joi.string().required(),
+    birthDate: joi
+        .date()
+        .less('now')  
+        .max(maxDate)
+        .required()
+        .messages({
+            "date.less": "Birth date must be in the past",
+            "date.max": "You must be at least 10 years old"
+        }),
+    location: joi.string().required()
+})

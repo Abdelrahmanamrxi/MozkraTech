@@ -1,5 +1,5 @@
-export const html =  ({code, message} = {}) => {
-    return `<!DOCTYPE html>
+export const html = ({ code, message } = {}) => {
+  return `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -21,7 +21,7 @@ export const html =  ({code, message} = {}) => {
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo-text">Mozakra<span class="logo-accent">Tech</span></div>
+            <div class="logo-text">Mozkra<span class="logo-accent">Tech</span></div>
         </div>
         <div class="content">
             <h1>${message}</h1>
@@ -42,5 +42,5 @@ export const html =  ({code, message} = {}) => {
         </div>
     </div>
 </body>
-</html>`
-}
+</html>`;
+};

@@ -1,9 +1,10 @@
-import userModel from "../../DB/models/user.model.js";
+import userModel, { providerTypes } from "../../DB/models/user.model.js";
 import { asyncHandler } from "../../utils/globalErrorHandling/index.js";
 import bcrypt from "bcrypt";
 import { eventEmitter } from "../../utils/sendEmail.events/sendEmail.events.js";
 import { generateToken } from "../../token/gnerateToken.js";
 import jwt from "jsonwebtoken";
+import {OAuth2Client} from 'google-auth-library';
 
 
 
@@ -182,3 +183,51 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     await userModel.updateOne({email}, { $unset: {OTPPassword: 0}});
     return res.status(200).json({ message: "password reset success" });
 }); 
+
+// ----------------------------------loginOrSignUpWithGoogle-------------------------------------------
+export const loginWithGoogle = asyncHandler(async (req, res, next) => {
+const { idToken, birthDate, location } = req.body;
+const client = new OAuth2Client();
+    async function verify() {
+        const ticket = await client.verifyIdToken({
+        idToken: idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,  
+    });
+        const payload = ticket.getPayload();
+        return payload;
+}
+    const { name, email, email_verified, picture } = await verify();
+    
+    let user = await userModel.findOne({email});
+    if (!user) {
+        user = await userModel.create({
+            fullName:name,
+            email: email,
+            isVerified: email_verified,
+            provider: providerTypes.google,
+            birthDate,
+            location
+        })
+    }
+
+    if (user.provider != providerTypes.google) {
+        return next(new Error("login with google failed login with system "));
+    }
+    const accessToken = await generateToken({
+        payload: {
+            email,
+            id: user._id},
+        SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+        option: {expiresIn: "1d"}
+    });
+    const refreshToken = await generateToken({
+        payload: {
+            email,
+            id: user._id
+        },
+            SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+            option: {expiresIn: "2w"}
+        
+    });
+    return res.status(200).json({message: "login with google success", accessToken, refreshToken});
+})

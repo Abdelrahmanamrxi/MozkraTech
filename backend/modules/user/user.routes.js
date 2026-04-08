@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { confirmEmail, forgetPassword, login, refreshToken, resetPassword, signUp } from "./user.controller.js";
+import { confirmEmail, forgetPassword, login, loginWithGoogle, refreshToken, resetPassword, signUp } from "./user.controller.js";
 import { validation } from "../../middleware/validation.js";
-import { confirmEmailSchema, forgetPasswordSchema, loginSchema, refreshTokenSchema, resetPasswordSchema, signUpSchema } from "./user.validation.js";
+import { confirmEmailSchema, forgetPasswordSchema, loginSchema, loginWithGoogleSchema, refreshTokenSchema, resetPasswordSchema, signUpSchema } from "./user.validation.js";
 
 const userRouter = Router();
 
@@ -12,6 +12,7 @@ userRouter.post("/login", validation(loginSchema),login);
 userRouter.get("/refreshToken", validation(refreshTokenSchema), refreshToken);
 userRouter.patch("/forgetPassword", validation(forgetPasswordSchema), forgetPassword);
 userRouter.patch("/resetPassword", validation(resetPasswordSchema), resetPassword);
+userRouter.post("/loginWithGoogle",validation(loginWithGoogleSchema),loginWithGoogle);
 
 
 

@@ -16,6 +16,11 @@ const roleTypes = {
     "admin": "admin"
 };
 
+export const providerTypes = {
+    "system": "system",
+    "google": "google"
+};
+
 const userSchema = new mongoose.Schema({
     fullName: {
         type: String,
@@ -38,7 +43,9 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: function (data) {
+            return data.provider == providerTypes.google ? false : true;
+        },
         minlength: 8,
         trim: true,
         match: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
@@ -131,6 +138,11 @@ const userSchema = new mongoose.Schema({
     },
     OTPPassword: {
         type: String
+    },
+    provider: {
+        type: String,
+        enum: Object.values(providerTypes),
+        default: providerTypes.system
     }
 
 },{

@@ -8,6 +8,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 import limiter from "./middleware/rateLimiter.js";
 
+
 const bootstrap = (app, express) => {
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
