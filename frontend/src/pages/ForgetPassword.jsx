@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -18,6 +18,7 @@ function ForgetPassword() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [otpTimeLeft, setOtpTimeLeft] = useState(0);
 
   const validateEmail = (emailValue) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,6 +42,7 @@ function ForgetPassword() {
       // Simulate API call to send OTP
       setTimeout(() => {
         setStep(2);
+        setOtpTimeLeft(1 * 60);
         setLoading(false);
       }, 1500);
     }
@@ -52,13 +54,18 @@ function ForgetPassword() {
 
     if (!otp.trim()) {
       newErrors.otp = t("forgetPassword.errors.otpRequired");
-    } else if (otp.length !== 6) {
+    } else if (otp.length !== 4) {
       newErrors.otp = t("forgetPassword.errors.otpDigits");
     }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
+      if (otpTimeLeft <= 0) {
+        setErrors({ submit: "OTP has expired. Please resend to get a new code." });
+        return;
+      }
+
       setLoading(true);
       // Simulate API call to verify OTP
       setTimeout(() => {
@@ -71,11 +78,22 @@ function ForgetPassword() {
 
   const handleResendOtp = () => {
     setLoading(true);
+    setOtpTimeLeft(1 * 60);
     setTimeout(() => {
       setLoading(false);
       // Resend OTP logic
     }, 1500);
   };
+
+  useEffect(() => {
+    if (step !== 2 || otpTimeLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setOtpTimeLeft((current) => Math.max(current - 1, 0));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [step, otpTimeLeft]);
 
   return (
     <div className="flex flex-col relative">
@@ -200,7 +218,7 @@ function ForgetPassword() {
                   <input
                     type="text"
                     placeholder={t("forgetPassword.otpPlaceholder")}
-                    maxLength="6"
+                    maxLength="4"
                     className="form-input text-center tracking-widest text-2xl"
                     value={otp}
                     onChange={(e) => {
@@ -214,9 +232,15 @@ function ForgetPassword() {
                   )}
                 </div>
 
+                <p className="text-xs text-white/70 text-center">
+                  {otpTimeLeft > 0
+                    ? `Expires in ${String(Math.floor(otpTimeLeft / 60)).padStart(2, "0")} : ${String(otpTimeLeft % 60).padStart(2, "0")}`
+                    : "OTP expired. Please resend to get a new code."}
+                </p>
+
                 <motion.button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || otpTimeLeft <= 0}
                   className="create-account-button text-white mx-auto block disabled:opacity-50"
                   whileHover={{ scale: loading ? 1 : 1.05 }}
                   whileTap={{ scale: loading ? 1 : 0.95 }}
@@ -241,6 +265,7 @@ function ForgetPassword() {
                     setStep(1);
                     setOtp("");
                     setErrors({});
+                    setOtpTimeLeft(0);
                   }}
                   className="underline underline-offset-4"
                 >

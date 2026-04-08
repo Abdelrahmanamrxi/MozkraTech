@@ -8,7 +8,7 @@ maxDate.setFullYear(maxDate.getFullYear() - minAge);
 export const signUpSchema = joi.object({
     fullName: joi.string().min(3).pattern(/^[A-Za-z\s]+$/).required(),
     email: joi.string().email().required(),
-    location: joi.string().required(),
+    location: joi.string(),
     password: joi.string().required().min(8).pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/),
     confirmPassword: joi.string().valid(joi.ref('password')).required(),
     birthDate: joi
@@ -29,6 +29,9 @@ export const confirmEmailSchema = joi.object({
     code: joi.string().required().length(4)
 });
 
+export const resendOTPSchema=joi.object({
+    email:joi.string().email().required()
+})
 
 export const loginSchema = joi.object({
     email: joi.string().email().required(),

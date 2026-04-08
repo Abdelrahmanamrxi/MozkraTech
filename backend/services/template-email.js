@@ -25,20 +25,20 @@ export const html = ({ code, message } = {}) => {
         </div>
         <div class="content">
             <h1>${message}</h1>
-            <p>Welcome to your learning journey! Please use the verification code below to secure your account and start tracking your progress.</p>
+            <p>Welcome to your learning journey. Please use the verification code below to verify your account and begin tracking your progress.</p>
             
             <div class="code-box">${code}</div>
             
-            <p>If you didn't request this code, you can safely ignore this email.</p>
+            <p>If you did not request this code, please ignore this email.</p>
         </div>
         <div class="footer">
-            <p style="font-size: 12px; margin-bottom: 15px;">Stay in touch with MozakraTech</p>
+            <p style="font-size: 12px; margin-bottom: 15px;">Stay connected with MozkraTech</p>
             <div class="social-icons">
-                <a href="${process.env.facebookLink}"><img src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703402/Group35062_erj5dx.png" width="30"></a>
-                <a href="${process.env.instegram}"><img src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703402/Group35063_zottpo.png" width="30"></a>
-                <a href="${process.env.twitterLink}"><img src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703402/Group_35064_i8qtfd.png" width="30"></a>
+                <a href="${process.env.facebookLink}"><img src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703402/Group35062_erj5dx.png" width="30" alt="Facebook"></a>
+                <a href="${process.env.instegram}"><img src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703402/Group35063_zottpo.png" width="30" alt="Instagram"></a>
+                <a href="${process.env.twitterLink}"><img src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703402/Group_35064_i8qtfd.png" width="30" alt="Twitter"></a>
             </div>
-            <p style="font-size: 10px; margin-top: 20px;">&copy; 2026 MozakraTech. All rights reserved.</p>
+            <p style="font-size: 10px; margin-top: 20px;">&copy; 2026 MozkraTech. All rights reserved.</p>
         </div>
     </div>
 </body>

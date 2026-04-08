@@ -16,10 +16,11 @@ eventEmitter.on("sendEmail", async (data) => {
     const otp = customAlphabet("1234567890", 4)();
 
     //hashing otp
-    const hashedOtp = await bcrypt.hashSync(otp, +process.env.SALT_ROUNDS);
+    const hashedOtp = await bcrypt.hash(otp, +process.env.SALT_ROUNDS);
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
 
-    //update otp
-    await userModel.updateOne({email}, {OTPEmail: hashedOtp});
+    //update otp and expiry
+    await userModel.updateOne({email}, {OTPEmail: hashedOtp, OTPEmailExpiresAt: expiresAt});
     
     await sendEmail(email, "confirm Email", html({code: otp, message: "Email Confirmation"}));
 
@@ -33,10 +34,11 @@ eventEmitter.on("forgetPassword", async (data) => {
     const otp = customAlphabet("1234567890", 4)();
 
     //hashing otp
-    const hashedOtp = await bcrypt.hashSync(otp, +process.env.SALT_ROUNDS);
+    const hashedOtp = await bcrypt.hash(otp, +process.env.SALT_ROUNDS);
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
 
-    //update otp
-    await userModel.updateOne({email}, {OTPPassword: hashedOtp});
+    //update otp and expiry
+    await userModel.updateOne({email}, {OTPPassword: hashedOtp, OTPPasswordExpiresAt: expiresAt});
     
     await sendEmail(email, "forget password", html({code: otp, message: "forget password"}));
 });

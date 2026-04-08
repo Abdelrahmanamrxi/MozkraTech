@@ -16,10 +16,7 @@ const roleTypes = {
     "admin": "admin"
 };
 
-export const providerTypes = {
-    "system": "system",
-    "google": "google"
-};
+
 
 const userSchema = new mongoose.Schema({
     fullName: {
@@ -39,12 +36,11 @@ const userSchema = new mongoose.Schema({
     location: {
         type: String,
         trim: true,
-        required: true
     },
     password: {
         type: String,
-        required: function (data) {
-            return data.provider == providerTypes.google ? false : true;
+        required: function () {
+            return this.provider == "google" ? false : true;
         },
         minlength: 8,
         trim: true,
@@ -117,6 +113,12 @@ const userSchema = new mongoose.Schema({
     timer: {
         type: Object
     },
+    OTPEmailExpiresAt: {
+        type: Date
+    },
+    OTPPasswordExpiresAt: {
+        type: Date
+    },
     gpa: {
         type: Number
     },
@@ -141,14 +143,13 @@ const userSchema = new mongoose.Schema({
     },
     provider: {
         type: String,
-        enum: Object.values(providerTypes),
-        default: providerTypes.system
+        enum: ['system','google'],
+        default:'system'
     }
 
 },{
     timestamps: true
 });
-
-
+userSchema.index({email:1,isVerified:1})
 const userModel = mongoose.models.User || mongoose.model("User", userSchema);
 export default userModel;

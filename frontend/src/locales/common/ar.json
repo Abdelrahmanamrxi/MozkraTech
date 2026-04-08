@@ -44,6 +44,8 @@
     "emailPlaceholder": "البريد الإلكتروني",
     "passwordPlaceholder": "كلمة المرور",
     "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+    "show": "إظهار",
+    "hide": "إخفاء",
     "gender": {
       "male": "ذكر",
       "female": "أنثى",
@@ -56,7 +58,25 @@
     },
     "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
     "loginHere": "تسجيل الدخول هنا",
-    "createAccountButton": "إنشاء الحساب →"
+    "createAccountButton": "إنشاء الحساب →",
+    "errors": {
+      "fillAllFields": "يرجى ملء جميع الحقول",
+      "fullNameRequired": "الاسم الكامل مطلوب",
+      "nameMin": "يجب أن يحتوي الاسم على 3 أحرف على الأقل",
+      "fullNamePattern": "يجب أن يحتوي الاسم الكامل على أحرف ومسافات فقط",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordMin": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+      "passwordPattern": "يجب أن تحتوي كلمة المرور على حرف كبير وصغير ورقم",
+      "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
+      "genderRequired": "الجنس مطلوب",
+      "birthDateRequired": "تاريخ الميلاد مطلوب",
+      "birthDateInvalid": "تاريخ الميلاد غير صالح",
+      "birthDatePast": "يجب أن يكون تاريخ الميلاد في الماضي",
+      "birthDateTooYoung": "يجب أن تكون على الأقل بعمر 10 سنوات",
+      "passwordsMatch": "كلمتا المرور غير متطابقتين"
+    }
   },
   "forgetPassword": {
     "back": "عودة",
@@ -70,8 +90,8 @@
     "sending": "جارٍ الإرسال...",
     "backToLogin": "العودة إلى تسجيل الدخول",
     "enterOtp": "أدخل رمز التحقق",
-    "otpSent": "لقد أرسلنا رمزًا مكونًا من 6 أرقام إلى",
-    "otpPlaceholder": "000000",
+    "otpSent": "لقد أرسلنا رمزًا مكونًا من 4 أرقام إلى",
+    "otpPlaceholder": "0000",
     "verifyOtp": "تحقق من الرمز",
     "verifying": "جارٍ التحقق...",
     "didntReceiveCode": "لم تستلم الرمز؟",
@@ -81,7 +101,7 @@
       "emailRequired": "البريد الإلكتروني مطلوب",
       "validEmail": "يرجى إدخال بريد إلكتروني صحيح",
       "otpRequired": "الرمز مطلوب",
-      "otpDigits": "يجب أن يكون الرمز مكونًا من 6 أرقام"
+      "otpDigits": "يجب أن يكون الرمز مكونًا من 4 أرقام"
     }
   }
 }

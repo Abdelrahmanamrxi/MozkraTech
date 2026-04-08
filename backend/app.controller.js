@@ -1,6 +1,5 @@
 import connectToDB from "./DB/connectionDB.js";
 import userRouter from "./modules/user/user.routes.js";
-import { globalErrorHandling } from "./utils/globalErrorHandling/index.js";
 import notFound from "./middleware/notFound.js";
 import cors from "cors";
 import morgan from "morgan";
@@ -10,34 +9,31 @@ import limiter from "./middleware/rateLimiter.js";
 
 
 const bootstrap = (app, express) => {
+    // 1. Body parsers
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
-    app.use(morgan("dev"));
-    app.use("/users", userRouter);
 
+    // 2. CORS (must be early)
     app.use(
         cors({
             origin: process.env.FRONTEND_URL,
-            methods: ["GET", "POST", "PUT", "DELETE"],
+            methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
             credentials: true,
         }),
     );
 
+    // 3. Logging
+    app.use(morgan("dev"));
+
+    // 4. Rate limiting
     app.use(limiter);
 
-  // {/** Testing api */}
-  // app.get('/api/v1',async(req,res,next)=>{
-  //     res.status(200).json({message:'OK',status:200})
-    // })
-    
+    // 5. Routes
+    app.use("/api/v1/auth", userRouter);
 
-
+    // 6. Error handling (last)
     app.use(errorHandler);
-    // app.use(globalErrorHandling);
-
-
-
     app.use(notFound);
 };
 

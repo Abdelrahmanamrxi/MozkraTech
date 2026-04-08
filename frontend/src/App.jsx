@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import LandingPage from "./pages/LandingPage/LandingPage";
-import SignupPage from "./pages/SignupPage";
+import SignupPage from "./pages/SignupPage/index.jsx";
 import LoginPage from "./pages/LoginPage";
 import ForgetPassword from "./pages/ForgetPassword";
 import Home from "./pages/Dashboard/Dashboard.jsx";

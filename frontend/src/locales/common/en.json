@@ -45,6 +45,8 @@
     "emailPlaceholder": "Email",
     "passwordPlaceholder": "Password",
     "confirmPasswordPlaceholder": "Confirm Password",
+    "show": "Show",
+    "hide": "Hide",
     "gender": {
       "male": "M",
       "female": "F",
@@ -57,7 +59,25 @@
     },
     "alreadyHaveAccount": "Already have an account?",
     "loginHere": "Login here",
-    "createAccountButton": "Create Account →"
+    "createAccountButton": "Create Account →",
+    "errors": {
+      "fillAllFields": "Please fill in all fields",
+      "fullNameRequired": "Full name is required",
+      "nameMin": "Name must be at least 3 characters",
+      "fullNamePattern": "Full name can only contain letters and spaces",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Invalid email address",
+      "passwordRequired": "Password is required",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordPattern": "Password must contain uppercase, lowercase, and a number",
+      "confirmPasswordRequired": "Confirm password is required",
+      "genderRequired": "Gender is required",
+      "birthDateRequired": "Birth date is required",
+      "birthDateInvalid": "Birth date is invalid",
+      "birthDatePast": "Birth date must be in the past",
+      "birthDateTooYoung": "You must be at least 10 years old",
+      "passwordsMatch": "Passwords do not match"
+    }
   },
   "forgetPassword": {
     "back": "Back",
@@ -71,8 +91,8 @@
     "sending": "Sending...",
     "backToLogin": "Back to Login",
     "enterOtp": "Enter OTP",
-    "otpSent": "We've sent a 6-digit code to",
-    "otpPlaceholder": "000000",
+    "otpSent": "We've sent a 4-digit code to",
+    "otpPlaceholder": "0000",
     "verifyOtp": "Verify OTP",
     "verifying": "Verifying...",
     "didntReceiveCode": "Didn't receive code?",
@@ -82,7 +102,7 @@
       "emailRequired": "Email is required",
       "validEmail": "Please enter a valid email",
       "otpRequired": "OTP is required",
-      "otpDigits": "OTP must be 6 digits"
+      "otpDigits": "OTP must be 4 digits"
     }
   }
 }
