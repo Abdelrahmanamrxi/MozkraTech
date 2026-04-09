@@ -145,7 +145,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['system','google'],
         default:'system'
-    }
+    },
+    viewers: [{
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        },
+        time: [Date]
+    }]
 
 },{
     timestamps: true

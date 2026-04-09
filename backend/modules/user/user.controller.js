@@ -323,3 +323,34 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
     const updatedUser = await userModel.updateOne({ _id: user }, req.body);
     return res.status(200).json({ message: "updateProfile success", updatedUser });
 })
+
+
+// ----------------------------------shareProfile-------------------------------------------
+export const shareProfile = asyncHandler(async (req, res, next) => {
+
+    const { id } = req.params;
+    const user = await userModel.findOne({_id: id, isDeleted: false, isVerified: true});
+
+    if (!user) {
+        return next(new HttpException("User Not Found or Deleted or Not Verified", 404));
+    }
+
+    if (req.user._id.toString() === id) {
+       return res.status(200).json({ message: "Welcome to your profile", user: req.user });
+    }
+
+    const emailExist = await user.viewers.find(viewer => {
+        return viewer.userId.toString() === req.user._id.toString();
+    });
+    if (emailExist) {
+        emailExist.time.push(Date.now());
+        if (emailExist.time.length > 5) {
+           emailExist.time =  emailExist.time.slice(-5);
+        }
+        
+    } else {
+        user.viewers.push({ userId: req.user._id, time: [Date.now()]});
+    }
+    await user.save();
+    return res.status(200).json({ message: "share Profile success", user });
+})

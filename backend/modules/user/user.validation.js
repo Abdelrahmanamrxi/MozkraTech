@@ -1,4 +1,5 @@
 import joi from "joi";
+import { generalRules } from "../../utils/generalRules/index.js";
 
 
 const minAge = 10;
@@ -83,4 +84,8 @@ export const updateProfileSchema = joi.object({
         "number.min": "GPA cannot be less than 0",
         "number.max": "GPA cannot be more than 4"
     })
+});
+
+export const shareProfileSchema = joi.object({
+    id: generalRules.id.required()
 });
