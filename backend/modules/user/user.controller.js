@@ -41,6 +41,7 @@ export const signUp = asyncHandler(async (req, res, next) => {
     setImmediate(() => {
         eventEmitter.emit("sendEmail", { email });
     });
+    
     return res.status(201).json({ message: "Sign up Successful", user });
 });
 
@@ -91,7 +92,7 @@ export const login = asyncHandler(async (req, res, next) => {
             id: user._id
         },
             SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
-            option: {expiresIn: "1d"}
+            option: {expiresIn: "15m"}
         
     });
     const refreshToken = await generateToken({
@@ -100,7 +101,7 @@ export const login = asyncHandler(async (req, res, next) => {
             id: user._id
         },
             SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
-            option: {expiresIn: "2w"}
+            option: {expiresIn: "3d"}
         
     });
 
@@ -200,7 +201,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
 
 // ----------------------------------signUpWithGoogle-------------------------------------------
 export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
-const { idToken, birthDate, location } = req.body;
+const { idToken,birthDate,gender } = req.body;
 const client = new OAuth2Client();
     async function verify() {
         const ticket = await client.verifyIdToken({
@@ -223,9 +224,31 @@ const client = new OAuth2Client();
             isVerified: email_verified,
             provider: 'google',
             birthDate,
-            location
+            gender
         })
-    return res.status(200).json({message: "login with google success", user});
+        const accessToken = await generateToken({
+        payload: {
+            email,
+            id: user._id},
+        SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+        option: {expiresIn: "15m"}
+    });
+    const refreshToken = await generateToken({
+        payload: {
+            email,
+            id: user._id
+        },
+            SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+            option: {expiresIn: "3d"}
+        
+    });
+ 
+    res.cookie('refreshToken',refreshToken,{
+        maxAge:3 * 24 * 60 * 60 * 1000,
+        sameSite:'strict',
+        httpOnly:true
+    })
+    return res.status(200).json({message: "Sign up with Google Successful", accessToken});
 })
 
 
@@ -246,17 +269,17 @@ const client = new OAuth2Client();
     
     let user = await userModel.findOne({email});
     if (!user) {
-        return next(new HttpException("email not exist Please sign up"),400);
+        return next(new HttpException("Email Doesn't Exist"),400);
     }
     if (user.provider != 'google') {
-        return next(new Error("login with google failed login with system "));
+        return next(new HttpException("Login with Google Failed",400));
     }
     const accessToken = await generateToken({
         payload: {
             email,
             id: user._id},
         SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
-        option: {expiresIn: "1d"}
+        option: {expiresIn: "15m"}
     });
     const refreshToken = await generateToken({
         payload: {
@@ -264,10 +287,16 @@ const client = new OAuth2Client();
             id: user._id
         },
             SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
-            option: {expiresIn: "2w"}
+            option: {expiresIn: "3d"}
         
     });
-    return res.status(200).json({message: "login with google success", accessToken, refreshToken});
+    res.cookie('refreshToken',refreshToken,{
+        sameSite:'strict',
+        httpOnly:true,
+        maxAge:3 * 24 * 60 * 60 * 1000
+
+    })
+    return res.status(200).json({message: "Login with Google Is Succesful", accessToken});
 })
 
 

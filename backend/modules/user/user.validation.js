@@ -69,7 +69,8 @@ export const signUpWithGoogleSchema = joi.object({
             "date.less": "Birth date must be in the past",
             "date.max": "You must be at least 10 years old"
         }),
-    location: joi.string().required()
+        gender: joi.string().valid('male', 'female', 'other').required()
+   
 })
 
 
