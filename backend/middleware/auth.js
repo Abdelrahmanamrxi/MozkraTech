@@ -1,6 +1,6 @@
 import  jwt  from 'jsonwebtoken';
 import userModel from '../DB/models/user.model.js';
-import { asyncHandler } from '../utils/globalErrorHandling/index.js';
+import { asyncHandler } from '../utils/asyncHandler/index.js';
 
 
 
@@ -13,8 +13,7 @@ export const authentication = asyncHandler(
     console.log(token);
 
         if (!prefix || !token) {
-        return next(new Error("token not found"));
-        return res.status(401).json({message: "token not found"});
+        return next(new HttpException("token not found",404))
     }
     let SIGNATURE_TOKEN = undefined;
     if (prefix == "admin") {
@@ -23,26 +22,28 @@ export const authentication = asyncHandler(
         SIGNATURE_TOKEN= process.env.SECRET_KEY_USER;
     }
     else {
-        return next(new Error("Invalid authorization token prefix"));
+        return next(new HttpException("Invalid authorization token prefix",401))
+
         // return res.status(401).json({message: "token not found"});
      }
      const decoded = jwt.verify(token, SIGNATURE_TOKEN);
      console.log(decoded);
 
         if (!decoded?.id) {
-            return next(new Error("token invalid payload"));
+            return next(new HttpException("token invalid payload", 404))
+
             // return res.status(401).json({message: "token invalid payload"});
     }
         const user = await userModel.findById(decoded.id);
         if (!user) {
-            return next(new Error("user not found"));
+            return next(new HttpException("user not found",404))
+
             // return res.status(401).json({message: "user not found"});
         }
         
-        if(parseInt(user?.passwordChangeAt.getTime() / 1000) > decoded.iat) {
-            return next(new Error("password changed after token issued"));
-            // return res.status(401).json({message: "password changed after token issued"});
-        }
+        if (user?.passwordChangeAt && parseInt(user.passwordChangeAt.getTime() / 1000) > decoded.iat) {
+        return next(new HttpException("password changed after token issued", 401));
+}
         req.user = user;
         next();
 
@@ -62,8 +63,7 @@ export const authorization = (accessRole = []) => {
 
         
         if (!accessRole.includes(req.user.role)) {
-            return next(new Error("unauthorized"));
-            // return res.status(401).json({message: "unauthorized"});
+            return next(new HttpException("unauthorized",401))
     }
     next();
 })

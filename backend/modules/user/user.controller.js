@@ -282,6 +282,15 @@ export const resendOTP=asyncHandler(async(req,res,next)=>{
 
     eventEmitter.emit('sendEmail',{email})
 
-    return res.status(200).json({message:'OTP Sent Succesfully'})
+    return res.status(200).json({message:'OTP Sent Successfully'})
 
+})
+
+// ----------------------------------updateProfile-------------------------------------------
+export const updateProfile = asyncHandler(async (req, res, next) => {
+
+    const user = req.user._id;
+
+    const updatedUser = await userModel.updateOne({ _id: user }, req.body);
+    return res.status(200).json({ message: "updateProfile success", updatedUser });
 })
