@@ -1,210 +1,114 @@
-﻿import { useState, useEffect } from "react";
-import { motion as Motion } from "framer-motion";
+﻿import { motion as Motion } from "framer-motion";
 import { Link } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
-import { z } from "zod";
-import axios from "axios";
 import SignupOtpStep from "./SignupOtpStep";
+import useSignupForm from "../../hooks/useSignupForm";
+import { setAccessToken } from "../../slices/authSlice";
+import {useDispatch} from 'react-redux'
+import axios from "axios";
+import { GoogleLogin } from "@react-oauth/google";
+import { useRef } from "react";
+import { useNavigate } from "react-router";
 
 function SignupForm({ isRtl, t }) {
-  const [errors, setErrors] = useState({});
-  const [step, setStep] = useState(1);
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [otpTimeLeft, setOtpTimeLeft] = useState(0);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    gender: "",
-    birthDate: { day: "", month: "", year: "" },
-  });
+ const baseUrl=import.meta.env.VITE_BACKEND_URL
+ const navigate=useNavigate()
+ const dispatch=useDispatch()
+ const googleLoginRef = useRef(null)
+    
+  const {
+    formData,
+    errors,
+    step,
+    otp,
+    loading,
+    showPassword,
+    showConfirmPassword,
+    timeLeft,
+    expired,
+    genderOptions,
+    handleChange,
+    handleGenderChange,
+    handleBirthDate,
+    handleSubmit,
+    handleOtpSubmit,
+    handleResendOtp,
+    setOtp,
+    setErrors,
+    setShowPassword,
+    setShowConfirmPassword,
+  } = useSignupForm(t);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL ?? import.meta.env.BACKEND_URL;
-  if (!backendUrl) {
-    console.warn("VITE_BACKEND_URL is not defined. Please add it to your .env file and restart Vite.");
-  }
-
-  const validationMessages = {
-    fillAllFields: t("signupPage.errors.fillAllFields"),
-    fullNameRequired: t("signupPage.errors.fullNameRequired"),
-    nameMin: t("signupPage.errors.nameMin"),
-    fullNamePattern: t("signupPage.errors.fullNamePattern"),
-    emailRequired: t("signupPage.errors.emailRequired"),
-    invalidEmail: t("signupPage.errors.invalidEmail"),
-    passwordRequired: t("signupPage.errors.passwordRequired"),
-    passwordMin: t("signupPage.errors.passwordMin"),
-    passwordPattern: t("signupPage.errors.passwordPattern"),
-    confirmPasswordRequired: t("signupPage.errors.confirmPasswordRequired"),
-    genderRequired: t("signupPage.errors.genderRequired"),
-    passwordsMatch: t("signupPage.errors.passwordsMatch"),
-  };
-
-  const userSchema = z
-    .object({
-      fullName: z
-        .string()
-        .min(1, validationMessages.fullNameRequired)
-        .min(3, validationMessages.nameMin)
-        .regex(/^[A-Za-z\s]+$/, validationMessages.fullNamePattern),
-      email: z.string().min(1, validationMessages.emailRequired).email(validationMessages.invalidEmail),
-      password: z
-        .string()
-        .min(1, validationMessages.passwordRequired)
-        .min(8, validationMessages.passwordMin)
-        .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, validationMessages.passwordPattern),
-      confirmPassword: z.string().min(1, validationMessages.confirmPasswordRequired),
-      gender: z.string().min(1, validationMessages.genderRequired),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: validationMessages.passwordsMatch,
-      path: ["confirmPassword"],
-    });
-
-  const handleChange = (e) => {
-    setErrors((prev) => ({ ...prev, submit: "" }));
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const genderOptions = [
-    { value: "Male", label: t("signupPage.gender.male") },
-    { value: "Female", label: t("signupPage.gender.female") },
-    { value: "Other", label: t("signupPage.gender.other") },
-  ];
-
-  const handleGenderChange = (selectedGender) => {
-    setFormData((prev) => ({ ...prev, gender: selectedGender }));
-    if (errors.gender) {
-      setErrors((prev) => ({ ...prev, gender: "" }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const allEmpty = Object.values(formData).every((val) => {
-      if (typeof val === "object" && val !== null) {
-        return Object.values(val).every((subVal) => subVal === "");
-      }
-      return val === "";
-    });
-
-    if (allEmpty) {
-      setErrors({ submit: validationMessages.fillAllFields });
-      return;
-    }
-
-    const result = userSchema.safeParse(formData);
-
-    if (!result.success) {
-      const newErrors = {};
-      result.error.issues.forEach((error) => {
-        newErrors[error.path[0]] = error.message;
-      });
-      setErrors(newErrors);
-      return;
-    }
-
-    const { day, month, year } = formData.birthDate;
-    const payload = {
-      ...formData,
-      gender:formData.gender.toLowerCase(),
-      birthDate: new Date(Number(year), Number(month) - 1, Number(day)),
-    };
-
-    console.log("Form is valid:", payload);
-
-    try {
-      setLoading(true);
-      const response = await axios.post(`${backendUrl}/auth/register`, payload);
-      console.log(response);
-      setOtpTimeLeft(1 * 60);
-      setStep(2);
-      setErrors({});
-    } catch (err) {
-     console.log(err)
-      const message = err?.response?.data?.message || err.message || "Registration failed";
-      setErrors({ submit: message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (step !== 2) return;
-    if (otpTimeLeft <= 0) return;
-
-    const interval = setInterval(() => {
-      setOtpTimeLeft((prev) => Math.max(prev - 1, 0));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [step, otpTimeLeft]);
-
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    console.log(e)
-    if (!otp.trim()) {
-      newErrors.otp = t("forgetPassword.errors.otpRequired");
-    } else if (otp.length !== 4) {
-      newErrors.otp = t("forgetPassword.errors.otpDigits");
-    }
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      if (otpTimeLeft <= 0) {
-        setErrors({ submit: "OTP has expired. Please resend to get a new code." });
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const response = await axios.patch(`${backendUrl}/auth/confirm-email`, {
-          email: formData.email,
-          code: otp,
-        });
-        console.log(response)
-        setStep(3);
-        setErrors({});
-      } catch (err) {
-        const message = err?.response?.data?.message || err.message || "OTP verification failed";
-        setErrors({ submit: message });
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
- const handleResendOtp = async (e) => {
-  e.preventDefault();
+// Handle Google sign-up success - receives credential with ID token
+const handleGoogleSuccess = async (credentialResponse) => {
   try {
-    setLoading(true);
-    await axios.post(`${backendUrl}/auth/resend-otp`, { email: formData.email});
-    setOtpTimeLeft(60);
-    setErrors({});
+    // Get the ID token from credential (JWT token)
+    const idToken = credentialResponse?.credential;
+    
+    if (!idToken) {
+      console.error("ID token missing from credential response");
+      setErrors({ submit: "Google authentication failed. Please try again." });
+      return;
+    }
+
+    console.log("ID Token received successfully");
+
+    // Construct birthDate from formData
+    const { day, month, year } = formData.birthDate;
+    const birthDate = new Date(Number(year), Number(month) - 1, Number(day));
+
+    // Send to backend
+    const response = await axios.post(`${baseUrl}/auth/signup-with-google`, {
+      idToken,
+      birthDate,
+      gender: formData.gender.toLowerCase(),
+    },{withCredentials:true});
+
+    // Save access token
+    dispatch(setAccessToken(response.data.accessToken));
+    navigate('/dashboard')
   } catch (err) {
-    setErrors({ submit: err?.response?.data?.message || "Resend failed" });
-  } finally {
-    setLoading(false);
+    const message = err?.response?.data?.message || err.message || "Registration failed";
+    console.error("Google signup error:", err);
+    setErrors({ submit: message });
   }
 };
-  const handleBirthDate = (field, value) => {
-    const limits = { day: 31, month: 12, year: new Date().getFullYear() };
-    if (value > limits[field]) return;
-    setFormData((prev) => ({
+
+// Validation check for Google signup
+const googleSignupEnabled =
+  Boolean(formData.birthDate.day) &&
+  Boolean(formData.birthDate.month) &&
+  Boolean(formData.birthDate.year) &&
+  Boolean(formData.gender);
+
+const handleGoogleButtonClick = () => {
+  if (!googleSignupEnabled) {
+    setErrors((prev) => ({
       ...prev,
-      birthDate: { ...prev.birthDate, [field]: value },
+      gender: formData.gender ? "" : "Please provide a gender before signing up with Google",
+      birthDate: (formData.birthDate.day && formData.birthDate.month && formData.birthDate.year) 
+        ? "" 
+        : "Please provide your birthdate before signing up with Google",
     }));
+    return; // Don't proceed with Google login if validation fails
+  }
+  // Find and click the Google button inside the ref
+  if (googleLoginRef.current) {
+    // Find the button element and click it
+    const button = googleLoginRef.current.querySelector('button') || 
+         googleLoginRef.current.querySelector('[role="button"]') ||
+         googleLoginRef.current.querySelector('div[role="button"]');
+    if (button) {
+      button.click();
+    }
+  }
+};
+  const handleOtpChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    setOtp(value);
+    if (errors.otp) {
+      setErrors((prev) => ({ ...prev, otp: "" }));
+    }
   };
 
   const renderSignupStep = () => (
@@ -329,6 +233,7 @@ function SignupForm({ isRtl, t }) {
                 className="w-10 lg:w-14 bg-transparent text-white placeholder:text-secondary outline-none text-center text-sm"
               />
             </div>
+            {errors.birthDate && <p className="text-red-400 text-xs mt-1 ml-4">{errors.birthDate}</p>}
           </div>
         </div>
 
@@ -357,18 +262,14 @@ function SignupForm({ isRtl, t }) {
   const renderOtpStep = () => (
     <SignupOtpStep
       otp={otp}
-      onOtpChange={(e) => {
-        const value = e.target.value.replace(/\D/g, "");
-        setOtp(value);
-        if (errors.otp) setErrors({ ...errors, otp: "" });
-      }}
+      onOtpChange={handleOtpChange}
       errors={errors}
       loading={loading}
       onSubmit={handleOtpSubmit}
       onResend={handleResendOtp}
       email={formData.email}
-      timeLeft={otpTimeLeft}
-      expired={otpTimeLeft <= 0}
+      timeLeft={timeLeft}
+      expired={expired}
       t={t}
     />
   );
@@ -392,8 +293,12 @@ function SignupForm({ isRtl, t }) {
     >
       <h2 className="text-3xl font-semibold text-center mb-2">{t("signupPage.createAccount")}</h2>
       <p className="text-center text-sm text-secondary mb-6">{t("signupPage.getStarted")}</p>
-
-      <button className="w-full flex items-center justify-center gap-2 bg-white/20 hover:bg-white/40 transition rounded-full py-2 mb-6">
+      
+      <button  
+        type="button"
+        onClick={handleGoogleButtonClick}
+        className="w-full cursor-pointer flex items-center justify-center gap-2 bg-white/20 hover:bg-white/40 transition rounded-full py-2 mb-6"
+      >
         <span>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -408,6 +313,25 @@ function SignupForm({ isRtl, t }) {
         </span>
         {t("signupPage.google")}
       </button>
+
+      {/* GoogleLogin component - positioned off-screen so it can be triggered */}
+      <div
+        ref={googleLoginRef}
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: "-9999px",
+          pointerEvents: "none"
+        }}
+      >
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => {
+            console.error("Google login failed");
+            setErrors({ submit: "Google login failed. Please try again." });
+          }}
+        />
+      </div>
 
       <div className="flex items-center gap-3 text-sm text-secondary mb-6">
         <div className="h-px bg-white/20 flex-1"></div>

@@ -25,8 +25,8 @@ export const validation = (schema) => {
         const result = schema.validate(resultObj);
         if(result?.error) {
             console.log(result.error)
-            return next(new HttpException("Validation Error"),400);
-            // return res.status(400).json({ message: "validation error", errors: result.error.details });
+            const error = new HttpException(result.error.message, 400)
+            return next(error)
         }
         next();
     }
