@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import SignupPage from "./pages/SignupPage/index.jsx";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/LoginPage/LoginPage";
 import ForgetPassword from "./pages/ForgetPassword";
 import Home from "./pages/Dashboard/Dashboard.jsx";
 import Chatbot from "./pages/Chatbot/Chatbot";

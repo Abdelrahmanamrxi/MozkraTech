@@ -56,8 +56,11 @@ export const resetPasswordSchema = joi.object({
 })
 
 export const loginWithGoogleSchema = joi.object({
-    idToken: joi.string().required(),
-})
+  idToken: joi.string().required().messages({
+    "any.required": "Google with Login Failed",
+    "string.base": "Google with Login Failed"
+  })
+});
 
 export const signUpWithGoogleSchema = joi.object({
     idToken: joi.string().required(),

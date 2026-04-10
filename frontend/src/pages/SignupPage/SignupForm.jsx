@@ -51,7 +51,7 @@ const handleGoogleSuccess = async (credentialResponse) => {
       return;
     }
 
-    console.log("ID Token received successfully");
+  //console.log("ID Token received successfully");
 
     // Construct birthDate from formData
     const { day, month, year } = formData.birthDate;
@@ -69,7 +69,7 @@ const handleGoogleSuccess = async (credentialResponse) => {
     navigate('/dashboard')
   } catch (err) {
     const message = err?.response?.data?.message || err.message || "Registration failed";
-    console.error("Google signup error:", err);
+   // console.error("Google signup error:", err);
     setErrors({ submit: message });
   }
 };
@@ -327,8 +327,8 @@ const handleGoogleButtonClick = () => {
         <GoogleLogin
           onSuccess={handleGoogleSuccess}
           onError={() => {
-            console.error("Google login failed");
-            setErrors({ submit: "Google login failed. Please try again." });
+            console.error("Google Signup Failed");
+            setErrors({ submit: "Google Signup Failed. Please try again." });
           }}
         />
       </div>

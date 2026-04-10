@@ -257,7 +257,7 @@ export const loginWithGoogle = asyncHandler(async (req, res, next) => {
 
 const client = new OAuth2Client();
     async function verify() {
-        const { idToken} = req.body;
+        const { idToken} = req.body;    
         const ticket = await client.verifyIdToken({
         idToken: idToken,
         audience: process.env.GOOGLE_CLIENT_ID,  

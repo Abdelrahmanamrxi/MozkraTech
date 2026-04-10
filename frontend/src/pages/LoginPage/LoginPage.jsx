@@ -1,14 +1,61 @@
-import React from "react";
+import {useState,useRef} from "react";
 import { useTranslation } from "react-i18next";
-import FormContainer from "../comp/containers/FormContainer";
-import { Link } from "react-router";
-import Logo from "../comp/logo/Logo";
+import FormContainer from "../../comp/containers/FormContainer";
+import { Link,useNavigate } from "react-router";
+import Logo from "../../comp/logo/Logo";
+import { useDispatch } from "react-redux";
+import { GoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import Footer from "../comp/layout/Footer/Footer";
+import Footer from "../../comp/layout/Footer/Footer";
 import { ArrowLeftIcon } from "lucide-react";
+import { setAccessToken } from "../../slices/authSlice";
+
+
 function LoginPage() {
   const { t, i18n } = useTranslation("common");
+  const dispatch=useDispatch()
+  const baseUrl=import.meta.env.VITE_BACKEND_URL
+  const [error,setErrors]=useState({google:'',login:''})
+  const googleLoginRef=useRef(null)
+  const navigate=useNavigate()
+
+  async function handleLoginGoogleSuccess(credentialResponse)
+  {
+    setErrors({})
+    const idToken=credentialResponse?.credential
+    
+    if(!idToken){
+      setErrors((prev)=>{
+        return {...prev,google:"Login Failed"}
+      })
+    }
+    try{
+      const response=await axios.post(`${baseUrl}/auth/login-with-google`,{idToken},{
+        withCredentials:true
+      })
+      dispatch(setAccessToken(response.data.accessToken))
+      navigate('/dashboard')
+    }
+    catch(err){
+          const message = err?.response?.data?.message || err.message || "Login Failed";
+          setErrors({ google: message });
+    }
+  }
+  const handleGoogleButtonClick=()=>{
+      if (googleLoginRef.current) {
+    // Find the button element and click it
+    const button = googleLoginRef.current.querySelector('button') || 
+         googleLoginRef.current.querySelector('[role="button"]') ||
+         googleLoginRef.current.querySelector('div[role="button"]');
+    if (button) {
+      button.click();
+    }
+  }
+  }
+
+
   const isRtl = i18n.language === "ar";
   const backPositionClasses = isRtl ? "absolute top-6 right-6 lg:right-20" : "absolute top-6 left-6 lg:left-20";
   const headingAccent = t("loginPage.headingAccent");
@@ -52,8 +99,25 @@ function LoginPage() {
           <h2 className="text-3xl text-white font-sans font-semibold text-center mb-2">
             {t("loginPage.logIn")}
           </h2>
-
-          <button className="w-full text-white mt-3 flex items-center justify-center gap-2 bg-white/20 hover:bg-white/40 transition rounded-full py-2 mb-6">
+              <div
+                  ref={googleLoginRef}
+                  style={{
+                    position: "absolute",
+                    left: "-9999px",
+                    top: "-9999px",
+                    pointerEvents: "none"
+                  }}
+                >
+                  <GoogleLogin
+                    onSuccess={handleLoginGoogleSuccess}
+                    onError={() => {
+                      console.error("Google login failed");
+                      setErrors({ google: "Google login failed. Please try again." });
+                    }}
+                  />
+                </div>
+          
+          <button onClick={handleGoogleButtonClick} className="w-full text-white mt-3 flex items-center justify-center gap-2 bg-white/20 hover:bg-white/40 transition rounded-full py-2 mb-6">
             <span>
               <svg
                 width="24"
@@ -73,14 +137,21 @@ function LoginPage() {
               </svg>
             </span>
             {t("loginPage.google")}
+            
           </button>
+        {error.google && (
+  <p className="w-full text-red-400 text-center text-base mb-5">
+    {error.google}
+  </p>
+)}
           <div className="space-y-10">
+              
             <div className="flex items-center gap-3 text-sm text-secondary mb-6">
               <div className="h-px bg-white/20 flex-1"></div>
               {t("loginPage.or")}
               <div className="h-px bg-white/20 flex-1"></div>
             </div>
-
+                    
             <input type="email" placeholder={t("loginPage.emailPlaceholder")} className="form-input" />
 
             <input
