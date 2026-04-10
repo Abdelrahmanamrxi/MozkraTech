@@ -354,3 +354,11 @@ export const shareProfile = asyncHandler(async (req, res, next) => {
     await user.save();
     return res.status(200).json({ message: "share Profile success", user });
 })
+
+
+// ----------------------------------dashboard-------------------------------------------
+export const dashboard = asyncHandler(async (req, res, next) => {
+    
+    const users = await userModel.find({isDeleted: false});
+    return res.status(200).json({ message: "dashboard success", users });
+})

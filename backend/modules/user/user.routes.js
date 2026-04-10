@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { confirmEmail, resendOTP,forgetPassword, login, loginWithGoogle, refreshToken, resetPassword, signUp, signUpWithGoogle, updateProfile, shareProfile } from "./user.controller.js";
+import { confirmEmail, resendOTP,forgetPassword, login, loginWithGoogle, refreshToken, resetPassword, signUp, signUpWithGoogle, updateProfile, shareProfile, dashboard } from "./user.controller.js";
 import { validation } from "../../middleware/validation.js";
 import { confirmEmailSchema, resendOTPSchema ,forgetPasswordSchema, loginSchema, loginWithGoogleSchema, refreshTokenSchema, resetPasswordSchema, signUpSchema, signUpWithGoogleSchema, updateProfileSchema, shareProfileSchema } from "./user.validation.js";
-import { authentication } from '../../middleware/auth.js';
+import { authentication, authorization } from '../../middleware/auth.js';
+import { roleTypes } from "../../DB/models/user.model.js";
 
 const userRouter = Router();
 
@@ -18,6 +19,7 @@ userRouter.post("/login-with-google",validation(loginWithGoogleSchema),loginWith
 userRouter.post('/resend-otp', validation(resendOTPSchema), resendOTP);
 userRouter.patch('/update-profile', authentication, validation(updateProfileSchema), updateProfile);
 userRouter.patch('/share-profile/:id', authentication, validation(shareProfileSchema), shareProfile);
+userRouter.get("/dashboard", authentication,authorization([roleTypes.admin]), dashboard)
 
 
 

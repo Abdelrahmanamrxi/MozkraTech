@@ -11,7 +11,7 @@ const languageTypes = {
     Arabic: "Arabic"
 };
 
-const roleTypes = {
+export const roleTypes = {
     "user": "user",
     "admin": "admin"
 };
