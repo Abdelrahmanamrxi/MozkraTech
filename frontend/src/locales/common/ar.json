@@ -29,7 +29,12 @@
     "passwordPlaceholder": "كلمة المرور",
     "forgotPassword": "نسيت كلمة المرور؟",
     "signupPrompt": "ليس لديك حساب؟",
-    "loginButton": "تسجيل الدخول"
+    "loginButton": "تسجيل الدخول",
+    "loggingIn": "جارٍ تسجيل الدخول...",
+    "errors": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "passwordRequired": "كلمة المرور مطلوبة"
+    }
   },
   "signupPage": {
     "back": "عودة",

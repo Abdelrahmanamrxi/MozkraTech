@@ -158,5 +158,6 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 userSchema.index({email:1,isVerified:1})
+
 const userModel = mongoose.models.User || mongoose.model("User", userSchema);
 export default userModel;

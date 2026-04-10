@@ -1,7 +1,7 @@
 import {useState,useRef} from "react";
 import { useTranslation } from "react-i18next";
 import FormContainer from "../../comp/containers/FormContainer";
-import { Link,useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../comp/logo/Logo";
 import { useDispatch } from "react-redux";
 import { GoogleLogin } from "@react-oauth/google";
@@ -9,27 +9,73 @@ import axios from "axios";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Footer from "../../comp/layout/Footer/Footer";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, Loader2 } from "lucide-react";
 import { setAccessToken } from "../../slices/authSlice";
 
 
 function LoginPage() {
   const { t, i18n } = useTranslation("common");
-  const dispatch=useDispatch()
-  const baseUrl=import.meta.env.VITE_BACKEND_URL
-  const [error,setErrors]=useState({google:'',login:''})
-  const googleLoginRef=useRef(null)
-  const navigate=useNavigate()
+  const dispatch = useDispatch();
+  const baseUrl = import.meta.env.VITE_BACKEND_URL;
+  const [errors, setErrors] = useState({ google: "", login: "", email: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
+  const googleLoginRef = useRef(null);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
+  const navigate = useNavigate();
 
-  async function handleLoginGoogleSuccess(credentialResponse)
-  {
-    setErrors({})
-    const idToken=credentialResponse?.credential
-    
-    if(!idToken){
-      setErrors((prev)=>{
-        return {...prev,google:"Login Failed"}
-      })
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const fieldErrors = {};
+    if (!formData.email.trim()) {
+      fieldErrors.email = t("loginPage.errors.emailRequired");
+    }
+    if (!formData.password) {
+      fieldErrors.password = t("loginPage.errors.passwordRequired");
+    }
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors((prev) => ({ ...prev, ...fieldErrors, login: "" }));
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors((prev) => ({ ...prev, login: "" }));
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/auth/login`,
+        formData,
+        {
+          withCredentials: true
+        }
+      );
+      dispatch(setAccessToken(response.data.accessToken));
+      navigate("/dashboard");
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || "Login Failed";
+      setErrors((prev) => ({ ...prev, login: message }));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setErrors((prev) => ({ ...prev, [name]: "", login: "" }));
+    setFormData((prev) => {
+      return { ...prev, [name]: value };
+    });
+  }
+
+
+  async function handleLoginGoogleSuccess(credentialResponse) {
+    setErrors((prev) => ({ ...prev, google: "", login: "" }));
+    const idToken = credentialResponse?.credential;
+
+    if (!idToken) {
+      setErrors((prev) => ({ ...prev, google: "Login Failed" }));
     }
     try{
       const response=await axios.post(`${baseUrl}/auth/login-with-google`,{idToken},{
@@ -40,7 +86,7 @@ function LoginPage() {
     }
     catch(err){
           const message = err?.response?.data?.message || err.message || "Login Failed";
-          setErrors({ google: message });
+          setErrors((prev) => ({ ...prev, google: message }));
     }
   }
   const handleGoogleButtonClick=()=>{
@@ -61,7 +107,7 @@ function LoginPage() {
   const headingAccent = t("loginPage.headingAccent");
 
   return (
-    <div className="flex flex-col relative ">
+    <div className="flex flex-col relative w-full overflow-x-hidden">
       <Link
         to=".."
         className={`${backPositionClasses} z-10 flex items-center gap-2 text-white/90 hover:text-white transition-colors ${isRtl ? "flex-row-reverse" : ""}`}
@@ -70,7 +116,7 @@ function LoginPage() {
         <ArrowLeftIcon className="w-5 h-5" />
         {t("loginPage.back")}
       </Link>
-      <div className={`min-h-screen flex flex-col gap-3 ${isRtl ? "lg:flex-row-reverse" : "lg:flex-row"} main-background items-center lg:justify-between relative lg:px-14 px-6 py-20`}>
+      <div className={`min-h-[100dvh] lg:min-h-screen w-full flex flex-col gap-3 ${isRtl ? "lg:flex-row-reverse" : "lg:flex-row"} main-background items-center lg:justify-between relative lg:px-14 px-6 lg:py-20 py-14`}>
         {/* LEFT SIDE */}
         <div className={`lg:w-1/2 w-full space-y-6 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
           <Logo />
@@ -111,7 +157,7 @@ function LoginPage() {
                   <GoogleLogin
                     onSuccess={handleLoginGoogleSuccess}
                     onError={() => {
-                      console.error("Google login failed");
+                      // console.error("Google login failed");
                       setErrors({ google: "Google login failed. Please try again." });
                     }}
                   />
@@ -139,26 +185,52 @@ function LoginPage() {
             {t("loginPage.google")}
             
           </button>
-        {error.google && (
+        {errors.google && (
   <p className="w-full text-red-400 text-center text-base mb-5">
-    {error.google}
+    {errors.google}
   </p>
 )}
-          <div className="space-y-10">
-              
+          <div className="space-y-6">
             <div className="flex items-center gap-3 text-sm text-secondary mb-6">
               <div className="h-px bg-white/20 flex-1"></div>
               {t("loginPage.or")}
               <div className="h-px bg-white/20 flex-1"></div>
             </div>
-                    
-            <input type="email" placeholder={t("loginPage.emailPlaceholder")} className="form-input" />
-
-            <input
-              type="password"
-              placeholder={t("loginPage.passwordPlaceholder")}
-              className="form-input"
-            />
+            {errors.login && (
+              <p className="w-full text-red-400 text-center text-base mb-3">
+                {errors.login}
+              </p>
+            )}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <input
+                  onChange={handleChange}
+                  type="email"
+                  name="email"
+                  placeholder={t("loginPage.emailPlaceholder")}
+                  className="form-input"
+                />
+                {errors.email && (
+                  <p className="text-red-400 text-sm">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <input
+                  type="password"
+                  onChange={handleChange}
+                  name="password"
+                  placeholder={t("loginPage.passwordPlaceholder")}
+                  className="form-input"
+                />
+                {errors.password && (
+                  <p className="text-red-400 text-sm">
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
           <div className="text-right mt-3">
             <Link to="/forgot-password" className="text-sm  text-secondary hover:text-white transition-colors">
@@ -170,9 +242,12 @@ function LoginPage() {
               {t("loginPage.signupPrompt")}
             </Link>
           </div>
-          <Link to="/home">
+        
             <motion.button
-              className="create-account-button text-white mx-auto block"
+              onClick={handleSubmit}
+              type="button"
+              disabled={isLoading}
+              className={`create-account-button text-white mx-auto block ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -180,11 +255,18 @@ function LoginPage() {
                 ease: [0.22, 1, 0.36, 1],
                 delay: 0.44,
               }}
-              whileTap={{ scale: 0.96 }}
+              whileTap={{ scale: isLoading ? 1 : 0.96 }}
             >
-              {t("loginPage.loginButton")}
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t("loginPage.loggingIn") || t("loginPage.loginButton")}
+                </span>
+              ) : (
+                t("loginPage.loginButton")
+              )}
             </motion.button>
-          </Link>
+         
         </FormContainer>
       </div>
       <Footer />

@@ -5,6 +5,7 @@ import { eventEmitter } from "../../utils/sendEmail.events/sendEmail.events.js";
 import { generateToken } from "../../token/gnerateToken.js";
 import jwt from "jsonwebtoken";
 import HttpException from "../../utils/HttpException.js";
+import { checkUserStreak } from "../../utils/customHelpers/customHelpers.js";
 import {OAuth2Client} from 'google-auth-library';
 
 
@@ -34,7 +35,11 @@ export const signUp = asyncHandler(async (req, res, next) => {
         password: hashedPassword,
         gender,
         birthDate,
-        provider:'system'
+        provider:'system',
+        currentStreak:1,
+        longestStreak:1,
+        preferredLanguage:'English',
+        lastActivityDate:Date.now()
     });
     
     // send email after response path so this request is not blocked
@@ -76,14 +81,17 @@ export const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
     const user = await userModel.findOne({email, isVerified: true, isDeleted: false, provider: "system"});
     if(!user) {
-        return next(new HttpException("User Doesn't Exist or not verified yet or logged in with google",401));
+        return next(new HttpException("No User with Such Record Exists",401));
     }
-
+    
     //compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if(!isPasswordValid) {
-        return next(new Error("password is invalid"));
+        return next(new HttpException("Email or Password is Invalid"),401);
     }
+
+    await checkUserStreak(user);
+    
 
     //generate token 
     const accessToken = await generateToken({
@@ -104,13 +112,12 @@ export const login = asyncHandler(async (req, res, next) => {
             option: {expiresIn: "3d"}
         
     });
-
-    return res.status(200).json({
-        message: "login success",
-        token: {
-            accessToken,
-            refreshToken
-    }});
+    res.cookie('refreshToken',refreshToken,{
+        maxAge:3 * 24 * 60 * 60 * 1000,
+        sameSite:'strict',
+        httpOnly:true
+    })
+    return res.status(200).json({message: "login success", accessToken});
 })
 
 

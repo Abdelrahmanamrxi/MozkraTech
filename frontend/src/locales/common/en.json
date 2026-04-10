@@ -30,7 +30,12 @@
     "passwordPlaceholder": "Password",
     "forgotPassword": "Forgot password?",
     "signupPrompt": "Don't have an account?",
-    "loginButton": "Login"
+    "loginButton": "Login",
+    "loggingIn": "Logging in...",
+    "errors": {
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required"
+    }
   },
   "signupPage": {
     "back": "Back",
