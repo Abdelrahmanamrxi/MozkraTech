@@ -296,7 +296,7 @@ const client = new OAuth2Client();
         maxAge:3 * 24 * 60 * 60 * 1000
 
     })
-    return res.status(200).json({message: "Login with Google Is Succesful", accessToken});
+    return res.status(200).json({message: "Login with Google Is Successful", accessToken});
 })
 
 
@@ -345,7 +345,7 @@ export const shareProfile = asyncHandler(async (req, res, next) => {
     if (emailExist) {
         emailExist.time.push(Date.now());
         if (emailExist.time.length > 5) {
-           emailExist.time =  emailExist.time.slice(-5);
+        emailExist.time =  emailExist.time.slice(-5);
         }
         
     } else {
@@ -359,6 +359,128 @@ export const shareProfile = asyncHandler(async (req, res, next) => {
 // ----------------------------------dashboard-------------------------------------------
 export const dashboard = asyncHandler(async (req, res, next) => {
     
-    const users = await userModel.find({isDeleted: false});
+    const users = await userModel.find({ isDeleted: false });
     return res.status(200).json({ message: "dashboard success", users });
-})
+});
+
+
+// ----------------------------------addFriend-------------------------------------------
+export const addFriend = asyncHandler(async (req, res, next) => {
+
+    const { userId } = req.params;
+    const [recipient, sender] = await Promise.all([
+        userModel.findOneAndUpdate(
+            { _id: userId, isDeleted: false, isVerified: true, "friendRequests.received": { $nin: [req.user._id] }, friends: { $nin: [req.user._id] } },
+            { $addToSet: { "friendRequests.received": req.user._id } },
+            { new: true }
+        ),
+        userModel.findOneAndUpdate(
+        { _id: req.user._id, isDeleted: false, isVerified: true, "friendRequests.sent": { $nin: [userId] } },
+        { $addToSet: { "friendRequests.sent": userId } },
+        { new: true }
+    )
+    ]);
+    if (!recipient || !sender) {
+        return next(new HttpException("User Not Found or request already sent", 404));
+    }
+    return res.status(200).json({ message: "addFriend success", recipient, sender });
+});
+
+
+// ----------------------------------accept Friend-------------------------------------------
+export const acceptFriendRequest = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    
+    const [sender, receiver] = await Promise.all([ userModel.findOneAndUpdate(
+        { _id: id, isDeleted: false, isVerified: true, "friendRequests.sent": { $in: [req.user._id ]} },
+        {
+            $addToSet: { friends: req.user._id },
+            $pull: { "friendRequests.sent": req.user._id }},
+        { new: true }
+    ),
+        userModel.findOneAndUpdate(
+        { _id: req.user._id, isDeleted: false, isVerified: true, "friendRequests.received": { $in: [id] } },
+        { $addToSet: { friends: id },
+        $pull: { "friendRequests.received": id } },
+        { new: true }
+        )
+    ]);
+
+    if (!sender || !receiver) {
+        return next(new HttpException("User Not Found", 404));
+    }
+
+    return res.status(200).json({ message: "friend request accepted successfully", sender, receiver });
+
+});
+
+// ----------------------------------declineFriendRequest-------------------------------------------
+export const declineFriendRequest = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const [senderUpdate, receiverUpdate] = await Promise.all([
+        userModel.findOneAndUpdate(
+            { _id: id, "friendRequests.sent": req.user._id },
+            { $pull: { "friendRequests.sent": req.user._id } },
+            { new: true }
+        ),
+        userModel.findOneAndUpdate(
+            { _id: req.user._id, "friendRequests.received": id },
+            { $pull: { "friendRequests.received": id } },
+            { new: true }
+        )
+    ]);
+    if (!senderUpdate || !receiverUpdate) {
+        return next(new HttpException("Friend request not found", 404));
+    }
+
+    return res.status(200).json({ message: "Friend request declined successfully", senderUpdate, receiverUpdate });
+});
+
+
+
+// ----------------------------------deleteFriend-------------------------------------------
+export const deleteFriend = asyncHandler(async (req, res, next) => {
+    const { id } = req.params; 
+
+    
+    const [userUpdate, friendUpdate] = await Promise.all([
+
+        userModel.findOneAndUpdate(
+            { _id: req.user._id, friends: { $in: [id] } }, 
+            { $pull: { friends: id } },
+            { new: true }
+        ),
+        userModel.findOneAndUpdate(
+            { _id: id, friends: { $in: [req.user._id] } },
+            { $pull: { friends: req.user._id } },
+            { new: true }
+        )
+    ]);
+
+    if (!userUpdate || !friendUpdate) {
+        return next(new HttpException("User is not in your friend list", 404));
+    }
+
+    return res.status(200).json({ 
+        message: "Friend deleted successfully", 
+        user: userUpdate,
+        friend: friendUpdate
+    });
+});
+
+
+// ----------------------------------getProfile-------------------------------------------
+export const getProfile = asyncHandler(async (req, res, next) => {
+    const user = await userModel.findOne(
+        { _id: req.user._id, isDeleted: false, isVerified: true }
+    ).populate([
+        { path: "friends" }
+    ]);
+
+    if(!user) {
+        return next(new HttpException("User Not Found", 404));
+    }
+    return res.status(200).json({ message: "getUsers success", user });
+});
+
+
