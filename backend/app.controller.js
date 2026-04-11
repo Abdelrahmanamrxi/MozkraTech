@@ -14,12 +14,16 @@ const bootstrap = (app, express) => {
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
 
+    // 2. Connect to DB
+    connectToDB();
+
     // 2. CORS (must be early)
     app.use(
         cors({
-            origin: process.env.FRONTEND_URL,
-            methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-            credentials: true,
+            // origin: process.env.FRONTEND_URL,
+            origin: "*",
+         /*    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+            credentials: true, */
         }),
     );
 

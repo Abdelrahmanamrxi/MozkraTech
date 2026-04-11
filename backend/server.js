@@ -1,9 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
-import connectToDB from './DB/connectionDB.js'
 import bootstrap from './app.controller.js'
-
-
+import { runIo } from './modules/chat/chat.socket.js'
 
 
 const app = express()
@@ -11,16 +9,9 @@ bootstrap(app, express);
 
 
 
-async function StartServer(){
-    try{
-        await connectToDB()
-        app.listen(process.env.PORT,()=>{
-            console.log(`[CONNECTED]: Server is Listening on ${process.env.PORT}`)
-        })
-    }
-    catch(err){
-        console.log(`[ERROR]:${err.message}`)
-    }
-}
+const httpServer = app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`)
+})
 
-StartServer();
+
+// runIo(httpServer);
