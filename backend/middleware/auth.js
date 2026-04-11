@@ -4,58 +4,48 @@ import { asyncHandler } from '../utils/asyncHandler/index.js';
 import HttpException from '../utils/HttpException.js';
 
 
-export const authentication = asyncHandler(
-    async (req, res, next) => {
 
-        const { authorization } = req.headers;
-    const [prefix, token] = authorization.split(" ") || [];
-    console.log(prefix);
-    console.log(token);
+export const authentication = asyncHandler(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-        if (!prefix || !token) {
-        return next(new HttpException("token not found",404))
-    }
-    let SIGNATURE_TOKEN = undefined;
-    if (prefix == "admin") {
-        SIGNATURE_TOKEN= process.env.SECRET_KEY_ADMIN;
-    }else if (prefix == "user") {
-        SIGNATURE_TOKEN= process.env.SECRET_KEY_USER;
-    }
-    else {
-        return next(new HttpException("Invalid authorization token prefix",401))
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next(new HttpException("Access Denied", 401));
+  }
 
-        // return res.status(401).json({message: "token not found"});
-    }
-    const decoded = jwt.verify(token, SIGNATURE_TOKEN);
-    console.log(decoded);
+  const token = authHeader.split(" ")[1];
 
-        if (!decoded?.id) {
-            return next(new HttpException("token invalid payload", 404))
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return next(new HttpException("Authorization Failed", 401));
+  }
 
-            // return res.status(401).json({message: "token invalid payload"});
-    }
-        const user = await userModel.findById(decoded.id);
-        if (!user) {
-            return next(new HttpException("user not found",404))
+  if (!decoded?.id) {
+    return next(new HttpException("Access Denied", 401));
+  }
 
-            // return res.status(401).json({message: "user not found"});
-        }
-        
-        if (user?.passwordChangeAt && parseInt(user.passwordChangeAt.getTime() / 1000) > decoded.iat) {
-        return next(new HttpException("password changed after token issued", 401));
-}
-        req.user = user;
-        next();
+  const user = await userModel.findById(decoded.id);
 
-        
- /*        if(error?.name === "JsonWebTokenError" ) {
-            return res.status(401).json({message: "token invalid"});
-    }   
-    if(error?.name === "TokenExpiredError" ) {
-            return res.status(401).json({message: "token expired"});
-    }
-        return res.status(500).json({message: "server error", message: error.message, stack:error.stack, error}); */
-})
+  if (!user) {
+    return next(new HttpException("User Not Found", 404));
+  }
+
+  if (
+    user.passwordChangeAt &&
+    user.passwordChangeAt.getTime() / 1000 > decoded.iat
+  ) {
+    return next(
+      new HttpException("Password changed, please login again", 401)
+    );
+  }
+
+  // attach user + role
+  req.user = user;
+  req.role = decoded.role;
+
+  next();
+});
 
 
 export const authorization = (accessRole = []) => {
@@ -63,7 +53,7 @@ export const authorization = (accessRole = []) => {
 
         
         if (!accessRole.includes(req.user.role)) {
-            return next(new HttpException("unauthorized",401))
+            return next(new HttpException("Unauthorized Role Undefined",401))
     }
     next();
 })

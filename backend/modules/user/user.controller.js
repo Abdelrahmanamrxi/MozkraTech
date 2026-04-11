@@ -50,7 +50,6 @@ export const dashboard = asyncHandler(async (req, res, next) => {
     return res.status(200).json({ message: "dashboard success", users });
 });
 
-
 // ----------------------------------addFriend-------------------------------------------
 export const addFriend = asyncHandler(async (req, res, next) => {
 

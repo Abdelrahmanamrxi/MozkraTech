@@ -4,17 +4,19 @@ import { PlusIcon } from "lucide-react";
 import { AnalyticsIcon, SendIcon } from "../../comp/ui/Icons";
 import FriendsMessages from "./FriendsMessages/FriendsMessages";
 import FriendsProgress from "./FriendsProgress/FriendsProgress";
-import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
-import Body from "../../comp/layout/Body";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import AddFriend from "./AddFriend/AddFriend";
 
 function Friends() {
   const [showMessagesSection, setSection] = useState(false);
+  const [isAddFriendsOpen, setIsAddFriendsOpen] = useState(false);
+
   const { t } = useTranslation("friends");
 
+
   return (
-    
+    <>
       <div className="min-h-screen p-8 lg:p-14 pt-12 lg:pt-20">
         {/* Header */}
         <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between">
@@ -26,6 +28,7 @@ function Friends() {
           </div>
 
           <motion.button
+            onClick={() => setIsAddFriendsOpen(true)}
             whileHover={{
               scale: 1.08,
               backgroundColor: "#b59ef7",
@@ -89,7 +92,27 @@ function Friends() {
 
         {showMessagesSection ? <FriendsMessages /> : <FriendsProgress />}
       </div>
-   
+
+      {/* Add Friends Modal */}
+      <AnimatePresence>
+        {isAddFriendsOpen && (
+          <AddFriend setIsAddFriendsOpen={setIsAddFriendsOpen}/>
+        )}
+      </AnimatePresence>
+ 
+{/* CSS for scrollbar hide */}
+<style>{`
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+`}</style>
+
+    
+    </>
   );
 }
 

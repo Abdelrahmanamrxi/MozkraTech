@@ -1,6 +1,7 @@
 import connectToDB from "./DB/connectionDB.js";
 import userRouter from "./modules/user/user.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
+import friendsRouter from "./modules/friendship/friends.routes.js"
 import notFound from "./middleware/notFound.js";
 import cors from "cors";
 import morgan from "morgan";
@@ -37,6 +38,7 @@ const bootstrap = (app, express) => {
     // 5. Routes
     app.use("/api/v1/auth", authRouter);
     app.use('/api/v1/user',userRouter)
+    app.use('/api/v1/friends',friendsRouter)
 
     // 6. Error handling (last)
     app.use(errorHandler);

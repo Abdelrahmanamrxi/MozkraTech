@@ -94,7 +94,7 @@ export const login = asyncHandler(async (req, res, next) => {
             email,
             id: user._id
         },
-            SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+            SIGNATURE: process.env.JWT_SECRET,
             option: {expiresIn: "15m"}
         
     });
@@ -103,7 +103,7 @@ export const login = asyncHandler(async (req, res, next) => {
             email,
             id: user._id
         },
-            SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+            SIGNATURE: process.env.JWT_SECRET,
             option: {expiresIn: "3d"}
         
     });
@@ -118,47 +118,49 @@ export const login = asyncHandler(async (req, res, next) => {
 
 
 // ----------------------------------refreshToken-------------------------------------------
-export const refreshToken = asyncHandler(async (req, res, next) => {
-    const { authorization } = req.body;
-    const [prefix, token] = authorization.split(" ")|| [];
-        if (!prefix || !token) {
-        return next(new HttpException("Token not Found"),400);
-     
-    }
-    let SIGNATURE_TOKEN = undefined;
-    if (prefix == "admin") {
-        SIGNATURE_TOKEN= process.env.SECRET_KEY_ADMIN;
-    }else if (prefix == "user") {
-        SIGNATURE_TOKEN= process.env.SECRET_KEY_USER;
-    }
-    else {
-        return next(new HttpException("Invalid Authorization Token",401));
-        // return res.status(401).json({message: "token not found"});
-    }
-    const decoded = jwt.verify(token, SIGNATURE_TOKEN);
-    console.log(decoded);
 
-        if (!decoded?.id) {
-            return next(new HttpException("Invalid Token Payload",401));
-            // return res.status(401).json({message: "token invalid payload"});
-    }
-        const user = await userModel.findById(decoded.id);
-        if (!user) {
-            return next(new HttpException("User Not Found",404));
-    }
-    
-    //generate access token
-    const accessToken = await generateToken({
-        payload: {
-            email: user.email,
-            id: user._id
-        },
-            SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
-            option: {expiresIn: "1d"}
-        
-    });
-    return res.status(200).json({message: "refresh token success", token: accessToken});
-})
+  export const refreshToken = asyncHandler(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next(new HttpException("Refresh token not found", 401));
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, process.env.REFRESH_SECRET);
+  } catch (err) {
+    return next(new HttpException("Invalid refresh token", 401));
+  }
+
+  if (!decoded?.id) {
+    return next(new HttpException("Invalid token payload", 401));
+  }
+
+  const user = await userModel.findById(decoded.id);
+
+  if (!user) {
+    return next(new HttpException("User not found", 404));
+  }
+
+  const accessToken = await generateToken({
+    payload: {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    SIGNATURE: process.env.JWT_SECRET,
+    option: { expiresIn: "15m" }
+  });
+
+  return res.status(200).json({
+    message: "Token refreshed successfully",
+    accessToken
+  });
+});
+
 
 
 // ----------------------------------forget password-------------------------------------------
@@ -232,7 +234,7 @@ const client = new OAuth2Client();
         payload: {
             email,
             id: user._id},
-        SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+        SIGNATURE: process.env.JWT_SECRET,
         option: {expiresIn: "15m"}
     });
     const refreshToken = await generateToken({
@@ -240,7 +242,7 @@ const client = new OAuth2Client();
             email,
             id: user._id
         },
-            SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+            SIGNATURE: process.env.JWT_SECRET,
             option: {expiresIn: "3d"}
         
     });
@@ -280,7 +282,7 @@ const client = new OAuth2Client();
         payload: {
             email,
             id: user._id},
-        SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+        SIGNATURE: process.env.JWT_SECRET,
         option: {expiresIn: "15m"}
     });
     const refreshToken = await generateToken({
@@ -288,7 +290,7 @@ const client = new OAuth2Client();
             email,
             id: user._id
         },
-            SIGNATURE: user.role === "admin" ? process.env.SECRET_KEY_ADMIN : process.env.SECRET_KEY_USER,
+            SIGNATURE: process.env.JWT_SECRET,
             option: {expiresIn: "3d"}
         
     });
