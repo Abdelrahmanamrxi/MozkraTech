@@ -1,8 +1,11 @@
+
 /* eslint-disable no-unused-vars */
 import {useState} from 'react'
 import { motion } from 'framer-motion'
-import { SearchIcon } from 'lucide-react';
-
+import { SearchIcon, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import api from "@/middleware/api"
+import useDebounce from '@/hooks/useDebounce';
+import {useQuery} from "@tanstack/react-query"
 
   const backdropVariants = {
     hidden: { opacity: 0 },
@@ -24,41 +27,46 @@ import { SearchIcon } from 'lucide-react';
       transition: { delay: i * 0.05, duration: 0.3 },
     }),
   };
+ 
 
+
+  async function searchFriends({queryKey}){
+  
+      const[ , debouncedQuery,currentPage]=queryKey
+      const response=await api.get(`/friends/search?name=${debouncedQuery}&limit=5&page=${currentPage}`)
+      return response.data
+   
+    
+ 
+     
+      }
+    
 
 
 
 function AddFriend({setIsAddFriendsOpen}) {
       const [searchQuery, setSearchQuery] = useState("");
-      const allFriends = [
-    { id: 1, name: "Alex Chen", username: "@alexchen", avatar: "AC", status: "online", level: 12, bio: "Game enthusiast" },
-    { id: 2, name: "Jordan Smith", username: "@jsmith", avatar: "JS", status: "online", level: 15, bio: "Always online" },
-    { id: 3, name: "Taylor Moon", username: "@tmoon", avatar: "TM", status: "away", level: 10, bio: "Casual player" },
-    { id: 4, name: "Casey Rivera", username: "@crivera", avatar: "CR", status: "offline", level: 8, bio: "New player" },
-    { id: 5, name: "Morgan Lee", username: "@mlee", avatar: "ML", status: "online", level: 20, bio: "Pro gamer" },
-    { id: 6, name: "Riley Park", username: "@rpark", avatar: "RP", status: "online", level: 14, bio: "Community leader" },
-  ];
+      const [currentPage,setPage]=useState(1)
+      const debouncedQuery=useDebounce(searchQuery,300)
+    
+       const {data={people:[],currentPage:1,totalDocs:0,totalPages:1},isLoading,isError,error}=useQuery({
+        queryKey:['friends',debouncedQuery,currentPage],
+        queryFn:searchFriends,
+        enabled:debouncedQuery.trim().length>0,
+        staleTime:1000 * 60 * 5,
+        retry:false
+       })
+      
+       const totalDocs = data.totalDocs ?? data.people.length;
+       const totalPages = data.totalPages ?? 1;
+       const canGoPrev = currentPage > 1;
+       const canGoNext = currentPage < totalPages;
 
-  const normalizedQuery = searchQuery.toLowerCase();
+       const friendSearchError = isError
+         ? error?.response?.data?.message || error?.message || "Something went wrong"
+         : null;
 
-  const filteredFriends = allFriends.filter(
-    (friend) =>
-      friend.name.toLowerCase().includes(normalizedQuery) ||
-      friend.username.toLowerCase().includes(normalizedQuery)
-  );
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "online":
-        return "#10b981";
-      case "away":
-        return "#f59e0b";
-      case "offline":
-        return "#6b7280";
-      default:
-        return "#6b7280";
-    }
-  };
+      
 
   return (
   <>
@@ -119,11 +127,9 @@ function AddFriend({setIsAddFriendsOpen}) {
   
                       <div className="flex flex-wrap items-center gap-2 text-xs text-[#C6B5F0]">
                         <span className="rounded-full border border-[#9B7EDE]/25 bg-[#9B7EDE]/10 px-3 py-1">
-                          {filteredFriends.length} matches
+                          {data.people&&data.people.length} matches
                         </span>
-                        <span className="rounded-full border border-[#9B7EDE]/25 bg-[#9B7EDE]/10 px-3 py-1">
-                          {allFriends.length} total players
-                        </span>
+                        
                         <span className="rounded-full border border-[#9B7EDE]/25 bg-[#9B7EDE]/10 px-3 py-1">
                           Search only mode
                         </span>
@@ -136,17 +142,17 @@ function AddFriend({setIsAddFriendsOpen}) {
                       initial={{ opacity: 0, x: -16 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.08 }}
-                      className="rounded-2xl border border-[#9B7EDE]/25 bg-[#120D24]/65 p-3"
+                      className="relative rounded-2xl border border-[#9B7EDE]/25 bg-[#120D24]/65 p-3"
                     >
                       <div className="mb-3 px-2 text-xs font-blinker uppercase tracking-[0.2em] text-[#B8A7E5]">
                         People
                       </div>
   
                       <div className="max-h-[48vh] space-y-3 overflow-y-auto pr-1 scrollbar-hide">
-                        {filteredFriends.length > 0 ? (
-                          filteredFriends.map((friend, index) => (
+                        { data.people?.length > 0 ? (
+                          data.people.map((friend, index) => (
                             <motion.div
-                              key={friend.id}
+                              key={friend._id}
                               custom={index}
                               variants={itemVariants}
                               initial="hidden"
@@ -157,11 +163,11 @@ function AddFriend({setIsAddFriendsOpen}) {
                               <div className="flex items-center justify-between gap-3">
                                 <div className="flex min-w-0 items-center gap-3">
                                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-[#9B7EDE] via-[#7F77DD] to-[#6B6AD4] text-sm font-bold text-white shadow-lg">
-                                    {friend.avatar}
+                                    {friend.fullName[0]}
                                   </div>
                                   <div className="min-w-0">
                                     <p className="truncate text-sm font-blinker font-semibold text-white">
-                                      {friend.name}
+                                      {friend.fullName}
                                     </p>
                          
                                   </div>
@@ -170,7 +176,7 @@ function AddFriend({setIsAddFriendsOpen}) {
                                 <div className="flex items-center gap-2">
                                   <span
                                     className="h-2.5 w-2.5 rounded-full"
-                                    style={{ backgroundColor: getStatusColor(friend.status) }}
+                                   
                                   />
                                   <span className="text-xs text-[#C6B5F0]">Lv. {friend.level}</span>
                                 </div>
@@ -190,10 +196,45 @@ function AddFriend({setIsAddFriendsOpen}) {
                               {searchQuery ? "No friends found" : "Start searching to find friends"}
                             </p>
                             <p className="mt-1 text-sm text-[#B8A7E5]/85">
-                              Try a different name or username.
+                             {friendSearchError ? friendSearchError : "Try a different name"}
                             </p>
                           </motion.div>
                         )}
+                      </div>
+                      {isLoading && (
+                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-[#0B0718]/85 backdrop-blur-sm p-6 text-center">
+                          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/10 shadow-lg">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                          </div>
+                          <p className="mt-4 text-base font-semibold text-white">Searching friends...</p>
+                          <p className="mt-2 text-sm text-[#C6B5F0]">Hang tight, results are on the way.</p>
+                        </div>
+                      )}
+
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#9B7EDE]/20 bg-[#16102a]/90 p-3 text-sm text-[#C6B5F0]">
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={!canGoPrev}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-[#1f1734] text-white transition hover:bg-[#2f214d] disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            <ChevronLeft className="h-5 w-5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPage((prev) => prev + 1)}
+                            disabled={!canGoNext}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-[#1f1734] text-white transition hover:bg-[#2f214d] disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#d3c6ff]">
+                          <span>Page</span>
+                          <span className="rounded-full bg-[#9B7EDE]/20 px-3 py-1 text-white">{currentPage} / {totalPages}</span>
+                          <span>{totalDocs ? `${totalDocs} total` : "No results"}</span>
+                        </div>
                       </div>
                     </motion.div>
                   </div>

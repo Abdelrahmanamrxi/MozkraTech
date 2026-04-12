@@ -120,17 +120,17 @@ export const login = asyncHandler(async (req, res, next) => {
 // ----------------------------------refreshToken-------------------------------------------
 
   export const refreshToken = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(new HttpException("Refresh token not found", 401));
-  }
-
-  const token = authHeader.split(" ")[1];
-
+    const cookieToken = req.cookies?.refreshToken;
+    const token = cookieToken 
+  
+    if (!token) {
+    return next(new HttpException("Refresh Token Not Found", 401));
+        }   
+        
   let decoded;
 
   try {
-    decoded = jwt.verify(token, process.env.REFRESH_SECRET);
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
     return next(new HttpException("Invalid refresh token", 401));
   }

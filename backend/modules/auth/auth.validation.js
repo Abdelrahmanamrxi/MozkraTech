@@ -53,9 +53,6 @@ export const loginSchema = joi.object({
     params: joi.object({})
 });
 
-export const refreshTokenSchema = joi.object({
-    authorization: joi.string().required()
-});
 
 export const forgetPasswordSchema = joi.object({
     body:joi.object({

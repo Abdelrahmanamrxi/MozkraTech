@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { signUpSchema,confirmEmailSchema,loginSchema,
-    refreshTokenSchema,forgetPasswordSchema,resetPasswordSchema,
+    forgetPasswordSchema,resetPasswordSchema,
     signUpWithGoogleSchema,loginWithGoogleSchema,resendOTPSchema
  } from "./auth.validation.js";
 import { validation } from "../../middleware/validation.js";
@@ -12,7 +12,7 @@ const authRouter = Router();
 authRouter.post("/register", validation(signUpSchema),signUp);
 authRouter.patch("/confirm-email", validation(confirmEmailSchema), confirmEmail);
 authRouter.post("/login", validation(loginSchema),login);
-authRouter.post("/refresh-token", validation(refreshTokenSchema), refreshToken);
+authRouter.post("/refresh-token", refreshToken);
 authRouter.patch("/forget-password", validation(forgetPasswordSchema), forgetPassword);
 authRouter.patch("/reset-password", validation(resetPasswordSchema), resetPassword);
 authRouter.post("/signup-with-google",validation(signUpWithGoogleSchema),signUpWithGoogle);

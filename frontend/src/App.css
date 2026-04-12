@@ -197,3 +197,33 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 select {
   color-scheme: dark;
 }
+
+.google-button-wrapper {
+  border-radius: 1.5rem;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.google-button-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28);
+}
+
+.google-button-wrapper button,
+.google-button-wrapper div[role="button"] {
+  width: 100% !important;
+  min-height: 52px;
+  border-radius: 0 !important;
+}
+
+.google-button-wrapper button {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.google-button-wrapper button span {
+  color: #fff !important;
+}

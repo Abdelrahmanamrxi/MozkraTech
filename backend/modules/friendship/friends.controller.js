@@ -7,29 +7,31 @@ import { asyncHandler } from "../../utils/asyncHandler/index.js"
 //------------------------------------------searchFriends-------------------------------------------
 export const searchFriends=asyncHandler(async(req,res,next)=>{
     const{limit=3,page=1,name}=req.query
-
+    const userId=req.user._id
 
     const pageNum = Math.max(1, parseInt(page));
     const limitNum = Math.min(10, parseInt(limit));
-    const skip=(pageNum-1)*limit
-    const filter=name?{fullName:{$regex:name,$options:'i'}}:{}
+    const skip = (pageNum - 1) * limitNum;
+    const filter = name ? { fullName: { $regex: name, $options: 'i' }, _id: { $ne: userId } } : {};
     const [data, total] = await Promise.all([
-    userModel.find(filter)
-      .sort({ createdAt: -1 })
-      .select("fullName email _id level")
-      .skip(skip)
-      .limit(limitNum),
-    userModel.countDocuments({fullName:name})
-  ]);
+      userModel.find(filter)
+        .sort({ createdAt: -1 })
+        .select("fullName email _id level")
+        .skip(skip)
+        .limit(limitNum),
+      userModel.countDocuments(filter)
+    ]);
 
-    if(data.length===0){
-        return next(new HttpException("There is no user with such criteria"),404)
+    if (data.length === 0) {
+      return next(new HttpException("There is no user with such criteria"), 404);
     }
-    res.status(200).json({
-        data,
-        totalPages:Math.ceil(total/limitNum),
-        totalPeople:total
 
+    const totalPages = total > 0 ? Math.max(1, Math.ceil(total / limitNum)) : 0;
+
+    res.status(200).json({
+      people: data,
+      totalPages,
+      totalDocs: total
     })
 })
 

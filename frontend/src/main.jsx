@@ -8,7 +8,7 @@ import store from './store/store.js'
 import "./i18n";
 const queryClient=new QueryClient()
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <QueryClientProvider client={queryClient} >
       <Provider store={store}>
@@ -16,5 +16,5 @@ createRoot(document.getElementById('root')).render(
     </Provider>
     </QueryClientProvider >
     </GoogleOAuthProvider>
-  </StrictMode>,
+  ,
 )
