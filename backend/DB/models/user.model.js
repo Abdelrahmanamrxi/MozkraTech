@@ -100,11 +100,6 @@ const userSchema = new mongoose.Schema(
       studyReminders: { type: Boolean, default: true },
       weeklyReports: { type: Boolean, default: true },
     },
-    preferredLanguage: {
-      type: String,
-      enum: Object.values(languageTypes),
-      default: "English",
-    },
     weeklyStudyHours: {
       type: Number,
       default: 0,

@@ -75,19 +75,19 @@ export const addFriend = asyncHandler(async (req, res, next) => {
 
 // ----------------------------------accept Friend-------------------------------------------
 export const acceptFriendRequest = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
+    const { userId } = req.params;
     
     const [sender, receiver] = await Promise.all([ userModel.findOneAndUpdate(
-        { _id: id, isDeleted: false, isVerified: true, "friendRequests.sent": { $in: [req.user._id ]} },
+        { _id: userId, isDeleted: false, isVerified: true, "friendRequests.sent": { $in: [req.user._id ]} },
         {
             $addToSet: { friends: req.user._id },
             $pull: { "friendRequests.sent": req.user._id }},
         { new: true }
     ),
         userModel.findOneAndUpdate(
-        { _id: req.user._id, isDeleted: false, isVerified: true, "friendRequests.received": { $in: [id] } },
-        { $addToSet: { friends: id },
-        $pull: { "friendRequests.received": id } },
+        { _id: req.user._id, isDeleted: false, isVerified: true, "friendRequests.received": { $in: [userId] } },
+        { $addToSet: { friends: userId },
+        $pull: { "friendRequests.received": userId } },
         { new: true }
         )
     ]);
@@ -102,16 +102,16 @@ export const acceptFriendRequest = asyncHandler(async (req, res, next) => {
 
 // ----------------------------------declineFriendRequest-------------------------------------------
 export const declineFriendRequest = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
+    const { userId } = req.params;
     const [senderUpdate, receiverUpdate] = await Promise.all([
         userModel.findOneAndUpdate(
-            { _id: id, "friendRequests.sent": req.user._id },
+            { _id: userId, "friendRequests.sent": req.user._id },
             { $pull: { "friendRequests.sent": req.user._id } },
             { new: true }
         ),
         userModel.findOneAndUpdate(
-            { _id: req.user._id, "friendRequests.received": id },
-            { $pull: { "friendRequests.received": id } },
+            { _id: req.user._id, "friendRequests.received": userId },
+            { $pull: { "friendRequests.received": userId } },
             { new: true }
         )
     ]);
@@ -126,18 +126,18 @@ export const declineFriendRequest = asyncHandler(async (req, res, next) => {
 
 // ----------------------------------deleteFriend-------------------------------------------
 export const deleteFriend = asyncHandler(async (req, res, next) => {
-    const { id } = req.params; 
+    const { userId } = req.params; 
 
     
     const [userUpdate, friendUpdate] = await Promise.all([
 
         userModel.findOneAndUpdate(
-            { _id: req.user._id, friends: { $in: [id] } }, 
-            { $pull: { friends: id } },
+            { _id: req.user._id, friends: { $in: [userId] } }, 
+            { $pull: { friends: userId } },
             { new: true }
         ),
         userModel.findOneAndUpdate(
-            { _id: id, friends: { $in: [req.user._id] } },
+            { _id: userId, friends: { $in: [req.user._id] } },
             { $pull: { friends: req.user._id } },
             { new: true }
         )

@@ -15,6 +15,19 @@ export const updateProfileSchema = joi.object({
    
 });
 
+
+
+export const addFriendSchema = joi.object({
+    body: joi.object({}), 
+    
+    params: joi.object({
+        userId: generalRules.id.required() 
+    }),
+    query: joi.object({})
+}).required();
+
+
+
 export const shareProfileSchema = joi.object({
     id: generalRules.id.required()
 });

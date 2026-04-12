@@ -4,7 +4,7 @@ import { asyncHandler } from "../../utils/asyncHandler/index.js"
 
 
 
-
+//------------------------------------------searchFriends-------------------------------------------
 export const searchFriends=asyncHandler(async(req,res,next)=>{
     const{limit=3,page=1,name}=req.query
 
@@ -23,7 +23,7 @@ export const searchFriends=asyncHandler(async(req,res,next)=>{
   ]);
 
     if(data.length===0){
-        return next(new HttpException("There is no user with such criteira"),404)
+        return next(new HttpException("There is no user with such criteria"),404)
     }
     res.status(200).json({
         data,
@@ -32,4 +32,71 @@ export const searchFriends=asyncHandler(async(req,res,next)=>{
 
     })
 })
+
+
+// // ------------------------------------------getAllFriends-------------------------------------------
+// export const getFriends = asyncHandler(async (req, res, next) => {
+//   const user = await userModel.findById(req.user._id).populate({
+//     path: "friends",
+//     select: "fullName email profileImage level currentStreak",
+//   });
+
+//   if (!user) {
+//     return next(new HttpException("User not found", 404));
+//   }
+
+//   res.status(200).json({
+//     success: true,
+//     friends: user.friends
+//   });
+// });
+
+
+
+
+
+// // ------------------------------------------viewProfileFriend-------------------------------------------
+// export const viewProfileFriend = asyncHandler(async (req, res, next) => {
+//     // 1. Get the friend's ID from URL parameters
+//     const { id } = req.params;
+
+//     // 2. Find the friend in the database
+//     const friend = await userModel.findOne({ _id: id, isDeleted: false });
+
+//     if (!friend) {
+//         return next(new HttpException("Friend profile not found", 404));
+//     }
+
+//     // 3. Check if this person is actually in your friends list
+//     const isStillFriend = req.user.friends.includes(id);
+//     if (!isStillFriend) {
+//         return next(new HttpException("You can only view profiles of your friends", 403));
+//     }
+
+//     // 4. Viewers Logic: Check if I (req.user._id) visited this friend before
+//     const viewerEntry = friend.viewers.find(viewer => {
+//         return viewer.userId.toString() === req.user._id.toString();
+//     });
+
+//     if (viewerEntry) {
+//         // If I visited before, just add a new timestamp
+//         viewerEntry.time.push(Date.now());
+//         // Keep only the last 5 visit times
+//         if (viewerEntry.time.length > 5) {
+//             viewerEntry.time = viewerEntry.time.slice(-5);
+//         }
+//     } else {
+//         // If this is my first visit, add my ID to their viewers list
+//         friend.viewers.push({ userId: req.user._id, time: [Date.now()] });
+//     }
+
+//     // 5. Save the changes to the friend's document
+//     await friend.save();
+
+//     // 6. Return the friend's profile data to the frontend
+//     return res.status(200).json({ 
+//         message: "Viewing friend profile success", 
+//         profile: friend 
+//     });
+// });
 

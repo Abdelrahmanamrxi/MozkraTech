@@ -76,7 +76,7 @@ export const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
     const user = await userModel.findOne({email, isVerified: true, isDeleted: false, provider: "system"});
     if(!user) {
-        return next(new HttpException("No User with Such Record Exists",401));
+        return next(new HttpException("No User with Such Record Exists or not verified",401));
     }
     
     //compare password

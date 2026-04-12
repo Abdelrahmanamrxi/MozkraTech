@@ -1,4 +1,5 @@
 import joi from 'joi'
+import { generalRules } from '../../utils/generalRules/index.js';
 
 
 export const searchFriendSchema=joi.object({
@@ -16,3 +17,9 @@ export const searchFriendSchema=joi.object({
     body:joi.object({}),
     params:joi.object({})
 })
+
+
+
+export const shareProfileSchema = joi.object({
+    id: generalRules.id.required()
+});
