@@ -7,17 +7,19 @@ import HttpException from '../utils/HttpException.js';
 
 export const authentication = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization;
-
+   
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return next(new HttpException("Access Denied", 401));
   }
 
   const token = authHeader.split(" ")[1];
-
+  
   let decoded;
   try {
     decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
   } catch (err) {
+    console.log(err)
     return next(new HttpException("Authorization Failed", 401));
   }
 

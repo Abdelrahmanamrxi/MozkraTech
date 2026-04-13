@@ -7,14 +7,13 @@ import { setAccessToken } from "../../slices/authSlice";
 import {useDispatch} from 'react-redux'
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
-import { useRef } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 function SignupForm({ isRtl, t }) {
  const baseUrl=import.meta.env.VITE_BACKEND_URL
  const navigate=useNavigate()
  const dispatch=useDispatch()
- const googleLoginRef = useRef(null)
     
   const {
     formData,
@@ -74,35 +73,42 @@ const handleGoogleSuccess = async (credentialResponse) => {
   }
 };
 
-// Validation check for Google signup
-const googleSignupEnabled =
+const isBirthDateComplete =
   Boolean(formData.birthDate.day) &&
   Boolean(formData.birthDate.month) &&
-  Boolean(formData.birthDate.year) &&
-  Boolean(formData.gender);
+  Boolean(formData.birthDate.year);
 
-const handleGoogleButtonClick = () => {
-  if (!googleSignupEnabled) {
-    setErrors((prev) => ({
-      ...prev,
-      gender: formData.gender ? "" : "Please provide a gender before signing up with Google",
-      birthDate: (formData.birthDate.day && formData.birthDate.month && formData.birthDate.year) 
-        ? "" 
-        : "Please provide your birthdate before signing up with Google",
-    }));
-    return; // Don't proceed with Google login if validation fails
-  }
-  // Find and click the Google button inside the ref
-  if (googleLoginRef.current) {
-    // Find the button element and click it
-    const button = googleLoginRef.current.querySelector('button') || 
-         googleLoginRef.current.querySelector('[role="button"]') ||
-         googleLoginRef.current.querySelector('div[role="button"]');
-    if (button) {
-      button.click();
-    }
-  }
+const googleSignupEnabled = isBirthDateComplete && Boolean(formData.gender);
+const requiredGenderMessage = t("signupPage.errors.genderRequired");
+const requiredBirthDateMessage = t("signupPage.errors.birthDateRequired");
+
+const handleGoogleDisabledClick = () => {
+  if (googleSignupEnabled) return;
+
+  setErrors((prev) => ({
+    ...prev,
+    gender: formData.gender ? prev.gender : requiredGenderMessage,
+    birthDate: isBirthDateComplete ? prev.birthDate : requiredBirthDateMessage,
+  }));
 };
+
+useEffect(() => {
+  setErrors((prev) => {
+    const next = { ...prev };
+    let changed = false;
+
+    if (formData.gender && next.gender === requiredGenderMessage) {
+      next.gender = "";
+      changed = true;
+    }
+    if (isBirthDateComplete && next.birthDate === requiredBirthDateMessage) {
+      next.birthDate = "";
+      changed = true;
+    }
+
+    return changed ? next : prev;
+  });
+}, [formData.gender, isBirthDateComplete, requiredGenderMessage, requiredBirthDateMessage, setErrors]);
   const handleOtpChange = (e) => {
     const value = e.target.value.replace(/\D/g, "");
     setOtp(value);
@@ -293,45 +299,62 @@ const handleGoogleButtonClick = () => {
     >
       <h2 className="text-3xl font-semibold text-center mb-2">{t("signupPage.createAccount")}</h2>
       <p className="text-center text-sm text-secondary mb-6">{t("signupPage.getStarted")}</p>
-      
-      <button  
-        type="button"
-        onClick={handleGoogleButtonClick}
-        className="w-full cursor-pointer flex items-center justify-center gap-2 bg-white/20 hover:bg-white/40 transition rounded-full py-2 mb-6"
-      >
-        <span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M21.6002 10.2H12.2002V13.9H17.7002C17.6002 14.8 17.0002 16.2 15.7002 17.1C14.9002 17.7 13.7002 18.1 12.2002 18.1C9.6002 18.1 7.3002 16.4 6.5002 13.9C6.3002 13.3 6.2002 12.6 6.2002 11.9C6.2002 11.2 6.3002 10.5 6.5002 9.9C6.6002 9.7 6.6002 9.5 6.7002 9.4C7.6002 7.3 9.7002 5.8 12.2002 5.8C14.1002 5.8 15.3002 6.6 16.1002 7.3L18.9002 4.5C17.2002 3 14.9002 2 12.2002 2C8.3002 2 4.9002 4.2 3.3002 7.5C2.6002 8.9 2.2002 10.4 2.2002 12C2.2002 13.6 2.6002 15.1 3.3002 16.5C4.9002 19.8 8.3002 22 12.2002 22C14.9002 22 17.2002 21.1 18.8002 19.6C20.7002 17.9 21.8002 15.3 21.8002 12.2C21.8002 11.4 21.7002 10.8 21.6002 10.2Z"
-              stroke="white"
-              strokeWidth="1.5"
-              strokeMiterlimit="10"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
-        {t("signupPage.google")}
-      </button>
+         <style>{`
+  .google-login-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: fit-content;
+  }
 
-      {/* GoogleLogin component - positioned off-screen so it can be triggered */}
-      <div
-        ref={googleLoginRef}
-        style={{
-          position: "absolute",
-          left: "-9999px",
-          top: "-9999px",
-          pointerEvents: "none"
-        }}
-      >
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={() => {
-            console.error("Google Signup Failed");
-            setErrors({ submit: "Google Signup Failed. Please try again." });
-          }}
-        />
-      </div>
+  .google-login-wrapper:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    transform: translateY(-2px);
+  }
+
+  .google-login-wrapper div {
+    border-radius: 16px;
+  }
+
+  .google-login-wrapper.is-disabled {
+    filter: saturate(0.55);
+    opacity: 0.75;
+  }
+
+  .google-login-overlay {
+    position: absolute;
+    inset: 0;
+    border: none;
+    background: rgba(2, 6, 23, 0.18);
+    cursor: not-allowed;
+  }
+`}</style>
+
+<div className={`google-login-wrapper mb-5 mt-4 ${googleSignupEnabled ? "" : "is-disabled"}`}>
+  <GoogleLogin
+    onSuccess={handleGoogleSuccess}
+    onError={() => {
+      setErrors({ submit: "Google login failed. Please try again." });
+    }}
+    theme="filled_black"
+    size="large"
+    width="350"
+  />
+  {!googleSignupEnabled && (
+    <button
+      type="button"
+      className="google-login-overlay"
+      onClick={handleGoogleDisabledClick}
+      aria-label={t("signupPage.google")}
+    />
+  )}
+</div>
+
+     
 
       <div className="flex items-center gap-3 text-sm text-secondary mb-6">
         <div className="h-px bg-white/20 flex-1"></div>
