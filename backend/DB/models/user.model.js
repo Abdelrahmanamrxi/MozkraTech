@@ -23,6 +23,16 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: 3,
     },
+    summary:{
+      type:String,
+      trim:true,
+      minLength:30
+    },
+    bio:{
+      type:String,
+      trim:true,
+      minLength:100
+    },
     email: {
       type: String,
       required: true,
@@ -64,6 +74,10 @@ const userSchema = new mongoose.Schema(
     currentStreak: {
       type: Number,
       default: 0,
+    },
+    currentXP:{
+      type:Number,
+      default:0
     },
     longestStreak: {
       type: Number,
@@ -162,6 +176,21 @@ const userSchema = new mongoose.Schema(
 );
 userSchema.index({ email: 1, isVerified: 1 });
 userSchema.index({ name: 1 });
+userSchema.methods.addXP=async function(amount){
+   this.currentXP=(this.currentXP || 0) + amount
+  const newLevel=Math.floor(Math.sqrt(this.currentXP / 100)) + 1;
+  let oldLevel;
+  if(newLevel>this.level){
+    oldLevel=this.level
+    this.level=newLevel
+  }
+  return {
+    user: await user.save(),
+    leveledUp:newLevel>oldLevel,
+    newLevel
+  }
+
+}
 
 const userModel = mongoose.models.User || mongoose.model("User", userSchema);
 export default userModel;

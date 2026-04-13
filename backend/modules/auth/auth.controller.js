@@ -126,7 +126,7 @@ export const login = asyncHandler(async (req, res, next) => {
     if (!token) {
     return next(new HttpException("Refresh Token Not Found", 401));
         }   
-        
+
   let decoded;
 
   try {
@@ -228,7 +228,12 @@ const client = new OAuth2Client();
             isVerified: email_verified,
             provider: 'google',
             birthDate,
-            gender
+            gender,
+            currentStreak:1,
+            longestStreak:1,
+            preferredLanguage:'English',
+            lastActivityDate:Date.now()
+
         })
         const accessToken = await generateToken({
         payload: {
