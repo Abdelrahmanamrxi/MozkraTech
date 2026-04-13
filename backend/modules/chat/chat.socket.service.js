@@ -1,7 +1,7 @@
 import { authSocket } from "../../middleware/auth.js";
 
 
-const connectioUser = new Map();
+export const connectioUser = new Map();
 
 
 export const registerAccount = async (socket) => {

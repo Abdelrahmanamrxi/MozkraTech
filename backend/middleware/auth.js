@@ -62,25 +62,20 @@ export const authorization = (accessRole = []) => {
 
 export const authSocket = async ({ socket }) => {
     try {
-        const [prefix, token] = socket?.handshake?.auth?.authorization?.split(" ") || [];
+        const authHeader = socket?.handshake?.auth?.authorization;
 
-        if (!prefix || !token) {
-            return { message: "token not found", statusCode: 401 };
+        
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return { message: "token not found or invalid format", statusCode: 401 };
         }
 
-        let SIGNATURE_TOKEN = undefined;
-        if (prefix == "admin") {
-            SIGNATURE_TOKEN = process.env.SECRET_KEY_ADMIN;
-        } else if (prefix == "user") {
-            SIGNATURE_TOKEN = process.env.SECRET_KEY_USER;
-        } else {
-            return { message: "Invalid authorization token prefix", statusCode: 401 };
-        }
+        const token = authHeader.split(" ")[1];
 
-        const decoded = jwt.verify(token, SIGNATURE_TOKEN);
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
         if (!decoded?.id) {
-            return { message: "token invalid payload", statusCode: 404 };
+            return { message: "token invalid payload", statusCode: 401 };
         }
 
         const user = await userModel.findById(decoded.id);
@@ -88,14 +83,19 @@ export const authSocket = async ({ socket }) => {
             return { message: "user not found", statusCode: 404 };
         }
 
-        if (user?.passwordChangeAt && parseInt(user.passwordChangeAt.getTime() / 1000) > decoded.iat) {
-            return { message: "token expired", statusCode: 404 };
+      
+        if (
+            user?.passwordChangeAt && 
+            user.passwordChangeAt.getTime() / 1000 > decoded.iat
+        ) {
+            return { message: "Password changed, please login again", statusCode: 401 };
         }
 
-        return { user, statusCode: 200 };
+      
+        return { user, role: decoded.role, statusCode: 200 };
 
     } catch (err) {
         console.log("JWT Error:", err.message);
-        return { message: err.message, statusCode: 401 };
+        return { message: "Authorization Failed", statusCode: 401 };
     }
 }

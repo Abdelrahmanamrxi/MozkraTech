@@ -9,6 +9,7 @@ import morgan from "morgan";
 import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 import limiter from "./middleware/rateLimiter.js";
+import chatRouter from "./modules/chat/chat.route.js";
 
 const bootstrap = (app, express) => {
   // 1. Body parsers
@@ -22,10 +23,10 @@ const bootstrap = (app, express) => {
   // 2. CORS (must be early)
   app.use(
     cors({
-      origin: process.env.FRONTEND_URL,
-      // origin: "*",
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-      credentials: true,
+    //   origin: process.env.FRONTEND_URL,
+      origin: "*",
+    //   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    //   credentials: true,
     }),
   );
 
@@ -39,6 +40,7 @@ const bootstrap = (app, express) => {
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/user", userRouter);
   app.use("/api/v1/subjects", subjectRouter);
+  app.use("/api/v1/chat", chatRouter);
   app.use("/api/v1/friends", friendsRouter);
 
   // 6. Error handling (last)

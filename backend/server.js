@@ -14,4 +14,4 @@ const httpServer = app.listen(process.env.PORT, () => {
 })
 
 
-// runIo(httpServer);
+runIo(httpServer);
