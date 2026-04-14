@@ -28,6 +28,8 @@ export const addFriendSchema = joi.object({
 
 
 
-export const shareProfileSchema = joi.object({
+export const getProfileByIDSchema = joi.object({
+params:joi.object({
     id: generalRules.id.required()
+})
 });

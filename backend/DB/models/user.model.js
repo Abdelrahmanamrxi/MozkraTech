@@ -176,6 +176,8 @@ const userSchema = new mongoose.Schema(
 );
 userSchema.index({ email: 1, isVerified: 1 });
 userSchema.index({ name: 1 });
+userSchema.index({_id:1,isVerified:1,isDeleted:1})
+
 userSchema.methods.addXP=async function(amount){
    this.currentXP=(this.currentXP || 0) + amount
   const newLevel=Math.floor(Math.sqrt(this.currentXP / 100)) + 1;
@@ -185,7 +187,7 @@ userSchema.methods.addXP=async function(amount){
     this.level=newLevel
   }
   return {
-    user: await user.save(),
+    user: await this.save(),
     leveledUp:newLevel>oldLevel,
     newLevel
   }

@@ -1,6 +1,7 @@
 import userModel from "../../DB/models/user.model.js";
 import { asyncHandler } from "../../utils/asyncHandler/index.js";
 import HttpException from "../../utils/HttpException.js";
+import friendshipModel from "../../DB/models/friendship.model.js"
 
 // ----------------------------------updateProfile-------------------------------------------
 export const updateProfile = asyncHandler(async (req, res, next) => {
@@ -12,37 +13,103 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
 })
 
 
-// ----------------------------------shareProfile-------------------------------------------
-export const shareProfile = asyncHandler(async (req, res, next) => {
+export const getProfileByID = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const ownUserId = req.user._id;
 
-    const { id } = req.params;
-    const user = await userModel.findOne({_id: id, isDeleted: false, isVerified: true});
+  
+  if (ownUserId.toString() === id.toString()) {
+    return next(
+      new HttpException("You cannot access your own profile through this endpoint", 403)
+    );
+  }
 
-    if (!user) {
-        return next(new HttpException("User Not Found or Deleted or Not Verified", 404));
+  const user = await userModel
+    .findOne({ _id: id, isDeleted: false, isVerified: true })
+    .select("level fullName currentXP currentStreak createdAt bio summary subjects viewers")
+    .populate("subjects", "name");
+
+  if (!user) {
+    return next(new HttpException("User Not Found or Deleted or Not Verified", 404));
+  }
+
+  // ---------------- friendship check ----------------
+  const friendship = await friendshipModel.findOne({
+    $or: [
+      { requesterId: ownUserId, receiverId: id },
+      { receiverId: ownUserId, requesterId: id }
+    ]
+  });
+
+  const isFriend = friendship?.status === "accepted";
+  const isPending = friendship?.status === "pending";
+
+  // ---------------- viewer tracking ----------------
+  const existingViewer = user.viewers.find(
+    (v) => v.userId.toString() === ownUserId.toString()
+  );
+
+  if (existingViewer) {
+    existingViewer.time.push(Date.now());
+
+    if (existingViewer.time.length > 5) {
+      existingViewer.time = existingViewer.time.slice(-5);
     }
-
-    if (req.user._id.toString() === id) {
-       return res.status(200).json({ message: "Welcome to your profile", user: req.user });
-    }
-
-    const emailExist = await user.viewers.find(viewer => {
-        return viewer.userId.toString() === req.user._id.toString();
+  } else {
+    user.viewers.push({
+      userId: ownUserId,
+      time: [Date.now()]
     });
-    if (emailExist) {
-        emailExist.time.push(Date.now());
-        if (emailExist.time.length > 5) {
-        emailExist.time =  emailExist.time.slice(-5);
-        }
-        
-    } else {
-        user.viewers.push({ userId: req.user._id, time: [Date.now()]});
+  }
+
+  await user.save();
+
+ // Sending Data specific to different usecases whether User is
+ // friends or still pending or not friends
+
+  let safeUser;
+
+  if (isFriend) {
+    safeUser = {
+      fullName: user.fullName,
+      level: user.level,
+      currentXP: user.currentXP,
+      currentStreak: user.currentStreak,
+      createdAt: user.createdAt,
+      bio: user.bio,
+      summary: user.summary,
+      subjects: user.subjects,
+    };
+  } 
+  else if (isPending) {
+    safeUser = {
+      fullName: user.fullName,
+      bio: user.bio,
+      summary: user.summary,
+      createdAt: user.createdAt,
+      subjects: [],
+    };
+  } 
+  else {
+    safeUser = {
+      fullName: user.fullName,
+      createdAt: user.createdAt,
+      bio: "Hidden",
+      summary: "Hidden",
+      subjects: []
+    };
+  }
+
+  return res.status(200).json({
+    message: "User Profile Loaded",
+    data: {
+      user: safeUser,
+      friendship,
+      isFriend,
+      isPending
     }
-    await user.save();
-    return res.status(200).json({ message: "share Profile success", user });
-})
-
-
+  });
+});
 // ----------------------------------dashboard-------------------------------------------
 export const dashboard = asyncHandler(async (req, res, next) => {
     

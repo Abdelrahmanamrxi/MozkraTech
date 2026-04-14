@@ -1,7 +1,7 @@
 import userModel from "../../DB/models/user.model.js"
 import HttpException from "../../utils/HttpException.js"
 import { asyncHandler } from "../../utils/asyncHandler/index.js"
-
+import friendshipModel from "../../DB/models/friendship.model.js"
 
 
 //------------------------------------------searchFriends-------------------------------------------
@@ -34,6 +34,68 @@ export const searchFriends=asyncHandler(async(req,res,next)=>{
       totalDocs: total
     })
 })
+
+
+
+
+
+export const addFriend = asyncHandler(async (req, res, next) => {
+  const { receiverId } = req.body;
+  const requesterId = req.user._id;
+
+  if (!receiverId) {
+    return next(new HttpException("receiverId is required", 400));
+  }
+
+  if (requesterId.toString() === receiverId) {
+    return next(new HttpException("You can't add yourself as a friend.", 400));
+  }
+
+  const user = await userModel.findOne({
+    _id: requesterId,
+    isDeleted: false,
+    isVerified: true
+  });
+
+  if (!user) {
+    return next(new HttpException("Requester user not found", 404));
+  }
+
+  const receiver = await userModel.findOne({
+    _id: receiverId,
+    isDeleted: false,
+    isVerified: true
+  });
+
+  if (!receiver) {
+    return next(new HttpException("User not found", 404));
+  }
+
+  const existing = await friendshipModel.findOne({
+    $or: [
+      { receiverId, requesterId },
+      { receiverId: requesterId, requesterId: receiverId }
+    ]
+  });
+
+  if (existing) {
+    return next(new HttpException("Friend request already exists", 400));
+  }
+
+  const friendship = await friendshipModel.create({
+    receiverId,
+    requesterId,
+    status: "pending"
+  });
+
+  user.addXP(30);
+  
+
+  return res.status(201).json({
+    message: "Friend Request Sent Successfully",
+    friendship
+  });
+});
 
 
 // // ------------------------------------------getAllFriends-------------------------------------------

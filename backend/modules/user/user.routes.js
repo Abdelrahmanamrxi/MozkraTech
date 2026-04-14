@@ -1,7 +1,7 @@
 import { Router } from "express";
-import {  updateProfile, shareProfile, dashboard, addFriend, getProfile, acceptFriendRequest, declineFriendRequest, deleteFriend } from "./user.controller.js";
+import {  updateProfile, getProfileByID, dashboard, addFriend, getProfile, acceptFriendRequest, declineFriendRequest, deleteFriend } from "./user.controller.js";
 import { validation } from "../../middleware/validation.js";
-import { updateProfileSchema, shareProfileSchema, addFriendSchema } from "./user.validation.js";
+import { updateProfileSchema, getProfileByIDSchema, addFriendSchema } from "./user.validation.js";
 import { authentication, authorization } from '../../middleware/auth.js';
 import { roleTypes } from "../../DB/models/user.model.js";
 
@@ -9,7 +9,7 @@ const userRouter = Router();
 
 
 userRouter.patch('/update-profile', authentication, validation(updateProfileSchema), updateProfile);
-userRouter.patch('/share-profile/:id', authentication, validation(shareProfileSchema), shareProfile);
+userRouter.get('/profile/:id', authentication, validation(getProfileByIDSchema), getProfileByID);
 userRouter.post("/dashboard", authentication,authorization([roleTypes.admin]), dashboard)
 userRouter.patch("/add-friend/:userId", authentication, validation(addFriendSchema),addFriend);
 userRouter.patch("/accept-friend/:userId", authentication,validation(addFriendSchema), acceptFriendRequest);

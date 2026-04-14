@@ -6,7 +6,7 @@ import FriendsMessages from "./FriendsMessages/FriendsMessages";
 import FriendsProgress from "./FriendsProgress/FriendsProgress";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import AddFriend from "./AddFriend/AddFriend";
+import SearchFriends from "./SearchFriends/SearchFriends";
 
 function Friends() {
   const [showMessagesSection, setSection] = useState(false);
@@ -96,7 +96,7 @@ function Friends() {
       {/* Add Friends Modal */}
       <AnimatePresence>
         {isAddFriendsOpen && (
-          <AddFriend setIsAddFriendsOpen={setIsAddFriendsOpen}/>
+          <SearchFriends setIsAddFriendsOpen={setIsAddFriendsOpen}/>
         )}
       </AnimatePresence>
  

@@ -18,6 +18,15 @@ export const searchFriendSchema=joi.object({
     params:joi.object({})
 })
 
+export const addFriendSchema=joi.object({
+  body:joi.object({
+    receiverId:joi.string().required().messages({
+      "string.empty":"Please provide a receiverId"
+    })
+  })  ,
+
+})
+
 
 
 export const shareProfileSchema = joi.object({

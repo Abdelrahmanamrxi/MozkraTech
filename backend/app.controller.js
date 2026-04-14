@@ -23,10 +23,10 @@ const bootstrap = async (app, express) => {
   // 2. CORS (must be early)
   app.use(
     cors({
-      // origin: process.env.FRONTEND_URL,
-    origin: "*",
-      //  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-      //  credentials: true,
+       origin: process.env.FRONTEND_URL,
+    //origin: "*",
+       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+       credentials: true,
     }),
   );
 

@@ -6,6 +6,7 @@ import { SearchIcon, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from "@/middleware/api"
 import useDebounce from '@/hooks/useDebounce';
 import {useQuery} from "@tanstack/react-query"
+import { useNavigate } from 'react-router';
 
   const backdropVariants = {
     hidden: { opacity: 0 },
@@ -27,28 +28,25 @@ import {useQuery} from "@tanstack/react-query"
       transition: { delay: i * 0.05, duration: 0.3 },
     }),
   };
+  
  
 
 
   async function searchFriends({queryKey}){
-  
       const[ , debouncedQuery,currentPage]=queryKey
       const response=await api.get(`/friends/search?name=${debouncedQuery}&limit=5&page=${currentPage}`)
-      return response.data
-   
-    
- 
-     
+      return response.data  
       }
     
 
 
 
-function AddFriend({setIsAddFriendsOpen}) {
+function SearchFriends({setIsAddFriendsOpen}) {
       const [searchQuery, setSearchQuery] = useState("");
       const [currentPage,setPage]=useState(1)
       const debouncedQuery=useDebounce(searchQuery,300)
-    
+      const navigate=useNavigate()
+
        const {data={people:[],currentPage:1,totalDocs:0,totalPages:1},isLoading,isError,error}=useQuery({
         queryKey:['friends',debouncedQuery,currentPage],
         queryFn:searchFriends,
@@ -56,6 +54,8 @@ function AddFriend({setIsAddFriendsOpen}) {
         staleTime:1000 * 60 * 5,
         retry:false
        })
+
+       console.log(data)
       
        const totalDocs = data.totalDocs ?? data.people.length;
        const totalPages = data.totalPages ?? 1;
@@ -152,6 +152,7 @@ function AddFriend({setIsAddFriendsOpen}) {
                         { data.people?.length > 0 ? (
                           data.people.map((friend, index) => (
                             <motion.div
+                              onClick={()=>{navigate(`/dashboard/profile/${friend._id}`)}}
                               key={friend._id}
                               custom={index}
                               variants={itemVariants}
@@ -244,4 +245,4 @@ function AddFriend({setIsAddFriendsOpen}) {
   )
 }
 
-export default AddFriend
+export default SearchFriends
