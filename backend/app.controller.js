@@ -11,22 +11,22 @@ import cookieParser from "cookie-parser";
 import limiter from "./middleware/rateLimiter.js";
 import chatRouter from "./modules/chat/chat.route.js";
 
-const bootstrap = (app, express) => {
+const bootstrap = async (app, express) => {
   // 1. Body parsers
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
 
   // 2. Connect to DB
-  connectToDB();
+  await connectToDB();
 
   // 2. CORS (must be early)
   app.use(
     cors({
-      origin: process.env.FRONTEND_URL,
-    //origin: "*",
-       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-       credentials: true,
+      // origin: process.env.FRONTEND_URL,
+    origin: "*",
+      //  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      //  credentials: true,
     }),
   );
 

@@ -1,19 +1,39 @@
-import chatModel from "../../DB/models/chat.model.js";
+import conversationModel from "../../DB/models/Conversation.model.js";
+import messageModel from "../../DB/models/message.model.js";
 import { asyncHandler } from "../../utils/asyncHandler/index.js";
 
 export const getChat = asyncHandler(async (req, res) => { 
     const { userId } = req.params;
-    const chat = await chatModel.findOne({ 
+    
+    
+    const conversation = await conversationModel.findOne({ 
         $or: [
-            {mainUser: req.user._id,subParticipant: userId},
-            {mainUser: userId,subParticipant: req.user._id}
+            {userId: req.user._id, otherUserId: userId},
+            {userId: userId, otherUserId: req.user._id}
         ]
     }).populate([
-        { path: "mainUser", select: "name email profilePicture image" },
-        {path:"messages.senderId", select: "name email profilePicture image"}
-    ])
-    if (!chat) {
+        { path: "userId", select: "fullName email profilePicture image" },
+        { path: "otherUserId", select: "fullName email profilePicture image" }
+    ]);
+
+    if (!conversation) {
         return res.status(200).json({ message: "No chat found", chat: null });
     }
-    return res.status(200).json({ message: "Chat retrieved successfully", chat });
-})
+
+    
+    const messages = await messageModel.find({ conversationId: conversation._id })
+        .populate("senderId", "fullName email profilePicture image");
+
+
+    const formattedChat = {
+        mainUser: conversation.userId,
+        subParticipant: conversation.otherUserId,
+        messages: messages.map(msg => ({
+            _id: msg._id,
+            message: msg.content, 
+            senderId: msg.senderId
+        }))
+    };
+
+    return res.status(200).json({ message: "Chat retrieved successfully", chat: formattedChat });
+});
