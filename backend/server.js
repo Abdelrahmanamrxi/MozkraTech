@@ -25,7 +25,7 @@ const startServer = async () => {
 
     } catch (error) {
         
-        console.error("⛔ CRITICAL ERROR DURING BOOTSTRAP:");
+        console.error("CRITICAL ERROR DURING BOOTSTRAP:");
         console.error(error.message);
         process.exit(1)
     }
