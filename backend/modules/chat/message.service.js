@@ -11,7 +11,7 @@ export const sendMessage = async (socket) => {
       return socket.emit("authError", data);
     }
     const userId = data.user._id;
-    const chat = await chatModel.findOneAndUpdate(
+    let chat =  await chatModel.findOneAndUpdate(
       {
         $or: [
           { mainUser: userId, subParticipant: destId },
@@ -20,13 +20,13 @@ export const sendMessage = async (socket) => {
       },
       {
         $push: {
-          message: { senderId: userId, message },
+          messages: { senderId: userId, message },
         },
       },
-      { returnDocument: "after" },
+      { new: true },
     )
         if (!chat) {
-            await chatModel.create({
+            chat = await chatModel.create({
                mainUser: userId,
                subParticipant: destId,
                messages: [{ senderId: userId, message }],
