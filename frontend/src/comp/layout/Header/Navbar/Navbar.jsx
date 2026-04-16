@@ -5,9 +5,11 @@ import Logo from "../../../logo/Logo";
 import i18n from "i18next"
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
+import Notifications from "../Notifications/Notifications";
 
 function Navbar() {
   const {t}=useTranslation(['common'])
+  const[notificationsOpen,setNotifications]=useState(false)
   
   const [currentLang, setCurrentLang] = useState(i18n.language || 'en');
   const links = [
@@ -238,6 +240,7 @@ function Navbar() {
           <>
             {/* Notification */}
             <motion.button
+              onClick={()=>{setNotifications(true)}}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="w-10 h-10 flex items-center justify-center rounded-full
@@ -282,7 +285,13 @@ function Navbar() {
           </>
         )}
       </div>
+      <AnimatePresence>
+        {notificationsOpen && (
+          <Notifications setNotifications={setNotifications} />
+        )}
+      </AnimatePresence>
     </motion.div>
+    
   );
 }
 

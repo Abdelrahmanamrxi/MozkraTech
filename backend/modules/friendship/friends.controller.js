@@ -2,7 +2,7 @@ import userModel from "../../DB/models/user.model.js"
 import HttpException from "../../utils/HttpException.js"
 import { asyncHandler } from "../../utils/asyncHandler/index.js"
 import friendshipModel from "../../DB/models/friendship.model.js"
-
+import { notificationModel } from "../../DB/models/notifications.model.js"
 
 //------------------------------------------searchFriends-------------------------------------------
 export const searchFriends=asyncHandler(async(req,res,next)=>{
@@ -89,8 +89,19 @@ export const addFriend = asyncHandler(async (req, res, next) => {
   });
 
   user.addXP(30);
-  
-
+  try{
+    await notificationModel.create({
+      userId:receiverId,
+      message:`${user.fullName} has sent you a friend request!`,
+      eventType:"friend_request_received",
+      payload:{
+        senderId:requesterId
+      } 
+    }) 
+  }
+  catch(err){
+    console.log(err)
+  }
   return res.status(201).json({
     message: "Friend Request Sent Successfully",
     friendship

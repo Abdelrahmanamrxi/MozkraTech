@@ -176,6 +176,27 @@ input[type="time"] {
   color-scheme: dark;
 }
 
+/* Custom scrollbars */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(144,103,198,0.75) rgba(15,12,35,0.6);
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 12, 35, 0.6);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(144, 103, 198, 0.85);
+  border-radius: 9999px;
+  border: 2px solid rgba(15, 12, 35, 0.65);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(144, 103, 198, 0.95);
+}
+
 /* Style time text */
 input[type="time"]::-webkit-datetime-edit-hour-field,
 input[type="time"]::-webkit-datetime-edit-minute-field {
