@@ -224,16 +224,35 @@ export const deleteFriend = asyncHandler(async (req, res, next) => {
 
 // ----------------------------------getProfile-------------------------------------------
 export const getProfile = asyncHandler(async (req, res, next) => {
-    const user = await userModel.findOne(
-        { _id: req.user._id, isDeleted: false, isVerified: true }
-    ).populate([
-        { path: "friends" }
-    ]);
+  const user = await userModel.findOne(
+    { _id: req.user._id, isDeleted: false, isVerified: true }
+  );
 
     if(!user) {
         return next(new HttpException("User Not Found", 404));
-    }
-    return res.status(200).json({ message: "getUsers success", user });
+  }
+  
+    const friendships = await friendshipModel.find({
+        status: 'accepted',
+        $or: [
+            { requesterId: user._id },
+            { receiverId: user._id }
+        ]
+    }).populate([
+        { path: 'requesterId', select: 'fullName image email' },
+        { path: 'receiverId', select: 'fullName image email' }
+    ]);
+  
+    const friendsList = friendships.map(f => {
+        return f.requesterId._id.toString() === user._id.toString() 
+            ? f.receiverId 
+            : f.requesterId;
+    });
+  
+    return res.status(200).json({ message: "getUsers success",user: {
+            ...user._doc,
+            friends: friendsList 
+        }});
 });
 
 
