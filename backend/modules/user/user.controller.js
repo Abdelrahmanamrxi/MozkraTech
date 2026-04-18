@@ -2,7 +2,7 @@ import userModel from "../../DB/models/user.model.js";
 import { asyncHandler } from "../../utils/asyncHandler/index.js";
 import HttpException from "../../utils/HttpException.js";
 import friendshipModel from "../../DB/models/friendship.model.js"
-
+import { notificationModel } from "../../DB/models/notifications.model.js";
 // ----------------------------------updateProfile-------------------------------------------
 export const updateProfile = asyncHandler(async (req, res, next) => {
 
@@ -45,22 +45,58 @@ export const getProfileByID = asyncHandler(async (req, res, next) => {
   const isPending = friendship?.status === "pending";
 
   // ---------------- viewer tracking ----------------
-  const existingViewer = user.viewers.find(
-    (v) => v.userId.toString() === ownUserId.toString()
-  );
 
-  if (existingViewer) {
-    existingViewer.time.push(Date.now());
+const viewerUser = await userModel.findById(ownUserId);
 
-    if (existingViewer.time.length > 5) {
-      existingViewer.time = existingViewer.time.slice(-5);
-    }
-  } else {
-    user.viewers.push({
-      userId: ownUserId,
-      time: [Date.now()]
-    });
+if (!viewerUser) return;
+
+// find existing viewer record
+const existingViewer = user.viewers.find(
+  (v) => v.userId.toString() === ownUserId.toString()
+);
+
+const now = Date.now();
+const TEN_MINUTES = 10 * 60 * 1000;
+
+let shouldNotify = false;
+
+if (!existingViewer) {
+  // first time view
+  user.viewers.push({
+    userId: ownUserId,
+    time: [now]
+  });
+
+  shouldNotify = true;
+} else {
+  // update time history
+  existingViewer.time.push(now);
+
+  if (existingViewer.time.length > 5) {
+    existingViewer.time = existingViewer.time.slice(-5);
   }
+
+  const lastViewTime = existingViewer.time.at(-2); 
+  // ⚠️ important: previous view, not current push
+
+  shouldNotify =
+    !lastViewTime || now - lastViewTime > TEN_MINUTES;
+}
+
+// save viewer update ONCE
+await user.save();
+
+// single notification block
+if (shouldNotify) {
+  await notificationModel.create({
+    userId: user._id,
+    message: `${viewerUser.fullName} viewed your profile!`,
+    eventType: "view_profile",
+    payload: {
+      viewerId: ownUserId
+    }
+  });
+}
 
   await user.save();
 

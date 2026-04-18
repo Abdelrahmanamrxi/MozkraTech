@@ -4,12 +4,13 @@ import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../logo/Logo";
 import i18n from "i18next"
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Notifications from "../Notifications/Notifications";
 
 function Navbar() {
   const {t}=useTranslation(['common'])
   const[notificationsOpen,setNotifications]=useState(false)
+  const bellRef = useRef(null)
   
   const [currentLang, setCurrentLang] = useState(i18n.language || 'en');
   const links = [
@@ -239,13 +240,15 @@ function Navbar() {
         {location.pathname.startsWith('/dashboard') && (
           <>
             {/* Notification */}
-            <motion.button
-              onClick={()=>{setNotifications(true)}}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 flex items-center justify-center rounded-full
-              bg-white/10 border border-white/20 backdrop-blur-md"
-            >
+            <div className="relative">
+              <motion.button
+                ref={bellRef}
+                onClick={()=>{setNotifications(!notificationsOpen)}}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-10 h-10 flex items-center justify-center rounded-full
+                bg-white/10 border border-white/20 backdrop-blur-md"
+              >
               <svg
                 width="24"
                 height="24"
@@ -276,6 +279,12 @@ function Navbar() {
                 />
               </svg>
             </motion.button>
+            <AnimatePresence>
+              {notificationsOpen && (
+                <Notifications setNotifications={setNotifications} bellRef={bellRef} />
+              )}
+            </AnimatePresence>
+            </div>
 
             {/* Profile */}
             <motion.div
@@ -285,11 +294,6 @@ function Navbar() {
           </>
         )}
       </div>
-      <AnimatePresence>
-        {notificationsOpen && (
-          <Notifications setNotifications={setNotifications} />
-        )}
-      </AnimatePresence>
     </motion.div>
     
   );

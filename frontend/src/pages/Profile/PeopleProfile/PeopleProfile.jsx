@@ -29,7 +29,7 @@ const {data,isLoading,error}=useQuery({
 
 
 
-  console.log(data)
+  
   const navigate = useNavigate();
 
 
@@ -59,26 +59,34 @@ const {data,isLoading,error}=useQuery({
     if(error)
       return <p>{error.response.data.message}</p>
     console.log(data)
+
     const nextLvlXP = Math.pow(data.data.user.level, 2) * 100;
     const currLvlXP = Math.pow(data.data.user.level - 1, 2) * 100;
     const xpInLevel = Math.max(0, data.data.user.currentXP - currLvlXP);
 
+    const d=data.data
     const user = {
-    fullName: data.data.user.fullName,
-    level: data.data.user.level,
+    fullName: d.user.fullName,
+    level: d.user.level,
     xpProgress: Math.min(100, (xpInLevel / (nextLvlXP - currLvlXP)) * 100),
-    summary: data.data.summary? data.data.summary:"No summary to show",
-    joinedAt: new Date(data.data.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
-    streak: data.data.user.currentStreak || 0,
-    xpToNext: Math.max(0, nextLvlXP - data.data.user.currentXP),
-    subjects: data.data.user.subjects && data.data.user.subjects.length > 0 ? data.data.user.subjects : [],
+    summary: d.summary? d.summary:"No summary to show",
+    joinedAt: new Date(d.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
+    streak: d.user.currentStreak || 0,
+    xpToNext: Math.max(0, nextLvlXP - d.user.currentXP),
+    subjects: d.user.subjects && d.user.subjects.length > 0 ? d.user.subjects : [],
     badges: ["Early Adopter", "Solver", "10 Day Streak"],
-    bio: data.data.user.bio?data.data.user.bio : "No bio to show",
+    bio: d.user.bio?d.user.bio : "No bio to show",
   };
 
+  
   const progressRing = user.xpProgress;
-  const isFriendshipPending = !data.data.friendship || data.data.friendship?.status === "pending";
+  
+  const isFriendshipPending = !d.friendship || d.friendship?.status === "pending";
+const isOutgoingRequest = d.friendship?.status === "pending"
+  && d.friendship.receiverId === id
 
+const isIncomingRequest = d.friendship?.status === "pending"
+  && d.friendship.requesterId === id
   return (
     <Motion.div
       variants={containerVariants}
@@ -157,6 +165,7 @@ const {data,isLoading,error}=useQuery({
               isFriendshipPending={isFriendshipPending}
               itemVariants={itemVariants}
               glassPanel={glassPanel}
+              isIncomingRequest={isIncomingRequest}
             />
           </div>
           <PeopleProfileSidebar
@@ -166,6 +175,8 @@ const {data,isLoading,error}=useQuery({
             progressRing={progressRing}
             itemVariants={itemVariants}
             glassPanel={glassPanel}
+            isIncomingRequest={isIncomingRequest}
+            isOutgoingRequest={isOutgoingRequest}
           />
         </div>
 

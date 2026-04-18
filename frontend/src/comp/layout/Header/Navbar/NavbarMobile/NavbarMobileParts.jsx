@@ -2,6 +2,7 @@ import React from "react";
 import { Bell, UserCircle2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import Notifications from "../../Notifications/Notifications";
 
 export function NotificationsUtilityRow({
   notifOpen,
@@ -86,66 +87,18 @@ export function NotificationsUtilityRow({
         </motion.button>
       </div>
 
-      {/* Notifications panel (inside menu) */}
+      {/* Notifications overlay using shared Notifications component */}
       <AnimatePresence initial={false}>
         {notifOpen && (
           <motion.div
-            key="notif-panel"
-            initial={{ opacity: 0, height: 0, y: -6 }}
-            animate={{ opacity: 1, height: "auto", y: 0 }}
-            exit={{ opacity: 0, height: 0, y: -6 }}
+            key="mobile-notification-overlay"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.18 }}
-            className="overflow-hidden rounded-2xl"
-            style={{
-              background: "rgba(0,0,0,0.18)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}
+            className="fixed inset-0 z-50 bg-black/55 flex items-center justify-center px-3"
           >
-            <div
-              className="px-4 py-3 flex items-center justify-between"
-              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-            >
-              <span
-                className="text-[0.75rem] font-semibold tracking-[0.12em] uppercase"
-                style={{ color: "rgba(141,134,201,0.65)" }}
-              >
-                {t('navbar.notifications.recent')}
-              </span>
-              <button
-                type="button"
-                className="text-[0.78rem] font-medium"
-                style={{ color: "rgba(255,255,255,0.55)" }}
-                onClick={() => setNotifOpen(false)}
-              >
-                {t('navbar.notifications.close')}
-              </button>
-            </div>
-
-            <div className="px-2 py-2 flex flex-col gap-1.5">
-              {notifications.map((n) => (
-                <div
-                  key={n.id}
-                  className="px-3 py-2.5 rounded-xl"
-                  style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                  }}
-                >
-                  <div
-                    className="font-blinker text-[0.92rem] font-medium"
-                    style={{ color: "rgba(255,255,255,0.82)" }}
-                  >
-                    {n.title}
-                  </div>
-                  <div
-                    className="text-[0.82rem] leading-snug"
-                    style={{ color: "rgba(255,255,255,0.50)" }}
-                  >
-                    {n.body}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <Notifications setNotifications={setNotifOpen} bellRef={null} mobile />
           </motion.div>
         )}
       </AnimatePresence>

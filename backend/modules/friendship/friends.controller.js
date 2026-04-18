@@ -3,7 +3,7 @@ import HttpException from "../../utils/HttpException.js"
 import { asyncHandler } from "../../utils/asyncHandler/index.js"
 import friendshipModel from "../../DB/models/friendship.model.js"
 import { notificationModel } from "../../DB/models/notifications.model.js"
-
+import {checkWhetherUsersExist} from "./friends.service.js"
 //------------------------------------------searchFriends-------------------------------------------
 export const searchFriends=asyncHandler(async(req,res,next)=>{
     const{limit=3,page=1,name}=req.query
@@ -107,6 +107,82 @@ export const addFriend = asyncHandler(async (req, res, next) => {
     friendship
   });
 });
+
+export const acceptFriend=asyncHandler(async (req,res,next)=>{
+  const userId = req.user._id
+  const { senderId } = req.body
+
+  const { user, friend } = await checkWhetherUsersExist(userId, senderId)
+
+  const updated = await friendshipModel.findOneAndUpdate(
+    {
+      requesterId: senderId,
+      receiverId: userId,
+      status: "pending"
+    },
+    {
+      $set: { status: "accepted" }
+    },
+    {
+      new: true
+    }
+  )
+
+  if (!updated) {
+    return res.status(200).json({
+      message: "Already handled or request not found"
+    })
+  }
+
+  user.addXP(40)
+
+  await notificationModel.findOneAndDelete({
+    userId,
+    eventType: "friend_request_received",
+    "payload.senderId": senderId
+  }, { sort: { createdAt: -1 } })
+
+  await notificationModel.create({
+    userId: senderId,
+    message: `${user.fullName} has accepted your friend request!`,
+    eventType: "friend_request_acceptance",
+    payload: {
+      senderId: userId
+    }
+  })
+
+  res.status(200).json({ message: "Friendship Accepted." })
+})
+
+export const rejectFriend=asyncHandler(async (req,res,next)=>{
+  const { senderId } = req.body
+  const userId = req.user._id
+
+  const { user, friend } = await checkWhetherUsersExist(userId, senderId)
+
+  const deletedFriendship = await friendshipModel.findOneAndDelete({
+    requesterId: senderId,
+    receiverId: userId,
+    status: "pending"
+  })
+
+  await notificationModel.findOneAndDelete({
+    userId,
+    eventType: "friend_request_received",
+    "payload.senderId": senderId
+  }, { sort: { createdAt: -1 } })
+
+  if (!deletedFriendship) {
+    return res.status(200).json({
+      message: "Already handled or request not found"
+    })
+  }
+
+  res.status(200).json({ message: "User has been rejected." })
+})
+
+
+
 
 
 // // ------------------------------------------getAllFriends-------------------------------------------

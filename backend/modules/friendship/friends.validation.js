@@ -21,10 +21,27 @@ export const searchFriendSchema=joi.object({
 export const addFriendSchema=joi.object({
   body:joi.object({
     receiverId:joi.string().required().messages({
-      "string.empty":"Please provide a receiverId"
+      "string.empty":"Please provide a Receiver Id"
     })
   })  ,
 
+})
+export const acceptFriendSchema=joi.object({
+    body:joi.object({
+        senderId:joi.string().required().messages({
+      "string.empty":"Please provide a senderId"
+    }),
+   
+    })
+})
+
+export const rejectFriendSchema=joi.object({
+    body:joi.object({
+        senderId:joi.string().required().messages({
+      "string.empty":"Please provide a Sender Id"
+    }),
+     
+    })
 })
 
 

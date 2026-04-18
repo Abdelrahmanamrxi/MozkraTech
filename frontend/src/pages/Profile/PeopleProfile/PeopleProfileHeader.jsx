@@ -1,9 +1,9 @@
 import React from "react";
 import { motion as Motion } from "framer-motion";
 import { Clock, Target, Sparkles, Flame, UserPlus } from "lucide-react";
-
-export default function PeopleProfileHeader({ user, friendship, isFriendshipPending, itemVariants, glassPanel }) {
-  const pending = isFriendshipPending ? (friendship?.status === "pending") : "";
+import { formatRelativeTime } from "@/utils/formatTime";
+export default function PeopleProfileHeader({ user, friendship, isFriendshipPending, itemVariants, glassPanel,isIncomingRequest }) {
+  const pending = friendship?.status === "pending";
 
   return (
     <Motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${glassPanel} p-6 md:p-10 h-full`}>
@@ -89,12 +89,13 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
               {pending && (
                 <>
                   <span className="hidden h-1 w-1 rounded-full bg-white/30 md:block" />
-                  <p className="flex items-center gap-2 text-[11px] font-Inter font-bold uppercase tracking-widest text-yellow-200">
+                  <p className={`flex items-center gap-2 text-[11px] font-Inter font-bold uppercase tracking-widest ${isIncomingRequest ? "text-emerald-300" : "text-amber-200"}`}>
                     <UserPlus size={14} />
-                    Connection pending
+                    {isIncomingRequest ? "This user has sent you a friend request" : "Friend request pending"}
                   </p>
                 </>
               )}
+              
               {friendship?.status === "accepted" && (
                 <>
                   <span className="hidden h-1 w-1 rounded-full bg-white/30 md:block" />
@@ -109,7 +110,16 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
             <p className="max-w-2xl text-sm leading-relaxed text-slate-100/85 md:text-[15px]">
               {user.bio}
             </p>
-
+            {pending && (
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-slate-100 shadow-[0_14px_30px_rgba(0,0,0,0.15)]">
+                <UserPlus size={14} className="text-slate-100" />
+                <span className="whitespace-nowrap">
+                  {isIncomingRequest
+                    ? `Request received at ${formatRelativeTime(friendship.createdAt)}`
+                    : `Request sent at ${formatRelativeTime(friendship.createdAt)}`}
+                </span>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3 pt-1 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/20 bg-white/10 p-3 text-left transition-all duration-300 hover:bg-white/16">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-slate-300">Subjects</p>

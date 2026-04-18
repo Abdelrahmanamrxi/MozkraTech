@@ -1,20 +1,58 @@
 import React from "react";
 import { motion as Motion } from "framer-motion";
-import { UserPlus, MessageSquare } from "lucide-react";
+import { UserPlus, MessageSquare, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import api from "../../../middleware/api";
+async function acceptFriend(id){
+  const response=await api.patch('friends/accept',{senderId:id})
+  return response.data
+}
+async function declineFriend(id){
+  const response = await api.delete('friends/reject', {
+    data: { senderId: id }
+  })
+  return response.data
+}
 
 async function addFriend(id){
   const response=await api.post(`friends/request`,{receiverId:id})
   return response.data
 }
-export default function PeopleProfileSidebar({ user, progressRing, itemVariants, glassPanel,id,friendship }) {
+export default function PeopleProfileSidebar({ user, progressRing, itemVariants, glassPanel,id,friendship,isOutgoingRequest,isIncomingRequest }) {
+
+ 
     const navigate = useNavigate();
-    const queryClient=useQueryClient()
+    const queryClient = useQueryClient()
     const isFriendshipPending = friendship == null || friendship?.status === "pending";
     const isFriendsAccepted = friendship?.status === "accepted";
+    const isOutgoingPending = friendship?.status === "pending" && isOutgoingRequest;
+    const isIncomingPending = friendship?.status === "pending" && isIncomingRequest;
+    const canSendRequest = !friendship && !isIncomingRequest;
+
+    const acceptFriendMutation = useMutation({
+      mutationFn: (id) => acceptFriend(id),
+      onMutate: async (id) => {
+        await queryClient.cancelQueries({ queryKey: ['user', id] })
+        return queryClient.getQueryData(['user', id])
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['user', id] })
+      }
+    })
+
+    const declineFriendMutation = useMutation({
+      mutationFn: (id) => declineFriend(id),
+      onMutate: async (id) => {
+        await queryClient.cancelQueries({ queryKey: ['user', id] })
+        return queryClient.getQueryData(['user', id])
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['user', id] })
+      }
+    })
+
     const addFriendMutation=useMutation({
         onMutate:async(id)=>{
             // cancel any query refetching happen while pressing the button
@@ -111,30 +149,41 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
           )}
 
           <div className="space-y-3 pt-2">
-                <button 
-                onClick={()=>{!friendship && addFriendMutation.mutate(id)}} 
-                disabled={!!friendship || addFriendMutation.isPending}
+                {canSendRequest && (
+                  <button 
+                onClick={() => addFriendMutation.mutate(id)} 
+                disabled={addFriendMutation.isPending}
                 className={`w-full rounded-2xl border px-4 py-3.5 text-[11px] font-Inter font-black uppercase tracking-[0.2em] shadow-[0_14px_48px_rgba(255,255,255,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 ${
-             !friendship 
-              ? "border-white/85 bg-white text-slate-900 hover:shadow-[0_18px_58px_rgba(255,255,255,0.28)] hover:bg-white/90" 
-              : friendship.status === "pending"
-             ? "border-yellow-400/50 bg-yellow-400/20 text-yellow-200 cursor-not-allowed"
-             : "border-green-400/50 bg-green-400/20 text-green-200 cursor-not-allowed"
+             addFriendMutation.isPending
+              ? "border-white/40 bg-white/20 text-slate-300 cursor-not-allowed" 
+              : "border-white/85 bg-white text-slate-900 hover:shadow-[0_18px_58px_rgba(255,255,255,0.28)] hover:bg-white/90"
              }`}
             >
             <span className="flex items-center justify-center gap-2">
-             <UserPlus size={16} strokeWidth={2.5} />
+             {addFriendMutation.isPending ? (
+               <Loader2 size={16} strokeWidth={2.5} className="animate-spin" />
+             ) : (
+               <UserPlus size={16} strokeWidth={2.5} />
+             )}
         {addFriendMutation.isPending 
       ? "Sending..." 
-      : !friendship 
-      ? "Connect" 
-      : friendship.status === "pending"
-      ? "Pending Approval"
-      : "Friends"
+      : "Send Friend Request"
     }
   </span>
-    </button>
-            <button
+    </button>)}
+            {isOutgoingPending && (
+                  <button 
+                    disabled
+                    className="w-full rounded-2xl border border-yellow-400/50 bg-yellow-400/20 px-4 py-3.5 text-[11px] font-Inter font-black uppercase tracking-[0.2em] text-yellow-200 cursor-not-allowed"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <UserPlus size={16} strokeWidth={2.5} />
+                      Request Sent
+                    </span>
+                  </button>
+                )}
+            {isFriendsAccepted && (
+              <button
               onClick={() => {
                 if (isFriendsAccepted) {
                   navigate('/dashboard/friends');
@@ -151,10 +200,40 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
                 <MessageSquare size={16} strokeWidth={2.5} />
                 Message
               </span>
-            </button>
+            </button>)}
+       {isIncomingPending && (
+<>
+         <button 
+         onClick={() => acceptFriendMutation.mutate(id)}
+         disabled={acceptFriendMutation.isPending}
+         className={`w-full cursor-pointer rounded-2xl border px-4 py-3.5 text-[11px] font-Inter font-black uppercase tracking-[0.2em] shadow-[0_14px_48px_rgba(255,255,255,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 border-green-400/50 bg-green-400/20 text-green-200 ${acceptFriendMutation.isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
+         >
+            <span className="flex items-center justify-center gap-2">
+             {acceptFriendMutation.isPending ? (
+               <Loader2 size={16} strokeWidth={2.5} className="animate-spin" />
+             ) : (
+               <UserPlus size={16} strokeWidth={2.5} />
+             )}
+             {acceptFriendMutation.isPending ? 'Accepting...' : 'Accept Request'}
+  </span>
+    </button>
+       <button   
+       onClick={() => declineFriendMutation.mutate(id)}
+       disabled={declineFriendMutation.isPending}
+       className={`w-full cursor-pointer rounded-2xl border px-4 py-3.5 text-[11px] font-Inter font-black uppercase tracking-[0.2em] shadow-[0_14px_48px_rgba(255,255,255,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 border-red-700/50 bg-red-700/80 cursor-pointer text-white ${declineFriendMutation.isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
+       >
+            <span className="flex items-center justify-center gap-2">
+             {declineFriendMutation.isPending ? (
+               <Loader2 size={16} strokeWidth={2.5} className="animate-spin" />
+             ) : null}
+                          {declineFriendMutation.isPending ? 'Declining...' : 'Decline Request'}
+  </span>
+    </button>
+    </>
+  )}    
           </div>
-        </div>
-      </div>
-    </Motion.div>
+          </div>
+          </div>
+          </Motion.div>
   );
 }

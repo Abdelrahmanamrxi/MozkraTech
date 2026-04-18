@@ -18,7 +18,10 @@ const notificationSchema=new mongoose.Schema({
     'message_received',
     'system_announcement',
     'streak_milestone_reached',
-    'achievement_unlocked'],
+    'achievement_unlocked',
+    'friend_request_acceptance',
+    'view_profile'
+],
     index:true
     },
     isRead:{
@@ -43,7 +46,7 @@ const notificationSchema=new mongoose.Schema({
     
     */}
 
-notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 10 }) // Deletes notifications after 10 mins for testing
+//notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 10*30*40 }) // Deletes notifications after 10 mins for testing
 notificationSchema.index({userId:1,createdAt:-1})
 notificationSchema.index({userId:1,isRead:1})
 

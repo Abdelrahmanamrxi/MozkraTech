@@ -2,6 +2,7 @@ import connectToDB from "./DB/connectionDB.js";
 import userRouter from "./modules/user/user.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
 import subjectRouter from "./modules/subject/subject.routes.js";
+import notificationRouter from "./modules/notifications/notifications.routes.js";
 import friendsRouter from "./modules/friendship/friends.routes.js";
 import notFound from "./middleware/notFound.js";
 import cors from "cors";
@@ -42,6 +43,7 @@ const bootstrap = async (app, express) => {
   app.use("/api/v1/subjects", subjectRouter);
   app.use("/api/v1/chat", chatRouter);
   app.use("/api/v1/friends", friendsRouter);
+  app.use("/api/v1/notifications",notificationRouter)
 
   // 6. Error handling (last)
   app.use(errorHandler);
