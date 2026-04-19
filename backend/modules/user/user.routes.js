@@ -1,13 +1,13 @@
 import { Router } from "express";
-import {  updateProfile, getProfileByID, dashboard, addFriend, getProfile, acceptFriendRequest, declineFriendRequest, deleteFriend } from "./user.controller.js";
+import {  updateProfile, getProfileByID, dashboard, addFriend, getProfile, acceptFriendRequest, declineFriendRequest, deleteFriend, searchForUsers } from "./user.controller.js";
 import { validation } from "../../middleware/validation.js";
-import { updateProfileSchema, getProfileByIDSchema, addFriendSchema } from "./user.validation.js";
+import { updateProfileSchema, getProfileByIDSchema,searchForUsersSchema,addFriendSchema } from "./user.validation.js";
 import { authentication, authorization } from '../../middleware/auth.js';
 import { roleTypes } from "../../DB/models/user.model.js";
 
 const userRouter = Router();
 
-
+userRouter.get('/',authentication,validation(searchForUsersSchema),searchForUsers)
 userRouter.patch('/update-profile', authentication, validation(updateProfileSchema), updateProfile);
 userRouter.get('/profile/:id', authentication, validation(getProfileByIDSchema), getProfileByID);
 userRouter.post("/dashboard", authentication,authorization([roleTypes.admin]), dashboard)

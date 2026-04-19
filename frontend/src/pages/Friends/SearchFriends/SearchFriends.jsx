@@ -34,7 +34,7 @@ import { useNavigate } from 'react-router';
 
   async function searchFriends({queryKey}){
       const[ , debouncedQuery,currentPage]=queryKey
-      const response=await api.get(`/friends/search?name=${debouncedQuery}&limit=5&page=${currentPage}`)
+      const response=await api.get(`/user?name=${debouncedQuery}&limit=5&page=${currentPage}`)
       return response.data  
       }
     

@@ -4,37 +4,87 @@ import { asyncHandler } from "../../utils/asyncHandler/index.js"
 import friendshipModel from "../../DB/models/friendship.model.js"
 import { notificationModel } from "../../DB/models/notifications.model.js"
 import {checkWhetherUsersExist} from "./friends.service.js"
-//------------------------------------------searchFriends-------------------------------------------
-export const searchFriends=asyncHandler(async(req,res,next)=>{
-    const{limit=3,page=1,name}=req.query
-    const userId=req.user._id
+//------------------------------------------getFriends-------------------------------------------
 
-    const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(10, parseInt(limit));
-    const skip = (pageNum - 1) * limitNum;
-    const filter = name ? { fullName: { $regex: name, $options: 'i' }, _id: { $ne: userId } } : {};
-    const [data, total] = await Promise.all([
-      userModel.find(filter)
-        .sort({ createdAt: -1 })
-        .select("fullName email _id level")
-        .skip(skip)
-        .limit(limitNum),
-      userModel.countDocuments(filter)
-    ]);
+export const getFriends=asyncHandler(async(req,res,next)=>{
+ const userId=req.user._id
+ const {search}=req.query
+ let query={}
 
-    if (data.length === 0) {
-      return next(new HttpException("There is no user with such criteria"), 404);
+ if(search){
+  query.search=search
+ }
+
+const friendsList=await friendshipModel.aggregate([
+  {
+    $match:{
+      $or:[{requesterId:userId},{receiverId:userId}],
+      status:"accepted"
+    }
+  },
+  {
+    $lookup:{
+      from:'users',
+      localField:"requesterId",
+      foreignField:"_id",
+      as:'requesterId'
+    }
+  },
+  {
+    $lookup:{
+      from:'users',
+      localField:'receiverId',
+      foreignField:"_id",
+      as:'receiverId'
+    }
+  },
+  {
+    $unwind:"$requesterId"
+  },
+  {
+    $unwind:"$receiverId"
+  },
+  {
+    $addFields:{
+      friend:{
+        $cond:[{$eq:["$requesterId._id",userId]},"$receiverId","$requesterId"]
+      }
+    }
+  },
+  {
+    $match:{
+      "friend.fullName":{
+        $regex:query.search || "",
+        $options:'i'
+        
+      }
+      
+    }
+  },
+  {
+    $project:{
+      friend:{
+        _id:1,
+        fullName:1,
+        updatedAt:1,
+        createdAt:1
+      }
     }
 
-    const totalPages = total > 0 ? Math.max(1, Math.ceil(total / limitNum)) : 0;
+  }
+])
+ const friends = friendsList.map(f => ({
+    friendshipId: f._id,
+    friend: f.friend,
+    createdAt: f.createdAt
+  }));
 
-    res.status(200).json({
-      people: data,
-      totalPages,
-      totalDocs: total
-    })
+res.status(200).json({ friends });
 })
 
+export const searchFriends=asyncHandler(async(req,res,next)=>{
+
+})
 
 
 

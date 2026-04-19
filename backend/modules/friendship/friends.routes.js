@@ -1,10 +1,11 @@
-import { addFriend, searchFriends,acceptFriend, rejectFriend } from "./friends.controller.js";
+import { addFriend,acceptFriend, rejectFriend } from "./friends.controller.js";
 import { Router } from "express";
 import { validation } from "../../middleware/validation.js";
 import { authentication } from "../../middleware/auth.js";
-import { searchFriendSchema, shareProfileSchema,addFriendSchema,acceptFriendSchema,rejectFriendSchema } from "./friends.validation.js";
+import { getFriends } from "./friends.controller.js";
+import { shareProfileSchema,addFriendSchema,acceptFriendSchema,rejectFriendSchema } from "./friends.validation.js";
 const friendsRouter = Router();
-friendsRouter.get('/search',authentication,validation(searchFriendSchema),searchFriends)
+friendsRouter.get('/',authentication,getFriends)
 friendsRouter.post('/request',authentication,validation(addFriendSchema),addFriend)
 friendsRouter.patch('/accept',authentication,validation(acceptFriendSchema),acceptFriend)
 friendsRouter.delete('/reject',authentication,validation(rejectFriendSchema),rejectFriend)

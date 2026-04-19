@@ -36,7 +36,8 @@ let conversation = await conversationModel.findOneAndUpdate(
     const newMessage = await messageModel.create({
         conversationId: conversation._id,
         senderId: userId,
-        content: message
+        content: message,
+        isRead:true
     });
 
     
