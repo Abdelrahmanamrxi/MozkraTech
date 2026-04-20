@@ -4,6 +4,7 @@ import TimerDisplay from "./sections/TimerDisplay";
 import TimerControls from "./sections/TimerControls";
 import TimerModes from "./sections/TimerModes";
 import ProgressBar from "./sections/ProgressBar";
+import api from "../../middleware/api";
 
 export default function Timer() {
   const navigate = useNavigate();
@@ -12,13 +13,48 @@ export default function Timer() {
   const [time, setTime] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [sessions, setSessions] = useState(0);
+  const [durations, setDurations] = useState({
+    focus: 25 * 60,
+    break: 5 * 60,
+  });
 
   const intervalRef = useRef(null);
 
-  const durations = {
-    focus: 25 * 60,
-    break: 5 * 60,
-  };
+  useEffect(() => {
+    let canceled = false;
+
+    const loadPreferences = async () => {
+      try {
+        const { data } = await api.post("/user/get-profile");
+        const timer = data?.user?.timer || {};
+        const focusMinutes = Number(timer.sessionDuration);
+        const breakMinutes = Number(timer.breakDuration);
+
+        const nextDurations = {
+          focus:
+            (Number.isFinite(focusMinutes) && focusMinutes > 0
+              ? focusMinutes
+              : 25) * 60,
+          break:
+            (Number.isFinite(breakMinutes) && breakMinutes > 0
+              ? breakMinutes
+              : 5) * 60,
+        };
+
+        if (!canceled) {
+          setDurations(nextDurations);
+          setTime(nextDurations.focus);
+        }
+      } catch (err) {
+        // Keep defaults if preferences are unavailable.
+      }
+    };
+
+    loadPreferences();
+    return () => {
+      canceled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (isRunning) {
@@ -42,7 +78,7 @@ export default function Timer() {
     }
 
     return () => clearInterval(intervalRef.current);
-  }, [isRunning, mode]);
+  }, [isRunning, mode, durations]);
 
   const switchMode = (newMode) => {
     setMode(newMode);

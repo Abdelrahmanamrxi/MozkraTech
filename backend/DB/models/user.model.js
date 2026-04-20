@@ -23,15 +23,15 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: 3,
     },
-    summary:{
-      type:String,
-      trim:true,
-      minLength:30
+    summary: {
+      type: String,
+      trim: true,
+      minLength: 30,
     },
-    bio:{
-      type:String,
-      trim:true,
-      minLength:100
+    bio: {
+      type: String,
+      trim: true,
+      minLength: 100,
     },
     email: {
       type: String,
@@ -75,9 +75,9 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    currentXP:{
-      type:Number,
-      default:0
+    currentXP: {
+      type: Number,
+      default: 0,
     },
     longestStreak: {
       type: Number,
@@ -118,8 +118,27 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    preferredTime: {
+      type: String,
+      enum: ["morning", "afternoon", "evening", "night"],
+      default: "morning",
+    },
+    weeklyGoalHours: {
+      type: Number,
+      default: 25,
+      min: 1,
+    },
     timer: {
-      type: Object,
+      sessionDuration: {
+        type: Number,
+        default: 60,
+        min: 1,
+      },
+      breakDuration: {
+        type: Number,
+        default: 15,
+        min: 1,
+      },
     },
     OTPEmailExpiresAt: {
       type: Date,
@@ -176,23 +195,22 @@ const userSchema = new mongoose.Schema(
 );
 userSchema.index({ email: 1, isVerified: 1 });
 userSchema.index({ name: 1 });
-userSchema.index({_id:1,isVerified:1,isDeleted:1})
+userSchema.index({ _id: 1, isVerified: 1, isDeleted: 1 });
 
-userSchema.methods.addXP=async function(amount){
-   this.currentXP=(this.currentXP || 0) + amount
-  const newLevel=Math.floor(Math.sqrt(this.currentXP / 100)) + 1;
+userSchema.methods.addXP = async function (amount) {
+  this.currentXP = (this.currentXP || 0) + amount;
+  const newLevel = Math.floor(Math.sqrt(this.currentXP / 100)) + 1;
   let oldLevel;
-  if(newLevel>this.level){
-    oldLevel=this.level
-    this.level=newLevel
+  if (newLevel > this.level) {
+    oldLevel = this.level;
+    this.level = newLevel;
   }
   return {
     user: await this.save(),
-    leveledUp:newLevel>oldLevel,
-    newLevel
-  }
-
-}
+    leveledUp: newLevel > oldLevel,
+    newLevel,
+  };
+};
 
 const userModel = mongoose.models.User || mongoose.model("User", userSchema);
 export default userModel;

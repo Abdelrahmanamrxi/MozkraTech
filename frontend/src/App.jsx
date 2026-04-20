@@ -12,6 +12,7 @@ import Schedule from "./pages/Schedule/Schedule.jsx";
 import Friends from "./pages/Friends/Friends.jsx";
 import Timer from "./pages/Timer/Timer.jsx";
 import Progress from "./pages/Progress/Progress.jsx";
+import SubjectRegister from "./pages/SubjectRegister/subjectRegister.jsx";
 import Body from "./comp/layout/Body.jsx";
 import ProtectedRoute from "./comp/auth/ProtectedRoute.jsx";
 import ErrorFallback from "./comp/error/ErrorFallback.jsx";
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignupPage />,
+  },
+  {
+    path: "/subject-register",
+    element: <SubjectRegister />,
   },
   {
     path: "/login",
