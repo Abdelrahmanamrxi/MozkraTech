@@ -13,6 +13,8 @@ import ScheduleenTranslation from "./locales/schedule/en.json";
 import SchedulearTranslation from "./locales/schedule/ar.json";
 import FriendsenTranslation from "./locales/friends/en.json";
 import FriendsarTranslation from "./locales/friends/ar.json";
+import ProfileenTranslation from "./locales/profile/en.json";
+import ProfilearTranslation from "./locales/profile/ar.json";
 
 i18n
   .use(initReactI18next)
@@ -28,6 +30,7 @@ i18n
         progress: ProgressenTranslation,
         schedule: ScheduleenTranslation,
         friends: FriendsenTranslation,
+        profile: ProfileenTranslation,
       },
       ar: {
         landing: LandingarTranslation,
@@ -36,9 +39,10 @@ i18n
         progress: ProgressarTranslation,
         schedule: SchedulearTranslation,
         friends: FriendsarTranslation,
+        profile: ProfilearTranslation,
       },
     },
-    ns: ["landing"], // optional but explicit
+    ns: ["landing", "common", "dashboard", "progress", "schedule", "friends", "profile"], // optional but explicit
     defaultNS: "landing",
     react: {
       useSuspense: true,

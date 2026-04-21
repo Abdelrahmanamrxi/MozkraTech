@@ -2,12 +2,6 @@ import mongoose from "mongoose";
 
 
 const conversationSchema = new mongoose.Schema({
-
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
     participantType: {
         type: String,
         enum: ['user-to-ai', 'user-to-user'],
@@ -15,15 +9,9 @@ const conversationSchema = new mongoose.Schema({
     },
     participants: [
     {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        unreadCount: { type: Number, default: 0 }
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
         }]
     ,
-    otherUserId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null
-    },
     pdfLimit: {
         type: Number,
         default: 0
@@ -48,7 +36,7 @@ const conversationSchema = new mongoose.Schema({
 }, {
     timestamps: true,
 });
-
+conversationSchema.index({ "participants.user": 1 });
 const conversationModel =
     mongoose.models.Conversation || mongoose.model("Conversation", conversationSchema);
 

@@ -1,0 +1,44 @@
+{
+  "loading": "جاري التحميل...",
+  "actions": {
+    "backProfile": "الملف الشخصي",
+    "message": "مراسلة",
+    "sendFriendRequest": "إرسال طلب صداقة",
+    "sending": "جارٍ الإرسال...",
+    "requestSent": "تم إرسال الطلب",
+    "acceptRequest": "قبول الطلب",
+    "accepting": "جارٍ القبول...",
+    "declineRequest": "رفض الطلب",
+    "declining": "جارٍ الرفض..."
+  },
+  "fallback": {
+    "summary": "لا يوجد ملخص للعرض",
+    "bio": "لا توجد نبذة للعرض",
+    "unknown": "غير معروف"
+  },
+  "badges": {
+    "earlyAdopter": "من أوائل المستخدمين",
+    "solver": "حلّال",
+    "tenDayStreak": "سلسلة 10 أيام"
+  },
+  "header": {
+    "publicProfile": "ملف شخصي عام",
+    "dayStreak": "سلسلة {{count}} يوم",
+    "levelShort": "المستوى {{level}}",
+    "joined": "انضم في {{date}}",
+    "incomingRequest": "هذا المستخدم أرسل لك طلب صداقة",
+    "pendingRequest": "طلب الصداقة قيد الانتظار",
+    "friendsSince": "أصدقاء منذ {{date}}",
+    "requestReceivedAt": "تم استلام الطلب في {{time}}",
+    "requestSentAt": "تم إرسال الطلب في {{time}}"
+  },
+  "stats": {
+    "subjects": "المواد",
+    "subject": "مادة",
+    "streak": "السلسلة",
+    "currentLevel": "المستوى الحالي",
+    "xpToNext": "{{xp}} نقطة خبرة للوصول للمستوى التالي.",
+    "complete": "{{value}}% مكتمل",
+    "subjectMastery": "إتقان المواد"
+  }
+}

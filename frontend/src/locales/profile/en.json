@@ -1,0 +1,44 @@
+{
+  "loading": "Loading...",
+  "actions": {
+    "backProfile": "Profile",
+    "message": "Message",
+    "sendFriendRequest": "Send Friend Request",
+    "sending": "Sending...",
+    "requestSent": "Request Sent",
+    "acceptRequest": "Accept Request",
+    "accepting": "Accepting...",
+    "declineRequest": "Decline Request",
+    "declining": "Declining..."
+  },
+  "fallback": {
+    "summary": "No summary to show",
+    "bio": "No bio to show",
+    "unknown": "Unknown"
+  },
+  "badges": {
+    "earlyAdopter": "Early Adopter",
+    "solver": "Solver",
+    "tenDayStreak": "10 Day Streak"
+  },
+  "header": {
+    "publicProfile": "Public Profile",
+    "dayStreak": "{{count}} Day Streak",
+    "levelShort": "LVL {{level}}",
+    "joined": "Joined {{date}}",
+    "incomingRequest": "This user has sent you a friend request",
+    "pendingRequest": "Friend request pending",
+    "friendsSince": "Friends since {{date}}",
+    "requestReceivedAt": "Request received at {{time}}",
+    "requestSentAt": "Request sent at {{time}}"
+  },
+  "stats": {
+    "subjects": "Subjects",
+    "subject": "Subject",
+    "streak": "Streak",
+    "currentLevel": "Current Level",
+    "xpToNext": "{{xp}} XP to unlock the next level.",
+    "complete": "{{value}}% complete",
+    "subjectMastery": "Subject Mastery"
+  }
+}

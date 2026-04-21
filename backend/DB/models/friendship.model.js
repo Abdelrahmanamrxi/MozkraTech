@@ -18,6 +18,10 @@ const friendshipSchema=new mongoose.Schema({
         enum:['pending','accepted','rejected'],
         required:true
     },
+    conversationId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Conversation'
+    }
 },{
 
     timestamps:true

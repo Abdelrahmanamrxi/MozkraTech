@@ -4,7 +4,7 @@ import { getChat } from "./chat.controller.js";
 
 const chatRouter = Router();
 
-chatRouter.get("/:userId", authentication, getChat)
+chatRouter.get("/", authentication, getChat)
 
 
 

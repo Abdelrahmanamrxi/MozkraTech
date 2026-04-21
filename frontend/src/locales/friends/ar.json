@@ -51,5 +51,25 @@
     "studyDesc": "حدد جلسة مذاكرة جماعية مع أصدقائك",
     "challengeDesc": "اعمل تحدي مذاكرة ونافس أصحابك",
     "shareDesc": "احتفل بتقدمك مع أصدقائك"
+  },
+  "searchFriends": {
+    "title": "ابحث عن الأصدقاء وأضفهم",
+    "subtitle": "ابحث عن اللاعبين بالاسم أو اسم المستخدم.",
+    "searchPlaceholder": "ابحث بالاسم",
+    "matches": "{{count}} نتيجة",
+    "searchOnlyMode": "وضع البحث فقط",
+    "people": "الأشخاص",
+    "levelShort": "المستوى {{level}}",
+    "noFriendsFound": "لم يتم العثور على أصدقاء",
+    "startSearching": "ابدأ البحث للعثور على أصدقاء",
+    "tryDifferentName": "جرّب اسمًا مختلفًا",
+    "searchingTitle": "جارٍ البحث عن الأصدقاء...",
+    "searchingSubtitle": "انتظر قليلًا، النتائج في الطريق.",
+    "page": "الصفحة",
+    "total": "الإجمالي {{count}}",
+    "noResults": "لا توجد نتائج",
+    "errors": {
+      "generic": "حدث خطأ ما"
+    }
   }
 }

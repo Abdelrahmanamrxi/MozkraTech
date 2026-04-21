@@ -24,7 +24,7 @@ const bootstrap = async (app, express) => {
   // 2. CORS (must be early)
   app.use(
     cors({
-       origin: process.env.FRONTEND_URL,
+       origin: [process.env.FRONTEND_URL,"http://localhost:5174"],
     //origin: "*",
        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
        credentials: true,

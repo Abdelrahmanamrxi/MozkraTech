@@ -4,6 +4,7 @@ import { asyncHandler } from "../../utils/asyncHandler/index.js"
 import friendshipModel from "../../DB/models/friendship.model.js"
 import { notificationModel } from "../../DB/models/notifications.model.js"
 import {checkWhetherUsersExist} from "./friends.service.js"
+import conversationModel from "../../DB/models/Conversation.model.js"
 //------------------------------------------getFriends-------------------------------------------
 
 export const getFriends=asyncHandler(async(req,res,next)=>{
@@ -68,7 +69,9 @@ const friendsList=await friendshipModel.aggregate([
         fullName:1,
         updatedAt:1,
         createdAt:1
-      }
+      },
+      conversationId: 1,
+      createdAt: 1
     }
 
   }
@@ -76,15 +79,13 @@ const friendsList=await friendshipModel.aggregate([
  const friends = friendsList.map(f => ({
     friendshipId: f._id,
     friend: f.friend,
-    createdAt: f.createdAt
+    createdAt: f.createdAt,
+    conversationId: f.conversationId
   }));
 
 res.status(200).json({ friends });
 })
 
-export const searchFriends=asyncHandler(async(req,res,next)=>{
-
-})
 
 
 
@@ -183,6 +184,17 @@ export const acceptFriend=asyncHandler(async (req,res,next)=>{
       message: "Already handled or request not found"
     })
   }
+
+  const conversation = await conversationModel.create({
+    participants:[
+      {user:userId},
+      {user: senderId}
+    ],
+    participantType:'user-to-user'
+  })
+
+  updated.conversationId = conversation._id;
+  await updated.save();
 
   user.addXP(40)
 

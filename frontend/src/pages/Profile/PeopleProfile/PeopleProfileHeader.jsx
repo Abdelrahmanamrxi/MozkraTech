@@ -1,9 +1,29 @@
 import React from "react";
 import { motion as Motion } from "framer-motion";
 import { Clock, Target, Sparkles, Flame, UserPlus } from "lucide-react";
-import { formatRelativeTime } from "@/utils/formatTime";
+import { useTranslation } from "react-i18next";
 export default function PeopleProfileHeader({ user, friendship, isFriendshipPending, itemVariants, glassPanel,isIncomingRequest }) {
+  const { t, i18n } = useTranslation("profile");
   const pending = friendship?.status === "pending";
+  const locale = i18n.language?.startsWith("ar") ? "ar-EG" : "en-US";
+
+  const friendshipDate = friendship?.createdAt
+    ? new Date(friendship.createdAt).toLocaleDateString(locale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "";
+
+  const requestTime = friendship?.createdAt
+    ? new Date(friendship.createdAt).toLocaleString(locale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : "";
 
   return (
     <Motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${glassPanel} p-6 md:p-10 h-full`}>
@@ -25,7 +45,7 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
             }}
           >
             <Sparkles size={13} />
-            Public Profile
+            {t("header.publicProfile")}
           </div>
          {friendship?.status==="accepted"&& (<div
             className="streak-badge inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-Inter font-bold uppercase tracking-wider text-[#f7ece1] backdrop-blur-xl"
@@ -35,7 +55,7 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
             }}
           >
             <Flame size={13} className="text-orange-400" />
-            {user.streak} Day Streak
+            {t("header.dayStreak", { count: user.streak })}
           </div>)}
         </div>
 
@@ -64,7 +84,7 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
                 background: "rgba(144,103,198,0.28)",
               }}
             >
-              LVL {user.level}
+              {t("header.levelShort", { level: user.level })}
             </div>
           </div>
 
@@ -84,14 +104,14 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
               <span className="hidden h-1 w-1 rounded-full bg-white/30 md:block" />
               <p className="flex items-center gap-2 text-[11px] font-Inter font-bold uppercase tracking-widest text-slate-200">
                 <Clock size={14} />
-                Joined {user.joinedAt}
+                {t("header.joined", { date: user.joinedAt })}
               </p>
               {pending && (
                 <>
                   <span className="hidden h-1 w-1 rounded-full bg-white/30 md:block" />
                   <p className={`flex items-center gap-2 text-[11px] font-Inter font-bold uppercase tracking-widest ${isIncomingRequest ? "text-emerald-300" : "text-amber-200"}`}>
                     <UserPlus size={14} />
-                    {isIncomingRequest ? "This user has sent you a friend request" : "Friend request pending"}
+                    {isIncomingRequest ? t("header.incomingRequest") : t("header.pendingRequest")}
                   </p>
                 </>
               )}
@@ -101,7 +121,7 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
                   <span className="hidden h-1 w-1 rounded-full bg-white/30 md:block" />
                   <p className="flex items-center gap-2 text-[11px] font-Inter font-bold uppercase tracking-widest text-slate-200">
                     <UserPlus size={14} />
-                    Friends since {new Date(friendship.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {t("header.friendsSince", { date: friendshipDate })}
                   </p>
                 </>
               )}
@@ -115,19 +135,19 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
                 <UserPlus size={14} className="text-slate-100" />
                 <span className="whitespace-nowrap">
                   {isIncomingRequest
-                    ? `Request received at ${formatRelativeTime(friendship.createdAt)}`
-                    : `Request sent at ${formatRelativeTime(friendship.createdAt)}`}
+                    ? t("header.requestReceivedAt", { time: requestTime })
+                    : t("header.requestSentAt", { time: requestTime })}
                 </span>
               </div>
             )}
             <div className="grid grid-cols-2 gap-3 pt-1 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/20 bg-white/10 p-3 text-left transition-all duration-300 hover:bg-white/16">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-slate-300">Subjects</p>
-                {user.subjects.length>0?<p className="mt-1 text-xl font-Inter font-black text-white">{user.subjects.length}</p>:<p className="mt-1 text-base font-Inter font-black text-white ">Unknown</p>}
+                <p className="text-[10px] uppercase tracking-[0.2em] text-slate-300">{t("stats.subjects")}</p>
+                {user.subjects.length>0?<p className="mt-1 text-xl font-Inter font-black text-white">{user.subjects.length}</p>:<p className="mt-1 text-base font-Inter font-black text-white ">{t("fallback.unknown")}</p>}
               </div>
               <div className="rounded-2xl border border-white/20 bg-white/10 p-3 text-left transition-all duration-300 hover:bg-white/16">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-slate-300">Streak</p>
-                {friendship?.status==="accepted" ? <p className="mt-1 text-xl font-Inter font-black text-white">{user.streak}d</p> : <p className="mt-1 text-base font-Inter font-black text-white">Unknown</p>}
+                <p className="text-[10px] uppercase tracking-[0.2em] text-slate-300">{t("stats.streak")}</p>
+                {friendship?.status==="accepted" ? <p className="mt-1 text-xl font-Inter font-black text-white">{t("header.dayStreak", { count: user.streak })}</p> : <p className="mt-1 text-base font-Inter font-black text-white">{t("fallback.unknown")}</p>}
               </div>
            
             </div>

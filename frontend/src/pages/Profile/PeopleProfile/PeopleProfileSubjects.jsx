@@ -1,14 +1,17 @@
 import React from "react";
 import { motion as Motion } from "framer-motion";
 import { BookOpen, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function PeopleProfileSubjects({ subjects, itemVariants, glassPanel }) {
+  const { t } = useTranslation("profile");
+
   return (
     <Motion.div variants={itemVariants} className={glassPanel + " p-6 md:p-7"}>
       <div className="mb-5 flex items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-Inter font-black uppercase tracking-[0.3em] text-slate-100">
-            Subject Mastery
+            {t("stats.subjectMastery")}
           </span>
         </div>
         <div className="h-px flex-1 bg-white/15" />

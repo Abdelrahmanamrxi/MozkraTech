@@ -7,6 +7,7 @@ import api from "@/middleware/api"
 import useDebounce from '@/hooks/useDebounce';
 import {useQuery} from "@tanstack/react-query"
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 
   const backdropVariants = {
     hidden: { opacity: 0 },
@@ -42,6 +43,7 @@ import { useNavigate } from 'react-router';
 
 
 function SearchFriends({setIsAddFriendsOpen}) {
+  const { t } = useTranslation("friends");
       const [searchQuery, setSearchQuery] = useState("");
       const [currentPage,setPage]=useState(1)
       const debouncedQuery=useDebounce(searchQuery,300)
@@ -63,7 +65,7 @@ function SearchFriends({setIsAddFriendsOpen}) {
        const canGoNext = currentPage < totalPages;
 
        const friendSearchError = isError
-         ? error?.response?.data?.message || error?.message || "Something went wrong"
+         ? error?.response?.data?.message || error?.message || t("searchFriends.errors.generic")
          : null;
 
       
@@ -95,10 +97,10 @@ function SearchFriends({setIsAddFriendsOpen}) {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h2 className="text-white font-Inter text-2xl md:text-3xl font-bold">
-                          Find And Add Friends
+                          {t("searchFriends.title")}
                         </h2>
                         <p className="mt-2 text-sm font-poppins text-[#C6B5F0]">
-                          Search players by name or username.
+                          {t("searchFriends.subtitle")}
                         </p>
                       </div>
                       <motion.button
@@ -118,7 +120,7 @@ function SearchFriends({setIsAddFriendsOpen}) {
                         </span>
                         <input
                           type="text"
-                          placeholder="Search by name "
+                          placeholder={t("searchFriends.searchPlaceholder")}
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="w-full rounded-2xl border border-[#9B7EDE]/35 bg-[#9B7EDE]/10 py-3 pl-11 pr-4 text-white placeholder-[#B8A7E5]/60 focus:border-[#C1A8FF] focus:outline-none focus:ring-2 focus:ring-[#9B7EDE]/20"
@@ -127,11 +129,11 @@ function SearchFriends({setIsAddFriendsOpen}) {
   
                       <div className="flex flex-wrap items-center gap-2 text-xs text-[#C6B5F0]">
                         <span className="rounded-full border border-[#9B7EDE]/25 bg-[#9B7EDE]/10 px-3 py-1">
-                          {data.people&&data.people.length} matches
+                          {t("searchFriends.matches", { count: data.people?.length || 0 })}
                         </span>
                         
                         <span className="rounded-full border border-[#9B7EDE]/25 bg-[#9B7EDE]/10 px-3 py-1">
-                          Search only mode
+                          {t("searchFriends.searchOnlyMode")}
                         </span>
                       </div>
                     </div>
@@ -145,7 +147,7 @@ function SearchFriends({setIsAddFriendsOpen}) {
                       className="relative rounded-2xl border border-[#9B7EDE]/25 bg-[#120D24]/65 p-3"
                     >
                       <div className="mb-3 px-2 text-xs font-blinker uppercase tracking-[0.2em] text-[#B8A7E5]">
-                        People
+                        {t("searchFriends.people")}
                       </div>
   
                       <div className="max-h-[48vh] space-y-3 overflow-y-auto pr-1 scrollbar-hide">
@@ -179,7 +181,7 @@ function SearchFriends({setIsAddFriendsOpen}) {
                                     className="h-2.5 w-2.5 rounded-full"
                                    
                                   />
-                                  <span className="text-xs text-[#C6B5F0]">Lv. {friend.level}</span>
+                                  <span className="text-xs text-[#C6B5F0]">{t("searchFriends.levelShort", { level: friend.level })}</span>
                                 </div>
                               </div>
                             </motion.div>
@@ -194,10 +196,10 @@ function SearchFriends({setIsAddFriendsOpen}) {
                               <SearchIcon size={28} />
                             </div>
                             <p className="text-base font-medium text-[#E5DBFF]">
-                              {searchQuery ? "No friends found" : "Start searching to find friends"}
+                              {searchQuery ? t("searchFriends.noFriendsFound") : t("searchFriends.startSearching")}
                             </p>
                             <p className="mt-1 text-sm text-[#B8A7E5]/85">
-                             {friendSearchError ? friendSearchError : "Try a different name"}
+                             {friendSearchError ? friendSearchError : t("searchFriends.tryDifferentName")}
                             </p>
                           </motion.div>
                         )}
@@ -207,8 +209,8 @@ function SearchFriends({setIsAddFriendsOpen}) {
                           <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/10 shadow-lg">
                             <Loader2 className="h-8 w-8 animate-spin text-primary" />
                           </div>
-                          <p className="mt-4 text-base font-semibold text-white">Searching friends...</p>
-                          <p className="mt-2 text-sm text-[#C6B5F0]">Hang tight, results are on the way.</p>
+                          <p className="mt-4 text-base font-semibold text-white">{t("searchFriends.searchingTitle")}</p>
+                          <p className="mt-2 text-sm text-[#C6B5F0]">{t("searchFriends.searchingSubtitle")}</p>
                         </div>
                       )}
 
@@ -232,9 +234,9 @@ function SearchFriends({setIsAddFriendsOpen}) {
                           </button>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 text-xs text-[#d3c6ff]">
-                          <span>Page</span>
+                          <span>{t("searchFriends.page")}</span>
                           <span className="rounded-full bg-[#9B7EDE]/20 px-3 py-1 text-white">{currentPage} / {totalPages}</span>
-                          <span>{totalDocs ? `${totalDocs} total` : "No results"}</span>
+                          <span>{totalDocs ? t("searchFriends.total", { count: totalDocs }) : t("searchFriends.noResults")}</span>
                         </div>
                       </div>
                     </motion.div>

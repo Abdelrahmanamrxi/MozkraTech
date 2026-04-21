@@ -4,6 +4,7 @@ import { UserPlus, MessageSquare, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import api from "../../../middleware/api";
 async function acceptFriend(id){
   const response=await api.patch('friends/accept',{senderId:id})
@@ -21,6 +22,7 @@ async function addFriend(id){
   return response.data
 }
 export default function PeopleProfileSidebar({ user, progressRing, itemVariants, glassPanel,id,friendship,isOutgoingRequest,isIncomingRequest }) {
+  const { t } = useTranslation("profile");
 
  
     const navigate = useNavigate();
@@ -94,12 +96,12 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
           >
             <div className="mb-3 flex items-end justify-between">
               <span className="text-[10px] font-Inter font-black uppercase tracking-[0.22em] text-slate-200/90">
-                Current Level
+                {t("stats.currentLevel")}
               </span>
               <span className="text-4xl font-Inter font-black text-white">{user.level}</span>
             </div>
 
-            <p className="mb-3 text-[11px] text-slate-200">{user.xpToNext} XP to unlock the next level.</p>
+            <p className="mb-3 text-[11px] text-slate-200">{t("stats.xpToNext", { xp: user.xpToNext })}</p>
 
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/15">
               <Motion.div
@@ -114,7 +116,7 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
             </div>
 
             <div className="mt-2 flex justify-end">
-              <span className="text-[11px] font-Inter font-bold text-white/90">{Number(user.xpProgress).toFixed(1)}% complete</span>
+              <span className="text-[11px] font-Inter font-bold text-white/90">{t("stats.complete", { value: Number(user.xpProgress).toFixed(1) })}</span>
             </div>
           </div>
           )}
@@ -140,10 +142,12 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
               }}
             >
               <span className="text-[10px] font-Inter font-black uppercase tracking-[0.22em] text-slate-200/90">
-                Subjects
+                  {t("stats.subjects")}
               </span>
               <p className="mt-2 text-sm font-Inter font-bold text-white">
-                {user.subjects?.length || "Unknown" } {user.subjects?.length === 1 ? 'Subject' : 'Subjects'}
+                  {user.subjects?.length
+                    ? `${user.subjects.length} ${user.subjects.length === 1 ? t("stats.subject") : t("stats.subjects")}`
+                    : t("fallback.unknown")}
               </p>
             </div>
           )}
@@ -166,8 +170,8 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
                <UserPlus size={16} strokeWidth={2.5} />
              )}
         {addFriendMutation.isPending 
-      ? "Sending..." 
-      : "Send Friend Request"
+      ? t("actions.sending") 
+      : t("actions.sendFriendRequest")
     }
   </span>
     </button>)}
@@ -178,7 +182,7 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
                   >
                     <span className="flex items-center justify-center gap-2">
                       <UserPlus size={16} strokeWidth={2.5} />
-                      Request Sent
+                      {t("actions.requestSent")}
                     </span>
                   </button>
                 )}
@@ -198,7 +202,7 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
             >
               <span className="flex items-center justify-center gap-2">
                 <MessageSquare size={16} strokeWidth={2.5} />
-                Message
+                {t("actions.message")}
               </span>
             </button>)}
        {isIncomingPending && (
@@ -214,19 +218,19 @@ export default function PeopleProfileSidebar({ user, progressRing, itemVariants,
              ) : (
                <UserPlus size={16} strokeWidth={2.5} />
              )}
-             {acceptFriendMutation.isPending ? 'Accepting...' : 'Accept Request'}
+             {acceptFriendMutation.isPending ? t("actions.accepting") : t("actions.acceptRequest")}
   </span>
     </button>
        <button   
        onClick={() => declineFriendMutation.mutate(id)}
        disabled={declineFriendMutation.isPending}
-       className={`w-full cursor-pointer rounded-2xl border px-4 py-3.5 text-[11px] font-Inter font-black uppercase tracking-[0.2em] shadow-[0_14px_48px_rgba(255,255,255,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 border-red-700/50 bg-red-700/80 cursor-pointer text-white ${declineFriendMutation.isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
+      className={`w-full cursor-pointer rounded-2xl border px-4 py-3.5 text-[11px] font-Inter font-black uppercase tracking-[0.2em] shadow-[0_14px_48px_rgba(255,255,255,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 border-red-700/50 bg-red-700/80 text-white ${declineFriendMutation.isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
        >
             <span className="flex items-center justify-center gap-2">
              {declineFriendMutation.isPending ? (
                <Loader2 size={16} strokeWidth={2.5} className="animate-spin" />
              ) : null}
-                          {declineFriendMutation.isPending ? 'Declining...' : 'Decline Request'}
+                          {declineFriendMutation.isPending ? t("actions.declining") : t("actions.declineRequest")}
   </span>
     </button>
     </>

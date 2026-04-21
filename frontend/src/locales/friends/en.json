@@ -52,5 +52,25 @@
     "studyDesc": "Schedule a group study session with friends",
     "challengeDesc": "Create a study challenge and compete",
     "shareDesc": "Celebrate your progress with friends"
+  },
+  "searchFriends": {
+    "title": "Find And Add Friends",
+    "subtitle": "Search players by name or username.",
+    "searchPlaceholder": "Search by name",
+    "matches": "{{count}} matches",
+    "searchOnlyMode": "Search only mode",
+    "people": "People",
+    "levelShort": "Lv. {{level}}",
+    "noFriendsFound": "No friends found",
+    "startSearching": "Start searching to find friends",
+    "tryDifferentName": "Try a different name",
+    "searchingTitle": "Searching friends...",
+    "searchingSubtitle": "Hang tight, results are on the way.",
+    "page": "Page",
+    "total": "{{count}} total",
+    "noResults": "No results",
+    "errors": {
+      "generic": "Something went wrong"
+    }
   }
 }

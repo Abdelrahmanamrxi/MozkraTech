@@ -63,7 +63,7 @@ const messageSchema =  new mongoose.Schema(
     timestamps: { createdAt: true, updatedAt: false },
   },
 );
-
+messageSchema.index({ conversationId: 1, createdAt: -1 });
 const messageModel =
   mongoose.models.Message || mongoose.model("Message", messageSchema);
 

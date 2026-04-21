@@ -7,6 +7,7 @@ import PeopleProfileSidebar from "./PeopleProfileSidebar";
 import PeopleProfileSubjects from "./PeopleProfileSubjects";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../../middleware/api";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -18,6 +19,7 @@ async function getProfileByID(id){
 
 
 function PeopleProfile() {
+const { t, i18n } = useTranslation("profile");
 
 const { id } = useParams();
 
@@ -54,11 +56,13 @@ const {data,isLoading,error}=useQuery({
 
 
     if(isLoading)
-      return <p>Loading...</p>
+      return <p>{t("loading")}</p>
     
     if(error)
       return <p>{error.response.data.message}</p>
     console.log(data)
+
+    const locale = i18n.language?.startsWith("ar") ? "ar-EG" : "en-US";
 
     const nextLvlXP = Math.pow(data.data.user.level, 2) * 100;
     const currLvlXP = Math.pow(data.data.user.level - 1, 2) * 100;
@@ -69,13 +73,17 @@ const {data,isLoading,error}=useQuery({
     fullName: d.user.fullName,
     level: d.user.level,
     xpProgress: Math.min(100, (xpInLevel / (nextLvlXP - currLvlXP)) * 100),
-    summary: d.summary? d.summary:"No summary to show",
-    joinedAt: new Date(d.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
+    summary: d.summary? d.summary:t("fallback.summary"),
+    joinedAt: new Date(d.user.createdAt).toLocaleDateString(locale, { year: 'numeric', month: 'short' }),
     streak: d.user.currentStreak || 0,
     xpToNext: Math.max(0, nextLvlXP - d.user.currentXP),
     subjects: d.user.subjects && d.user.subjects.length > 0 ? d.user.subjects : [],
-    badges: ["Early Adopter", "Solver", "10 Day Streak"],
-    bio: d.user.bio?d.user.bio : "No bio to show",
+    badges: [
+      t("badges.earlyAdopter"),
+      t("badges.solver"),
+      t("badges.tenDayStreak"),
+    ],
+    bio: d.user.bio?d.user.bio : t("fallback.bio"),
   };
 
   
@@ -154,7 +162,7 @@ const isIncomingRequest = d.friendship?.status === "pending"
             size={14}
             className="text-slate-300 transition-transform group-hover:-translate-x-1"
           />
-          <span className="text-slate-100">Profile</span>
+          <span className="text-slate-100">{t("actions.backProfile")}</span>
         </Motion.button>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-stretch">
