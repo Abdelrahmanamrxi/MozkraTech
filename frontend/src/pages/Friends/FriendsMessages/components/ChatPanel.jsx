@@ -1,43 +1,55 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { ChevronLeft, ChevronRight, EmojiIcon, SendIcon } from "../../../../comp/ui/Icons";
-import { formatRelativeTime } from "@/utils/formatTime";
+import {formatRelativeTime} from "@/utils/formatTime.js"
 
 
 
 function ChatHeader({
   displaySelected,
-  activeStatus,
+  lastActivityDate,
+  friendActivityLabel,
   userStatus,
   socketConnectionStatus,
   sidebarOpen,
   onToggleSidebar,
 }) {
+  const normalizedUserStatus =
+    typeof userStatus === "string"
+      ? { status: userStatus, lastActivityDate: null }
+      : userStatus;
+
+  const fallbackStatus = friendActivityLabel(lastActivityDate);
+  const activityStatus = normalizedUserStatus?.status || fallbackStatus;
+  const isOnline = normalizedUserStatus?.status
+    ? normalizedUserStatus.status === "online"
+    : fallbackStatus === "online";
+
   return (
     <div className="px-4 py-3 border-b border-[#9B7EDE]/20 flex items-center justify-between shrink-0">
       <div className="flex items-center gap-3">
-        <motion.button
+        <Motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={onToggleSidebar}
           className="w-8 h-8 rounded-xl bg-[rgba(82,70,107,0.5)] hover:bg-[rgba(82,70,107,0.8)] border border-[#9B7EDE]/15 flex items-center justify-center text-purple-300 transition-colors shrink-0"
         >
           {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-        </motion.button>
+        </Motion.button>
 
         <div className="relative shrink-0">
           <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
             <span className="text-white font-semibold text-xs">{displaySelected?.fullName?.[0] ?? "?"}</span>
           </div>
           <span
-            className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${userStatus === "online" ? "bg-green-500" : "bg-gray-500"}`}
+            className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${isOnline ? "bg-green-500" : "bg-gray-500"}`}
           />
         </div>
 
         <div>
           <h2 className="text-white font-semibold text-sm leading-tight">{displaySelected?.fullName}</h2>
           <div className="flex items-center gap-2">
-            <p className="text-xs text-[#B8A7E5]">{activeStatus}</p>
+            <p className="text-xs text-[#B8A7E5]">{activityStatus}</p>
             <span className="text-xs text-[#B8A7E5]/60">•</span>
             <p className={`text-xs ${socketConnectionStatus === "connected" ? "text-emerald-400" : "text-red-400"}`}>
               {socketConnectionStatus === "connected" ? "Connected To Internet" : "Disconnected From The Internet"}
@@ -76,7 +88,7 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="flex flex-col items-center gap-3 bg-red-950/30 border border-red-500/30 rounded-lg p-4 max-w-xs">
           <p className="text-red-300 text-sm font-medium">Failed to load messages</p>
-          <p className="text-red-200/70 text-xs text-center">{error.message || "An error occurred while fetching messages"}</p>
+          <p className="text-red-200/70 text-xs text-center">{"An error occurred while fetching messages"}</p>
         </div>
       </div>
     );
@@ -91,7 +103,7 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
     >
       <AnimatePresence initial={false}>
         {selectedMessages.map((msg, index) => (
-          <motion.div
+          <Motion.div
             key={msg.id ?? msg._id ?? index}
             initial={{ opacity: 0, y: 10, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -132,7 +144,7 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
                 </div>
               )}
             </div>
-          </motion.div>
+          </Motion.div>
         ))}
       </AnimatePresence>
       <div ref={messagesEndRef} />
@@ -160,7 +172,7 @@ function MessageComposer({ selected, inputRef, input, onInputChange, onKeyDown, 
         <button className="text-purple-300/60 hover:text-purple-300 transition-colors shrink-0">
           <EmojiIcon />
         </button>
-        <motion.button
+        <Motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.94 }}
           onClick={onSend}
@@ -168,7 +180,7 @@ function MessageComposer({ selected, inputRef, input, onInputChange, onKeyDown, 
           className="w-9 h-9 rounded-full bg-[#9b7ede] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center shrink-0 shadow-lg shadow-purple-900/30 transition-opacity cursor-pointer"
         >
           <SendIcon />
-        </motion.button>
+        </Motion.button>
       </div>
     </div>
   );
@@ -177,12 +189,11 @@ function MessageComposer({ selected, inputRef, input, onInputChange, onKeyDown, 
 function ChatPanel({
   selected,
   displaySelected,
-  activeStatus,
+  userStatus,
   sidebarOpen,
   onToggleSidebar,
   isLoading,
   error,
-  userStatus,
   socketConnectionStatus,
   selectedMessages,
   messagesEndRef,
@@ -192,10 +203,11 @@ function ChatPanel({
   onKeyDown,
   onSend,
   canSend,
+  friendActivityLabel,
   t,
 }) {
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{
@@ -208,11 +220,12 @@ function ChatPanel({
     >
       <ChatHeader
         displaySelected={displaySelected}
-        activeStatus={activeStatus}
+        lastActivityDate={displaySelected?.updatedAt || selected?.lastActivityDate}
         userStatus={userStatus}
         socketConnectionStatus={socketConnectionStatus}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={onToggleSidebar}
+        friendActivityLabel={friendActivityLabel}
       />
 
       <MessagesContent
@@ -233,7 +246,7 @@ function ChatPanel({
         canSend={canSend}
         t={t}
       />
-    </motion.div>
+    </Motion.div>
   );
 }
 

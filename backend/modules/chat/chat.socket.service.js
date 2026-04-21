@@ -15,12 +15,13 @@ export const setUserOnline = (userId) => {
 export const setUserOffline = (userId) => {
   userStatus.set(userId.toString(), {
     status: "offline",
-    lastActivityDAte: userStatus.get(userId.toString())?.lastActive || Date.now(),
+    lastActivityDate: userStatus.get(userId.toString())?.lastActivityDate || Date.now(),
   });
 };
 
 
 export const saveUserStatusToDB = async (userId) => {
+  console.log(userId)
   const status = userStatus.get(userId.toString());
   if (status) {
     await userModel.findByIdAndUpdate(userId, {
@@ -46,16 +47,24 @@ export const registerAccount = async (socket) => {
 };
 
 export const logOut= async (socket) => {
-    
-    const data = await authSocket({ socket });
+
     return socket.on("disconnect", async () => {
-        const data = await authSocket({ socket });
+  const data = await authSocket({ socket });
     if (data.statusCode != 200) {
-        return socket.emit("authError", data);
+    return;
     }
-    connectioUser.delete(data.user._id.toString(), socket.id);
-    setUserOffline(data.user._id.toString())
-    await saveUserStatusToDB(data.user._id.toString())
+
+  const userId = data.user._id.toString();
+  const activeSocketId = connectioUser.get(userId);
+
+  // If this is not the currently tracked socket, a newer connection is active.
+  if (activeSocketId !== socket.id) {
+    return;
+  }
+
+  connectioUser.delete(userId);
+  setUserOffline(userId)
+  await saveUserStatusToDB(userId)
     console.log(connectioUser);
     return "done";
     })

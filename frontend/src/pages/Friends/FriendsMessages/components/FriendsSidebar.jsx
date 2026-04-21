@@ -1,6 +1,7 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { SearchIcon } from "../../../../comp/ui/Icons";
+
 
 function FriendsSidebar({
   sidebarOpen,
@@ -10,15 +11,35 @@ function FriendsSidebar({
   filteredFriends,
   isLoading,
   error,
+  friendActivityLabel,
   selectedFriendId,
   unreadByFriend,
   onSelectFriend,
-  friendActivityLabel,
+  userStatus,
 }) {
+  const normalizedUserStatus =
+    typeof userStatus === "string"
+      ? { status: userStatus, lastActivityDate: null }
+      : userStatus;
+
+  function checkOnline(activity, friendId) {
+    const isSelectedFriend =
+      selectedFriendId?.toString() === friendId?.toString();
+
+    if (isSelectedFriend && normalizedUserStatus?.status) {
+      return normalizedUserStatus.status === "online"
+        ? "bg-green-500"
+        : "bg-gray-500";
+    }
+
+    return friendActivityLabel(activity) === "online"
+      ? "bg-green-500"
+      : "bg-gray-500";
+  }
   return (
     <AnimatePresence initial={false}>
       {sidebarOpen && (
-        <motion.div
+        <Motion.div
           key="sidebar"
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: "auto", opacity: 1 }}
@@ -60,15 +81,29 @@ function FriendsSidebar({
                 </div>
               ) : error ? (
                 <div className="flex h-full items-center justify-center text-sm text-red-300 px-4 text-center">
-                  {error?.response?.data?.message || error?.message || "Unable to load friends."}
+                  {"Unable to load friends."}
                 </div>
               ) : filteredFriends.length > 0 ? (
                 filteredFriends.map((item) => {
                   const friend = item.friend;
-                  const isActive = friendActivityLabel(friend.updatedAt) === "Active";
+                  const isSelectedFriend =
+                    selectedFriendId?.toString() === friend._id?.toString();
+
+                  const selectedStatusText =
+                    isSelectedFriend && normalizedUserStatus?.status
+                      ? normalizedUserStatus.status
+                      : null;
+
+                  const activityTimestamp =
+                    isSelectedFriend && normalizedUserStatus?.lastActivityDate
+                      ? normalizedUserStatus.lastActivityDate
+                      : item.friend.lastActivityDate;
+
+                  const renderedActivity =
+                    selectedStatusText || friendActivityLabel(activityTimestamp);
 
                   return (
-                    <motion.button
+                    <Motion.button
                       key={friend._id}
                       onClick={() => onSelectFriend(friend, item.conversationId)}
                       whileHover={{ backgroundColor: "rgba(82,70,107,0.5)" }}
@@ -81,7 +116,7 @@ function FriendsSidebar({
                         </div>
                         <span
                           className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${
-                            isActive ? "bg-green-500" : "bg-gray-500"
+                            checkOnline(item.friend.lastActivityDate, friend._id)
                           }`}
                         />
                         {unreadByFriend[friend._id] > 0 && (
@@ -96,12 +131,12 @@ function FriendsSidebar({
                           <span className="text-sm font-medium truncate text-white/90">{friend.fullName}</span>
                           <div className="flex flex-col items-end gap-2">
                             <span className="text-[10px] text-purple-300/40 shrink-0 ml-1">
-                              {friendActivityLabel(friend.updatedAt)}
+                              {renderedActivity}
                             </span>
                           </div>
                         </div>
                       </div>
-                    </motion.button>
+                    </Motion.button>
                   );
                 })
               ) : (
@@ -109,7 +144,7 @@ function FriendsSidebar({
               )}
             </div>
           </div>
-        </motion.div>
+        </Motion.div>
       )}
     </AnimatePresence>
   );

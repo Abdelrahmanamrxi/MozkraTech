@@ -2,6 +2,7 @@ import { authSocket } from "../../middleware/auth.js";
 import conversationModel from "../../DB/models/Conversation.model.js";
 import messageModel from "../../DB/models/message.model.js";
 import { connectioUser } from "./chat.socket.service.js";
+import { setUserOnline } from "./chat.socket.service.js";
 import { userStatus } from "./chat.socket.service.js";
 import { notificationModel } from "../../DB/models/notifications.model.js";
 export const sendMessage = async (socket) => {
@@ -18,6 +19,7 @@ export const sendMessage = async (socket) => {
     }
 
     const userId = data.user._id;
+  setUserOnline(userId.toString());
 
     const participantsIds = [userId.toString(), destId.toString()].sort();
 
@@ -48,7 +50,7 @@ export const sendMessage = async (socket) => {
   
     conversation.lastMessage = newMessage._id;
     await conversation.save();
-    const status=userStatus.get(userId)
+    const receiverStatus = userStatus.get(destId.toString())
 
     socket.emit("successMessage", {
       conversationId: conversation._id,
@@ -56,7 +58,7 @@ export const sendMessage = async (socket) => {
       sentAt: newMessage.createdAt,
       senderId: userId.toString(),
       receiverId: destId.toString(),
-      status:status
+      status: receiverStatus || { status: "offline", lastActivityDate: null },
     });
 
    
@@ -86,6 +88,7 @@ export const markAsRead = async (socket) => {
     if (data.statusCode !== 200) return socket.emit("authError", data);
 
     const userId = data.user._id.toString();
+    setUserOnline(userId);
     const conversation = await conversationModel
       .findOne({ _id: conversationId })
       .select("participants");
@@ -100,7 +103,7 @@ export const markAsRead = async (socket) => {
       (participant) => participant.user.toString() === userId,
     );
 
-    const status=userStatus.get(userId)
+    const status = userStatus.get(userId)
 
     if (!isParticipant) {
       return socket.emit("sendError", {

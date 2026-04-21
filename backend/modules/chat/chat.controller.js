@@ -19,7 +19,7 @@ export const getChat = asyncHandler(async (req, res) => {
 
     const messages = await messageModel
         .find(query)
-        .populate("senderId", "fullName email profilePicture image")
+        .populate("senderId", "fullName email profilePicture image lastActivityDate")
         .sort({ createdAt: -1 })
         .limit(20);
 
@@ -30,8 +30,9 @@ export const getChat = asyncHandler(async (req, res) => {
             senderId: msg.senderId,
             createdAt:msg.createdAt,
             isRead:msg.isRead
-        }))
+        })),
+       
     };
-
+    console.log(formattedChat)
     return res.status(200).json({ message: "Chat retrieved successfully", chat: formattedChat });
 });

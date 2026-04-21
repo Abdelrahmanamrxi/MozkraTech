@@ -68,7 +68,8 @@ const friendsList=await friendshipModel.aggregate([
         _id:1,
         fullName:1,
         updatedAt:1,
-        createdAt:1
+        createdAt:1,
+        lastActivityDate:1
       },
       conversationId: 1,
       createdAt: 1

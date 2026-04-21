@@ -8,13 +8,14 @@ import useFriendsMessages from "../../../hooks/useFriendsMessages";
 import FriendsSidebar from "./components/FriendsSidebar";
 import ChatPanel from "./components/ChatPanel";
 
-const friendActivityLabel = (updatedAt) => {
-  if (!updatedAt) return "unknown";
+const friendActivityLabel = (time) => {
+  
+  if (!time) return "unknown";
 
-  const diffMs = Date.now() - new Date(updatedAt).getTime();
-  if (diffMs < 60_000) return "Active";
+  const diffMs = Date.now() - new Date(time).getTime();
+  if (diffMs < 60_000) return "online";
 
-  return formatRelativeTime(updatedAt);
+  return formatRelativeTime(time);
 };
 
 async function getFriends(search) {
@@ -39,7 +40,7 @@ export default function FriendsMessages() {
     queryFn: () => getFriends(debouncedQuery),
     retry: false,
   });
-
+  
   const { socketConnectionStatus, userStatus, messages, sendMessage, markAsRead, isLoading: chatIsLoading, error: chatError } = useFriendsMessages(selected);
   const friendItems = useMemo(() => data?.friends ?? [], [data?.friends]);
 
@@ -84,7 +85,6 @@ const displaySelected = useMemo(() => {
     [messages, selected?._id],
   );
   console.log(displaySelected)
-  const activeStatus = displaySelected ? friendActivityLabel(displaySelected.updatedAt) : "";
   const canSend = socketConnectionStatus === "connected" && !!input.trim() && !!selected?._id;
 
   const handleSend = () => {
@@ -128,7 +128,7 @@ const displaySelected = useMemo(() => {
       markAsRead({ conversationId: selected.conversationId });
     }
   }, [messages, selected?.conversationId, markAsRead]);
-
+  
   return (
     <div className="mt-2 font-Inter">
       <div className="flex items-center justify-center p-2 sm:p-4">
@@ -141,16 +141,17 @@ const displaySelected = useMemo(() => {
             filteredFriends={filteredFriends}
             isLoading={isLoading}
             error={error}
+            friendActivityLabel={friendActivityLabel}
             selectedFriendId={selected?._id}
             unreadByFriend={unreadByFriend}
             onSelectFriend={selectFriend}
-            friendActivityLabel={friendActivityLabel}
+            userStatus={userStatus}
           />
 
           <ChatPanel
             selected={selected}
             displaySelected={displaySelected}
-            activeStatus={activeStatus}
+            friendActivityLabel={friendActivityLabel}
             sidebarOpen={sidebarOpen}
             onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
             isLoading={chatIsLoading}

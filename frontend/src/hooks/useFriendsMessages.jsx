@@ -6,6 +6,21 @@ import { io } from 'socket.io-client'
 import { useQuery } from '@tanstack/react-query'
 import api from '../middleware/api'
 
+function normalizeStatus(status) {
+  if (!status) return null
+  if (typeof status === 'string') {
+    return {
+      status,
+      lastActivityDate: null,
+    }
+  }
+
+  return {
+    status: status.status ?? null,
+    lastActivityDate: status.lastActivityDate ?? null,
+  }
+}
+
 async function getChat(selected,cursor){
   try{
 
@@ -29,7 +44,7 @@ function normalizeChat(messages,selected){
       friendId:selected._id,
       senderId:senderId,
       sentAt:message.createdAt,
-      from:isFromThem?'them':'me',
+      from:isFromThem?'them':'me'
 
     }
   }).reverse()
@@ -38,10 +53,16 @@ function normalizeChat(messages,selected){
 function useFriendsMessages(selected) {
     const socketRef = useRef(null)
     const [messages, setMessages] = useState([])
-    const [userStatus, setUserStatus] = useState("offline")
+    const [userStatus, setUserStatus] = useState(null)
     const accessToken=useSelector((state)=>state.auth.accessToken)
     const[status,setStatus]=useState("idle")
 
+    useEffect(() => {
+      requestAnimationFrame(() => {
+        setUserStatus(null)
+      })
+    }, [selected?._id])
+    
     // Clear messages when conversation changes
     useEffect(() => {
       requestAnimationFrame(() => {
@@ -116,9 +137,12 @@ function useFriendsMessages(selected) {
         const senderId = payload.senderId?._id?.toString() ?? payload.senderId?.toString();
         const receiverId = payload.receiverId?.toString();
         const friendId = receiverId;
-        
-        if (payload.status) {
-          setUserStatus(payload.status);
+        const isCurrentConversation =
+          payload.conversationId?.toString() === selected?.conversationId?.toString();
+
+        const normalizedStatus = normalizeStatus(payload.status)
+        if (normalizedStatus && isCurrentConversation) {
+          setUserStatus(normalizedStatus)
         }
         
         setMessages((prev) => {
@@ -141,6 +165,7 @@ function useFriendsMessages(selected) {
               senderId,
               receiverId,
               sentAt:payload.createdAt,
+              userStatus:payload.status
             },
           ];
         });
@@ -157,8 +182,12 @@ function useFriendsMessages(selected) {
         setStatus("sendError");
       });
       socket.on("messagesMarkedAsRead", ({ conversationId, status }) => {
-        if (status) {
-          setUserStatus(status);
+        const isCurrentConversation =
+          conversationId?.toString() === selected?.conversationId?.toString();
+
+        const normalizedStatus = normalizeStatus(status)
+        if (normalizedStatus && isCurrentConversation) {
+          setUserStatus(normalizedStatus)
         }
         
         setMessages((prev) =>
@@ -170,22 +199,11 @@ function useFriendsMessages(selected) {
         );
       });
 
-      socket.on("userOnline", ({ userId }) => {
-        if(selected?._id?.toString() === userId?.toString()){
-          setUserStatus("online");
-        }
-      });
-
-      socket.on("userOffline", ({ userId }) => {
-        if(selected?._id?.toString() === userId?.toString()){
-          setUserStatus("offline");
-        }
-      });
 
       return () => {
         socket.disconnect();
       };
-    }, [accessToken, selected?._id]);
+    }, [accessToken, selected?._id, selected?.conversationId]);
     
     const sendMessage = useCallback(({ destId, message }) => {
       const socket = socketRef.current;
@@ -220,7 +238,7 @@ function useFriendsMessages(selected) {
 
 
     
-    console.log(messages)
+   
     return { 
       status,
       socketConnectionStatus: status,
