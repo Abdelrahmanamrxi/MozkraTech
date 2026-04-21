@@ -23,6 +23,11 @@ const subjectSchema = new mongoose.Schema(
       required: true,
       enum: ["theoretical", "practical"],
     },
+    hoursPerWeek: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

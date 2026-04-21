@@ -1,13 +1,13 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap");
 /* Hide scrollbar for nav links */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari, Opera */
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* Optional: iPad Pro specific adjustments */
@@ -32,7 +32,7 @@
   --font-sans: "Poppins", sans-serif;
   --font-blinker: "Blinker", sans-serif;
   --font-spectral: "Spectral", serif;
-  --font-Inter:"Inter",serif
+  --font-Inter: "Inter", serif;
 }
 
 .main-background {
@@ -44,13 +44,13 @@
   );
 }
 
-
-
-
 [dir="rtl"] body {
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 }
 
+body {
+  @apply bg-primary-dark;
+}
 
 .cards-styling {
   @apply absolute bg-white/20 backdrop-blur-md rounded-2xl px-6 py-8 text-white text-sm font-semibold;
@@ -155,7 +155,7 @@
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
- /* Label */
+/* Label */
 .label {
   @apply text-xs font-medium text-[#B8A7E5] mb-2 block;
 }
@@ -179,7 +179,7 @@ input[type="time"] {
 /* Custom scrollbars */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(144,103,198,0.75) rgba(15,12,35,0.6);
+  scrollbar-color: rgba(144, 103, 198, 0.75) rgba(15, 12, 35, 0.6);
 }
 .custom-scrollbar::-webkit-scrollbar {
   width: 10px;
@@ -205,7 +205,7 @@ input[type="time"]::-webkit-datetime-edit-minute-field {
 }
 
 input[type="time"]::-webkit-datetime-edit-text {
-  color: #B8A7E5;
+  color: #b8a7e5;
 }
 
 /* Style icon */
@@ -225,7 +225,10 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 }
 
 .google-button-wrapper:hover {

@@ -38,6 +38,10 @@ function SignupForm({ isRtl, t }) {
     setShowConfirmPassword,
   } = useSignupForm(t);
 
+const handleOtpSubmitWithRedirect = async (e) => {
+  await handleOtpSubmit(e, () => navigate("/subject-register"));
+};
+
 // Handle Google sign-up success - receives credential with ID token
 const handleGoogleSuccess = async (credentialResponse) => {
   try {
@@ -65,7 +69,7 @@ const handleGoogleSuccess = async (credentialResponse) => {
 
     // Save access token
     dispatch(setAccessToken(response.data.accessToken));
-    navigate('/dashboard')
+    navigate('/subject-register')
   } catch (err) {
     const message = err?.response?.data?.message || err.message || "Registration failed";
    // console.error("Google signup error:", err);
@@ -271,7 +275,7 @@ useEffect(() => {
       onOtpChange={handleOtpChange}
       errors={errors}
       loading={loading}
-      onSubmit={handleOtpSubmit}
+      onSubmit={handleOtpSubmitWithRedirect}
       onResend={handleResendOtp}
       email={formData.email}
       timeLeft={timeLeft}

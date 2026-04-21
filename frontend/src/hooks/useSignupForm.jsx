@@ -189,7 +189,7 @@ export default function useSignupForm(t) {
    * Submit the OTP verification step.
    */
   const handleOtpSubmit = useCallback(
-    async (e) => {
+    async (e, onSuccess) => {
       e.preventDefault();
       const newErrors = {};
 
@@ -212,6 +212,9 @@ export default function useSignupForm(t) {
         await axios.patch(`${baseUrl}/auth/confirm-email`, { email: formData.email, code: otp });
         setStep(3);
         setErrors({});
+        if (typeof onSuccess === "function") {
+          onSuccess();
+        }
       } catch (err) {
         const message = err?.response?.data?.message || err.message || "OTP verification failed";
         setErrors({ submit: message });
