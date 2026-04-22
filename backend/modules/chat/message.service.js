@@ -19,26 +19,36 @@ export const sendMessage = async (socket) => {
     }
 
     const userId = data.user._id;
-  setUserOnline(userId.toString());
+    setUserOnline(userId.toString());
 
-    const participantsIds = [userId.toString(), destId.toString()].sort();
+    const participantsIds = [userId.toString(), destId.toString()];
 
-    const conversation = await conversationModel.findOneAndUpdate(
-      {
-        "participants.user": { $all: participantsIds },
-      },
-      {
-        $set: { lastMessageAt: Date.now() },
-        $setOnInsert: {
-          participants: [
-            { user: participantsIds[0] },
-            { user: participantsIds[1] },
-          ],
-          participantType: "user-to-user",
-        },
-      },
-      { upsert: true, new: true }
-    );
+    let conversation = await conversationModel.findOne({
+      "participants.user": { $all: participantsIds },
+      participantType: "user-to-user",
+    });
+
+    if (conversation) {
+      const receiver = conversation.participants.find(
+        (participant) => participant.user.toString() === destId.toString(),
+      );
+
+      if (receiver) {
+        receiver.unReadCount = (receiver.unReadCount || 0) + 1;
+      }
+
+      conversation.lastMessageAt = Date.now();
+      await conversation.save();
+    } else {
+      conversation = await conversationModel.create({
+        participants: [
+          { user: userId, unReadCount: 0 },
+          { user: destId, unReadCount: 1 },
+        ],
+        participantType: "user-to-user",
+        lastMessageAt: Date.now(),
+      });
+    }
 
     const newMessage = await messageModel.create({
       conversationId: conversation._id,
@@ -47,7 +57,7 @@ export const sendMessage = async (socket) => {
       isRead: false,
     });
 
-  
+
     conversation.lastMessage = newMessage._id;
     await conversation.save();
     const receiverStatus = userStatus.get(destId.toString())
@@ -61,7 +71,7 @@ export const sendMessage = async (socket) => {
       status: receiverStatus || { status: "offline", lastActivityDate: null },
     });
 
-   
+
     const receiverSocketId = connectioUser.get(destId.toString());
 
     if (receiverSocketId) {
@@ -89,8 +99,13 @@ export const markAsRead = async (socket) => {
 
     const userId = data.user._id.toString();
     setUserOnline(userId);
+    
     const conversation = await conversationModel
-      .findOne({ _id: conversationId })
+      .findOneAndUpdate(
+        { _id: conversationId, "participants.user": userId },
+        { $set: { "participants.$.unReadCount": 0 } },
+        { new: true }
+      )
       .select("participants");
 
     if (!conversation) {
@@ -103,7 +118,7 @@ export const markAsRead = async (socket) => {
       (participant) => participant.user.toString() === userId,
     );
 
-    const status = userStatus.get(userId)
+    const status = userStatus.get(userId);
 
     if (!isParticipant) {
       return socket.emit("sendError", {
@@ -121,6 +136,7 @@ export const markAsRead = async (socket) => {
       });
     }
 
+    // Mark all unread messages from the other participant as read
     await messageModel.updateMany(
       {
         conversationId,
@@ -132,6 +148,14 @@ export const markAsRead = async (socket) => {
       },
     );
 
+    // Emit confirmation back to the current user
+    socket.emit("markAsReadConfirmed", {
+      conversationId,
+      unReadCount: 0,
+      status,
+    });
+
+    // Notify the sender that their messages have been read
     const otherParticipantSocketId = connectioUser.get(
       otherParticipant.user.toString(),
     );
@@ -139,7 +163,7 @@ export const markAsRead = async (socket) => {
     if (otherParticipantSocketId) {
       socket.to(otherParticipantSocketId).emit("messagesMarkedAsRead", {
         conversationId,
-        status
+        status,
       });
     }
   });

@@ -12,10 +12,38 @@
     "searchPlaceholder": "ابحث عن أصدقاء...",
     "noFriends": "لم يتم العثور على أصدقاء",
     "inputPlaceholder": "اكتب رسالة...",
+    "selectFriend": "اختر صديقًا من اليسار لعرض الرسائل.",
+    "loading": "جارٍ تحميل الرسائل...",
+    "loadErrorTitle": "فشل تحميل الرسائل",
+    "loadErrorDescription": "حدث خطأ أثناء جلب الرسائل",
+    "loadingOlder": "جارٍ تحميل الرسائل الأقدم...",
+    "loadingOlderFailed": "فشل تحميل الرسائل الأقدم. اضغط لإعادة المحاولة.",
+    "scrollUpForHistory": "اسحب للأعلى لتحميل الرسائل الأقدم",
+    "startOfConversation": "لقد وصلت لبداية هذه المحادثة",
+    "noMessagesTitle": "لا توجد رسائل بعد",
+    "noMessagesDescription": "ابدأ المحادثة بإرسال رسالة.",
+    "seen": "تمت القراءة",
+    "sent": "تم الإرسال",
+    "connected": "متصل بالإنترنت",
+    "disconnected": "غير متصل بالإنترنت",
+    "loadingFriends": "جارٍ تحميل الأصدقاء...",
+    "unableToLoadFriends": "تعذر تحميل الأصدقاء.",
+    "noMessagesYet": "لا توجد رسائل بعد",
+    "youLabel": "أنت",
     "status": {
       "online": "متصل",
       "offline": "غير متصل"
     }
+  },
+  "time": {
+    "justNow": "للتو",
+    "secondsAgo": "منذ {{count}}ث",
+    "oneMinuteAgo": "منذ دقيقة",
+    "minutesAgo": "منذ {{count}} دقائق",
+    "oneHourAgo": "منذ ساعة",
+    "hoursAgo": "منذ {{count}} ساعات",
+    "oneDayAgo": "منذ يوم",
+    "daysAgo": "منذ {{count}} أيام"
   },
   "progress": {
     "compareTitle": "مقارنة التقدم",

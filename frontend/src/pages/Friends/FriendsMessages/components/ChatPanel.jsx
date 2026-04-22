@@ -1,7 +1,7 @@
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { ChevronLeft, ChevronRight, EmojiIcon, SendIcon } from "../../../../comp/ui/Icons";
-import {formatRelativeTime} from "@/utils/formatTime.js"
+import { formatRelativeTime } from "@/utils/formatTime.js";
 
 
 
@@ -13,6 +13,7 @@ function ChatHeader({
   socketConnectionStatus,
   sidebarOpen,
   onToggleSidebar,
+  t,
 }) {
   const normalizedUserStatus =
     typeof userStatus === "string"
@@ -52,7 +53,7 @@ function ChatHeader({
             <p className="text-xs text-[#B8A7E5]">{activityStatus}</p>
             <span className="text-xs text-[#B8A7E5]/60">•</span>
             <p className={`text-xs ${socketConnectionStatus === "connected" ? "text-emerald-400" : "text-red-400"}`}>
-              {socketConnectionStatus === "connected" ? "Connected To Internet" : "Disconnected From The Internet"}
+              {socketConnectionStatus === "connected" ? t("messages.connected") : t("messages.disconnected")}
             </p>
           </div>
         </div>
@@ -62,12 +63,25 @@ function ChatHeader({
   );
 }
 
-function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading, error }) {
+function MessagesContent({
+  selected,
+  selectedMessages,
+  messagesEndRef,
+  messagesContainerRef,
+  onMessagesScroll,
+  onLoadOlder,
+  hasMoreHistory,
+  isLoadingOlder,
+  historyError,
+  isLoading,
+  error,
+  t,
+}) {
 
   if (!selected) {
     return (
       <div className="flex-1 flex items-center justify-center text-purple-300/50 text-sm px-4">
-        Select a friend from the left to see messages.
+        {t("messages.selectFriend")}
       </div>
     );
   }
@@ -77,7 +91,7 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
       <div className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
-          <p className="text-purple-300/70 text-sm">Loading messages...</p>
+          <p className="text-purple-300/70 text-sm">{t("messages.loading")}</p>
         </div>
       </div>
     );
@@ -87,8 +101,8 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
     return (
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="flex flex-col items-center gap-3 bg-red-950/30 border border-red-500/30 rounded-lg p-4 max-w-xs">
-          <p className="text-red-300 text-sm font-medium">Failed to load messages</p>
-          <p className="text-red-200/70 text-xs text-center">{"An error occurred while fetching messages"}</p>
+          <p className="text-red-300 text-sm font-medium">{t("messages.loadErrorTitle")}</p>
+          <p className="text-red-200/70 text-xs text-center">{t("messages.loadErrorDescription")}</p>
         </div>
       </div>
     );
@@ -96,11 +110,48 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
 
   return (
     <div
+      ref={messagesContainerRef}
+      onScroll={onMessagesScroll}
       className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3
       [&::-webkit-scrollbar]:w-1
       [&::-webkit-scrollbar-thumb]:bg-[#52466B]
       [&::-webkit-scrollbar-track]:bg-transparent"
     >
+      <div className="sticky top-0 z-10 flex justify-center pb-2">
+        <div className="px-3 py-1 rounded-full border border-[#9B7EDE]/20 bg-[#2b2540]/90 text-[11px] text-[#C9B9EE]">
+          {isLoadingOlder && (
+            <span className="inline-flex items-center gap-1.5">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              {t("messages.loadingOlder")}
+            </span>
+          )}
+          {!isLoadingOlder && historyError && (
+            <button
+              type="button"
+              onClick={onLoadOlder}
+              className="text-red-200 hover:text-red-100 transition-colors"
+            >
+              {t("messages.loadingOlderFailed")}
+            </button>
+          )}
+          {!isLoadingOlder && !historyError && hasMoreHistory && (
+            <span>{t("messages.scrollUpForHistory")}</span>
+          )}
+          {!isLoadingOlder && !historyError && !hasMoreHistory && (
+            <span>{t("messages.startOfConversation")}</span>
+          )}
+        </div>
+      </div>
+
+      {!selectedMessages.length && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-xs text-center space-y-2">
+            <p className="text-sm font-medium text-[#D5C7F6]">{t("messages.noMessagesTitle")}</p>
+            <p className="text-xs text-[#B8A7E5]/80">{t("messages.noMessagesDescription")}</p>
+          </div>
+        </div>
+      )}
+
       <AnimatePresence initial={false}>
         {selectedMessages.map((msg, index) => (
           <Motion.div
@@ -108,17 +159,17 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
             initial={{ opacity: 0, y: 10, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 340, damping: 24 }}
-            className={`group flex items-end gap-2 ${msg.from === "me" ? "justify-start" : "justify-end"}`}
+            className={`group flex items-end gap-2 ${msg.from === "me" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`flex flex-col gap-1 max-w-[65%] ${msg.from === "me" ? "items-start" : "items-end"}`}
+              className={`flex flex-col gap-1 max-w-[75%] ${msg.from === "me" ? "items-end" : "items-start"}`}
             >
               <div
                 className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm transition-colors duration-150
                 ${
                   msg.from === "me"
-                    ? "bg-linear-to-r from-[#c4b5fd] to-[#a78bfa] text-slate-950 rounded-bl-2xl"
-                    : "bg-[#27233a] text-white rounded-br-2xl"
+                    ? "bg-linear-to-r from-[#c4b5fd] to-[#a78bfa] text-slate-950 rounded-br-sm"
+                    : "bg-[#27233a] text-white rounded-bl-sm"
                 }`}
                 title={
                   msg.sentAt
@@ -131,15 +182,15 @@ function MessagesContent({ selected, selectedMessages, messagesEndRef, isLoading
                 {msg.message}
               </div>
               <div className="flex items-center justify-between gap-2 text-[10px] text-purple-300/40">
-                <span>{formatRelativeTime(msg.sentAt || msg.createdAt || msg.time)}</span>
+                <span>{formatRelativeTime(msg.sentAt || msg.createdAt || msg.time, t)}</span>
                 {msg.from === "me" && (
                   <span className={msg.isRead ? "text-emerald-300" : "text-orange-300"}>
-                    {msg.isRead ? "Seen" : "Sent"}
+                    {msg.isRead ? t("messages.seen") : t("messages.sent")}
                   </span>
                 )}
               </div>
               {msg.from === "them" && (
-                <div className="self-end w-8 h-8 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center mt-1">
+                <div className="self-start w-8 h-8 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center mt-1">
                   <span className="text-white font-semibold text-[10px]">{selected.fullName?.[0] ?? "?"}</span>
                 </div>
               )}
@@ -194,8 +245,14 @@ function ChatPanel({
   onToggleSidebar,
   isLoading,
   error,
+  historyError,
   socketConnectionStatus,
   selectedMessages,
+  hasMoreHistory,
+  isLoadingOlder,
+  messagesContainerRef,
+  onMessagesScroll,
+  onLoadOlder,
   messagesEndRef,
   inputRef,
   input,
@@ -226,14 +283,22 @@ function ChatPanel({
         sidebarOpen={sidebarOpen}
         onToggleSidebar={onToggleSidebar}
         friendActivityLabel={friendActivityLabel}
+        t={t}
       />
 
       <MessagesContent
         selected={selected}
         isLoading={isLoading}
         error={error}
+        historyError={historyError}
+        hasMoreHistory={hasMoreHistory}
+        isLoadingOlder={isLoadingOlder}
+        messagesContainerRef={messagesContainerRef}
+        onMessagesScroll={onMessagesScroll}
+        onLoadOlder={onLoadOlder}
         selectedMessages={selectedMessages}
         messagesEndRef={messagesEndRef}
+        t={t}
       />
 
       <MessageComposer

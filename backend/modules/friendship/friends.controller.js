@@ -3,88 +3,168 @@ import HttpException from "../../utils/HttpException.js"
 import { asyncHandler } from "../../utils/asyncHandler/index.js"
 import friendshipModel from "../../DB/models/friendship.model.js"
 import { notificationModel } from "../../DB/models/notifications.model.js"
-import {checkWhetherUsersExist} from "./friends.service.js"
+import { checkWhetherUsersExist } from "./friends.service.js"
 import conversationModel from "../../DB/models/Conversation.model.js"
 //------------------------------------------getFriends-------------------------------------------
 
-export const getFriends=asyncHandler(async(req,res,next)=>{
- const userId=req.user._id
- const {search}=req.query
- let query={}
+export const getFriends = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id
+  const { search } = req.query
+  let query = {}
 
- if(search){
-  query.search=search
- }
-
-const friendsList=await friendshipModel.aggregate([
-  {
-    $match:{
-      $or:[{requesterId:userId},{receiverId:userId}],
-      status:"accepted"
-    }
-  },
-  {
-    $lookup:{
-      from:'users',
-      localField:"requesterId",
-      foreignField:"_id",
-      as:'requesterId'
-    }
-  },
-  {
-    $lookup:{
-      from:'users',
-      localField:'receiverId',
-      foreignField:"_id",
-      as:'receiverId'
-    }
-  },
-  {
-    $unwind:"$requesterId"
-  },
-  {
-    $unwind:"$receiverId"
-  },
-  {
-    $addFields:{
-      friend:{
-        $cond:[{$eq:["$requesterId._id",userId]},"$receiverId","$requesterId"]
-      }
-    }
-  },
-  {
-    $match:{
-      "friend.fullName":{
-        $regex:query.search || "",
-        $options:'i'
-        
-      }
-      
-    }
-  },
-  {
-    $project:{
-      friend:{
-        _id:1,
-        fullName:1,
-        updatedAt:1,
-        createdAt:1,
-        lastActivityDate:1
-      },
-      conversationId: 1,
-      createdAt: 1
-    }
-
+  if (search) {
+    query.search = search
   }
-])
- const friends = friendsList.map(f => ({
+
+  const friendsList = await friendshipModel.aggregate([
+    {
+      $match: {
+        $or: [{ requesterId: userId }, { receiverId: userId }],
+        status: "accepted"
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: "requesterId",
+        foreignField: "_id",
+        as: 'requesterId'
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'receiverId',
+        foreignField: "_id",
+        as: 'receiverId'
+      }
+    },
+    {
+      $unwind: "$requesterId"
+    },
+    {
+      $unwind: "$receiverId"
+    },
+    {
+      $addFields: {
+        friend: {
+          $cond: [{ $eq: ["$requesterId._id", userId] }, "$receiverId", "$requesterId"]
+        }
+      }
+    },
+    {
+      $match: {
+        "friend.fullName": {
+          $regex: query.search || "",
+          $options: 'i'
+
+        }
+
+      }
+    },
+    {
+      $lookup: {
+        from: "conversations",
+        localField: "conversationId",
+        foreignField: "_id",
+        as: "conversation"
+      }
+    },
+    {
+      $unwind: {
+        path: "$conversation",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $lookup: {
+        from: "messages",
+        let: { convId: "$conversationId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$conversationId", "$$convId"]
+              }
+            }
+          },
+          {
+            $sort: {
+              createdAt: -1
+            }
+          },
+          {
+            $limit: 1
+          },
+          {
+            $project: {
+              _id: 1,
+              content: 1,
+              senderId: 1,
+              isRead: 1,
+              createdAt: 1
+            }
+          }
+        ],
+        as: "lastMessage"
+      }
+    },
+    {
+      $addFields: {
+        unReadCount: {
+          $ifNull: [
+            {
+              $getField: {
+                field: "unReadCount",
+                input: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$conversation.participants",
+                        cond: { $eq: ["$$this.user", userId] }
+                      }
+                    },
+                    0
+                  ]
+                }
+              }
+            },
+            0
+          ]
+        },
+        lastMessage: {
+          $arrayElemAt: ["$lastMessage", 0]
+        }
+      }
+    },
+    {
+      $project: {
+        friend: {
+          _id: 1,
+          fullName: 1,
+          updatedAt: 1,
+          createdAt: 1,
+          lastActivityDate: 1
+        },
+        conversationId: 1,
+        createdAt: 1,
+        unReadCount: 1,
+        lastMessage: 1
+      }
+
+    }
+  ])
+  const friends = friendsList.map(f => ({
     friendshipId: f._id,
     friend: f.friend,
     createdAt: f.createdAt,
-    conversationId: f.conversationId
+    conversationId: f.conversationId,
+    unReadCount: f.unReadCount,
+    lastMessage: f.lastMessage || null
   }));
+ 
 
-res.status(200).json({ friends });
+  res.status(200).json({ friends });
 })
 
 
@@ -141,17 +221,17 @@ export const addFriend = asyncHandler(async (req, res, next) => {
   });
 
   user.addXP(30);
-  try{
+  try {
     await notificationModel.create({
-      userId:receiverId,
-      message:`${user.fullName} has sent you a friend request!`,
-      eventType:"friend_request_received",
-      payload:{
-        senderId:requesterId
-      } 
-    }) 
+      userId: receiverId,
+      message: `${user.fullName} has sent you a friend request!`,
+      eventType: "friend_request_received",
+      payload: {
+        senderId: requesterId
+      }
+    })
   }
-  catch(err){
+  catch (err) {
     console.log(err)
   }
   return res.status(201).json({
@@ -160,7 +240,7 @@ export const addFriend = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const acceptFriend=asyncHandler(async (req,res,next)=>{
+export const acceptFriend = asyncHandler(async (req, res, next) => {
   const userId = req.user._id
   const { senderId } = req.body
 
@@ -187,11 +267,11 @@ export const acceptFriend=asyncHandler(async (req,res,next)=>{
   }
 
   const conversation = await conversationModel.create({
-    participants:[
-      {user:userId},
-      {user: senderId}
+    participants: [
+      { user: userId },
+      { user: senderId }
     ],
-    participantType:'user-to-user'
+    participantType: 'user-to-user'
   })
 
   updated.conversationId = conversation._id;
@@ -217,7 +297,7 @@ export const acceptFriend=asyncHandler(async (req,res,next)=>{
   res.status(200).json({ message: "Friendship Accepted." })
 })
 
-export const rejectFriend=asyncHandler(async (req,res,next)=>{
+export const rejectFriend = asyncHandler(async (req, res, next) => {
   const { senderId } = req.body
   const userId = req.user._id
 
@@ -308,9 +388,9 @@ export const rejectFriend=asyncHandler(async (req,res,next)=>{
 //     await friend.save();
 
 //     // 6. Return the friend's profile data to the frontend
-//     return res.status(200).json({ 
-//         message: "Viewing friend profile success", 
-//         profile: friend 
+//     return res.status(200).json({
+//         message: "Viewing friend profile success",
+//         profile: friend
 //     });
 // });
 

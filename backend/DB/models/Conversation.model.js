@@ -8,10 +8,11 @@ const conversationSchema = new mongoose.Schema({
         default: 'user-to-ai'
     },
     participants: [
-    {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-        }]
-    ,
+        {
+            user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            unReadCount: { type: Number, default: 0 }
+        }
+    ],
     pdfLimit: {
         type: Number,
         default: 0
@@ -29,10 +30,7 @@ const conversationSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-    unreadCount: [{
-        type: Number,
-        default: 0
-    }],
+
 }, {
     timestamps: true,
 });

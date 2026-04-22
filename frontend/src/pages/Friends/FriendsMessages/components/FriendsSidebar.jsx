@@ -17,24 +17,45 @@ function FriendsSidebar({
   onSelectFriend,
   userStatus,
 }) {
+  const normalizedSelectedFriendId = selectedFriendId?.toString?.() ?? selectedFriendId;
   const normalizedUserStatus =
     typeof userStatus === "string"
       ? { status: userStatus, lastActivityDate: null }
       : userStatus;
 
+  const totalUnread = filteredFriends.reduce((sum, item) => {
+    const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
+    if (!friendId) return sum;
+    return sum + (unreadByFriend[friendId] || 0);
+  }, 0);
+
+  function getLastMessagePreview(item) {
+    const content = item.lastMessage?.content;
+    if (!content) return t("messages.noMessagesYet");
+
+    const senderId = item.lastMessage?.senderId?.toString?.() || item.lastMessage?.senderId;
+    const friendId = item.friend?._id?.toString?.() || item.friend?._id;
+    const friendFirstName = item.friend?.fullName?.split(" ")?.[0] || "Friend";
+
+    const senderLabel =
+      senderId && friendId && senderId.toString() === friendId.toString()
+        ? friendFirstName
+        : t("messages.youLabel");
+
+    return `${senderLabel}: ${content}`;
+  }
+
   function checkOnline(activity, friendId) {
     const isSelectedFriend =
-      selectedFriendId?.toString() === friendId?.toString();
+      normalizedSelectedFriendId === friendId?.toString?.();
 
-    if (isSelectedFriend && normalizedUserStatus?.status) {
-      return normalizedUserStatus.status === "online"
+    if (isSelectedFriend) {
+      return normalizedUserStatus?.status === "online"
         ? "bg-green-500"
         : "bg-gray-500";
     }
 
-    return friendActivityLabel(activity) === "online"
-      ? "bg-green-500"
-      : "bg-gray-500";
+    return "bg-gray-500";
   }
   return (
     <AnimatePresence initial={false}>
@@ -51,8 +72,8 @@ function FriendsSidebar({
             <div className="p-4 border-b border-[#9B7EDE]/10">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-white font-semibold text-sm">{t("messages.title")}</h3>
-                <span className="text-xs text-purple-300/50">
-                  {filteredFriends.length} {t("messages.unread")}
+                <span className="text-sm text-white font-semibold font-blinker">
+                  {totalUnread} {t("messages.unread")}
                 </span>
               </div>
 
@@ -77,30 +98,29 @@ function FriendsSidebar({
               {isLoading ? (
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-[#B8A7E5]">
                   <Loader2 className="h-6 w-6 animate-spin text-white" />
-                  <span>Loading friends...</span>
+                  <span>{t("messages.loadingFriends")}</span>
                 </div>
               ) : error ? (
                 <div className="flex h-full items-center justify-center text-sm text-red-300 px-4 text-center">
-                  {"Unable to load friends."}
+                  {t("messages.unableToLoadFriends")}
                 </div>
               ) : filteredFriends.length > 0 ? (
                 filteredFriends.map((item) => {
                   const friend = item.friend;
+                  const friendId = friend._id?.toString?.() ?? friend._id;
+                  const unreadCount = unreadByFriend[friendId?.toString?.() ?? friendId] ?? item.unReadCount ?? 0;
                   const isSelectedFriend =
-                    selectedFriendId?.toString() === friend._id?.toString();
+                    normalizedSelectedFriendId === friend._id?.toString?.();
 
-                  const selectedStatusText =
-                    isSelectedFriend && normalizedUserStatus?.status
-                      ? normalizedUserStatus.status
-                      : null;
+                  const isSelectedFriendOnline =
+                    isSelectedFriend && normalizedUserStatus?.status === "online";
 
                   const activityTimestamp =
                     isSelectedFriend && normalizedUserStatus?.lastActivityDate
                       ? normalizedUserStatus.lastActivityDate
                       : item.friend.lastActivityDate;
 
-                  const renderedActivity =
-                    selectedStatusText || friendActivityLabel(activityTimestamp);
+                  const renderedActivity = friendActivityLabel(activityTimestamp, isSelectedFriendOnline);
 
                   return (
                     <Motion.button
@@ -115,15 +135,22 @@ function FriendsSidebar({
                           <span className="text-white font-semibold text-xs">{friend.fullName?.[0] ?? "?"}</span>
                         </div>
                         <span
-                          className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${
-                            checkOnline(item.friend.lastActivityDate, friend._id)
-                          }`}
+                          className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${checkOnline(item.friend.lastActivityDate, friend._id)
+                            }`}
                         />
-                        {unreadByFriend[friend._id] > 0 && (
-                          <span className="absolute top-0 right-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-semibold text-white px-1">
-                            {unreadByFriend[friend._id]}
-                          </span>
-                        )}
+                        <AnimatePresence>
+                          {!isSelectedFriend && unreadCount > 0 && (
+                            <Motion.span
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.8 }}
+                              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                              className="absolute top-0 right-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-semibold text-white px-1"
+                            >
+                              {unreadCount}
+                            </Motion.span>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -135,6 +162,9 @@ function FriendsSidebar({
                             </span>
                           </div>
                         </div>
+                        <p className="text-xs text-purple-200/60 truncate">
+                          {getLastMessagePreview(item)}
+                        </p>
                       </div>
                     </Motion.button>
                   );

@@ -81,12 +81,7 @@ function Friends() {
           >
             <SendIcon />
             {t("tabs.messages")}
-            <span
-              className={`text-xs rounded-full px-1.5 py-0.5 font-semibold transition-all duration-250
-        ${showMessagesSection ? "bg-red-500/80 text-white" : "bg-red-500/80 text-white"}`}
-            >
-              3
-            </span>
+          
           </button>
         </div>
 
