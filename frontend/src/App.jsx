@@ -17,7 +17,7 @@ import Body from "./comp/layout/Body.jsx";
 import ProtectedRoute from "./comp/auth/ProtectedRoute.jsx";
 import ErrorFallback from "./comp/error/ErrorFallback.jsx";
 import PeopleProfile from "./pages/Profile/PeopleProfile/PeopleProfile.jsx";
-
+import AISchedule from "./pages/AISchedule/AISchedule.jsx";
 const router = createBrowserRouter([
   // ✅ PUBLIC ROUTES WITH BODY LAYOUT
   {
@@ -85,6 +85,11 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     errorElement: <ErrorFallback />,  // ✅ ADD THIS
     children: [
+      {
+        path:'/schedule-generation',
+        element:<AISchedule/>
+
+      },
       {
         path: "/dashboard/timer",
         element: <Timer />,

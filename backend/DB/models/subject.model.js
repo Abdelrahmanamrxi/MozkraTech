@@ -28,7 +28,7 @@ const subjectSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -38,6 +38,8 @@ const subjectSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+subjectSchema.index({userId:1})
 
 const subjectModel =
   mongoose.models.Subject || mongoose.model("Subject", subjectSchema);

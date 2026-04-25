@@ -243,7 +243,7 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
           className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white placeholder-white/40 text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
         />
 
-        <div className="flex gap-3">
+        <div className="flex flex-col lg:flex-row gap-3">
           <FormDropdown
             options={difficultyOptions}
             value={difficulty}
@@ -259,7 +259,7 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
           />
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex lg:flex-row flex-col gap-3">
           <FormDropdown
             options={typeOptions}
             value={subjectType}
@@ -445,7 +445,7 @@ const SubjectRegister = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary-dark">
+    <div className="min-h-screen main-background">
       <section className="min-h-screen p-7 lg:p-14 pt-12 lg:pt-16">
         <div
           className={`flex flex-col font-Inter gap-2 mb-8 ${isRTL ? "text-right" : ""}`}
@@ -461,7 +461,7 @@ const SubjectRegister = () => {
           <div className="flex flex-col gap-6 lg:w-[58%]">
             <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-[24px] p-6">
               <div
-                className={`flex justify-between items-center mb-6 ${isRTL ? "flex-row-reverse" : ""}`}
+                className={`flex flex-col lg:flex-row gap-5 lg:justify-between lg:items-center mb-6 ${isRTL ? "flex-row-reverse" : ""}`}
               >
                 <div className={isRTL ? "text-right" : ""}>
                   <p className="text-lg font-semibold text-white">
@@ -475,7 +475,7 @@ const SubjectRegister = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowAddSubject((v) => !v)}
-                  className="flex items-center gap-1.5 bg-[#9B7EDE] text-white text-sm px-4 py-2 rounded-full font-medium cursor-pointer"
+                  className="flex items-center gap-1.5 bg-[#9B7EDE] self-start text-white text-sm px-4 py-2 rounded-full font-medium cursor-pointer"
                 >
                   <PlusIcon size={16} /> {t.addSubject}
                 </motion.button>
@@ -503,6 +503,14 @@ const SubjectRegister = () => {
                 )}
               </AnimatePresence>
             </div>
+            <div className="bg-[#3D3555]/60 flex gap-5 flex-col border-t border-[#9B7EDE]/20 p-8 rounded-[24px]">
+           <p className="text-white font-Inter text-lg font-bold">Describe your week in detail — include tasks, deadlines, habits, and any preferences</p>
+           <p class="text-xs text-[#B8A7E5] mb-3">We’ll use this to generate your personalized weekly schedule.</p>
+                <textarea
+                       placeholder="Example: Work 9am–5pm daily, gym 3x/week after 6pm, study 2h/day. Meetings: Sunday 3pm. I’m busy on Monday (no tasks). Prefer mornings for focus, evenings to relax, sleep at 12am."
+                      className="w-full bg-primary-dark border border-white/20 rounded-[12px] h-[30vh]   p-10 px-5 py-4 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
+                      />
+                      </div>
           </div>
 
           {/* RIGHT COLUMN */}
