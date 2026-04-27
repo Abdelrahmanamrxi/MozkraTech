@@ -5,6 +5,7 @@ import HttpException from "../../utils/HttpException.js";
 
 export const createSubject = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
+  console.log(req.user._id)
   const { name, difficulty, interestLevel, subjectType, hoursPerWeek } =
     req.body;
 
@@ -14,7 +15,7 @@ export const createSubject = asyncHandler(async (req, res, next) => {
     interestLevel,
     subjectType,
     hoursPerWeek,
-    user: userId,
+    userId,
   });
 
   await userModel.findByIdAndUpdate(userId, {
@@ -29,7 +30,7 @@ export const createSubject = asyncHandler(async (req, res, next) => {
 export const getUserSubjects = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
 
-  const subjects = await SubjectModel.find({ user: userId }).sort({
+  const subjects = await SubjectModel.find({ userId }).sort({
     createdAt: -1,
   });
 

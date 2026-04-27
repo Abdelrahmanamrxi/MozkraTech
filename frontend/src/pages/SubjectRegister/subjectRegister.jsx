@@ -382,6 +382,7 @@ const SubjectRegister = () => {
       setIsLoadingSubjects(true);
       try {
         const { data } = await api.get("/subjects");
+        console.log(data)
         if (isActive)
           setSubjects(Array.isArray(data?.subjects) ? data.subjects : []);
       } catch (err) {
@@ -438,6 +439,7 @@ const SubjectRegister = () => {
       });
       navigate("/dashboard");
     } catch (err) {
+      console.log(err)
       setSaveError("Failed to save data.");
     } finally {
       setIsSaving(false);

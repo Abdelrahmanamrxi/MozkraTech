@@ -17,7 +17,7 @@ const scheduleSchema = new mongoose.Schema({
     required: true, // END OF THE WEEK MUST BE AFTER THE START OF THE WEEK 
   },
 
-  tasks: [
+  sessions: [
     {
       taskId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -26,8 +26,7 @@ const scheduleSchema = new mongoose.Schema({
       },
       subjectId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Subject',
-        required:true
+        ref:'Subject'
       },
       startTime: {
         type: Date, // START TIME OF THE TASK MUST BE WITHIN THE THE WEEKSTART AND WEEKEND AND ITS LESS THAN THE END TIME
