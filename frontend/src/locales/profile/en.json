@@ -19,7 +19,10 @@
   "badges": {
     "earlyAdopter": "Early Adopter",
     "solver": "Solver",
-    "tenDayStreak": "10 Day Streak"
+    "tenDayStreak": "10 Day Streak",
+    "activeLearner": "Active Learner",
+    "twelveDayStreak": "12-Day Streak",
+    "topPerformer": "Top Performer"
   },
   "header": {
     "publicProfile": "Public Profile",
@@ -40,5 +43,88 @@
     "xpToNext": "{{xp}} XP to unlock the next level.",
     "complete": "{{value}}% complete",
     "subjectMastery": "Subject Mastery"
+  },
+  "hero": {
+    "level": "Level {{level}}",
+    "actions": {
+      "gpaCalculator": "GPA Calculator",
+      "editSubjects": "Edit Subjects",
+      "editProfile": "Edit Profile"
+    },
+    "titles": {
+      "computerScienceStudent": "Computer Science Student"
+    }
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "labels": {
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save Changes"
+    }
+  },
+  "personalInfo": {
+    "title": "Personal Information",
+    "editButton": "Edit",
+    "fields": {
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "memberSince": "Member Since"
+    }
+  },
+  "statsLabels": {
+    "studyHours": "Study Hours",
+    "courses": "Courses",
+    "achievements": "Achievements",
+    "streakDays": "Streak Days"
+  },
+  "preferences": {
+    "title": "Preferences",
+    "labels": {
+      "emailNotifications": "Email Notifications",
+      "studyReminders": "Study Reminders",
+      "weeklyReports": "Weekly Reports",
+      "achievementAlerts": "Achievement Alerts"
+    }
+  },
+  "recentActivity": {
+    "title": "Recent Activity",
+    "timeLabel": "{{day}}, {{time}}",
+    "types": {
+      "quizCompleted": "Completed Data Structures Quiz",
+      "moduleStarted": "Started Database Design Module",
+      "streakAchieved": "Achieved 12-Day Streak",
+      "projectCompleted": "Completed Web Development Project"
+    },
+    "timestamps": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    }
+  },
+  "accountSettings": {
+    "title": "Account",
+    "buttons": {
+      "changePassword": "Change Password",
+      "privacySettings": "Privacy Settings",
+      "exportData": "Export Data",
+      "deleteAccount": "Delete Account"
+    },
+    "deleteModal": {
+      "title": "Delete Account",
+      "warning": "This action is permanent and cannot be undone. All your data, progress, and achievements will be lost forever.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "description": "You've unlocked {{unlocked}} out of {{total}} achievements. Keep going!",
+    "viewAll": "View all achievements"
   }
 }

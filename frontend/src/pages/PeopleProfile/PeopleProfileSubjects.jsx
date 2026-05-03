@@ -3,7 +3,11 @@ import { motion as Motion } from "framer-motion";
 import { BookOpen, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-export default function PeopleProfileSubjects({ subjects, itemVariants, glassPanel }) {
+export default function PeopleProfileSubjects({
+  subjects,
+  itemVariants,
+  glassPanel,
+}) {
   const { t } = useTranslation("profile");
 
   return (
@@ -31,7 +35,10 @@ export default function PeopleProfileSubjects({ subjects, itemVariants, glassPan
               >
                 <BookOpen size={19} />
               </div>
-              <ChevronRight size={16} className="text-slate-300 transition-transform duration-300 group-hover:translate-x-1" />
+              <ChevronRight
+                size={16}
+                className="text-slate-300 transition-transform duration-300 group-hover:translate-x-1"
+              />
             </div>
             <h3 className="mb-3 text-sm font-Inter font-bold uppercase tracking-wider text-white">
               {subj.name}

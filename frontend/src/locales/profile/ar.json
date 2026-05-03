@@ -19,7 +19,10 @@
   "badges": {
     "earlyAdopter": "من أوائل المستخدمين",
     "solver": "حلّال",
-    "tenDayStreak": "سلسلة 10 أيام"
+    "tenDayStreak": "سلسلة 10 أيام",
+    "activeLearner": "متعلم نشط",
+    "twelveDayStreak": "سلسلة 12 يوما",
+    "topPerformer": "أفضل أداء"
   },
   "header": {
     "publicProfile": "ملف شخصي عام",
@@ -40,5 +43,88 @@
     "xpToNext": "{{xp}} نقطة خبرة للوصول للمستوى التالي.",
     "complete": "{{value}}% مكتمل",
     "subjectMastery": "إتقان المواد"
+  },
+  "hero": {
+    "level": "المستوى {{level}}",
+    "actions": {
+      "gpaCalculator": "حاسبة المعدل",
+      "editSubjects": "تعديل المواد",
+      "editProfile": "تعديل الملف الشخصي"
+    },
+    "titles": {
+      "computerScienceStudent": "طالب علوم الحاسوب"
+    }
+  },
+  "editProfile": {
+    "title": "تعديل الملف الشخصي",
+    "labels": {
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "location": "الموقع"
+    },
+    "buttons": {
+      "cancel": "إلغاء",
+      "save": "حفظ التغييرات"
+    }
+  },
+  "personalInfo": {
+    "title": "المعلومات الشخصية",
+    "editButton": "تعديل",
+    "fields": {
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "location": "الموقع",
+      "memberSince": "عضو منذ"
+    }
+  },
+  "statsLabels": {
+    "studyHours": "ساعات الدراسة",
+    "courses": "الدورات",
+    "achievements": "الإنجازات",
+    "streakDays": "أيام السلسلة"
+  },
+  "preferences": {
+    "title": "التفضيلات",
+    "labels": {
+      "emailNotifications": "إشعارات البريد الإلكتروني",
+      "studyReminders": "تذكيرات الدراسة",
+      "weeklyReports": "تقارير أسبوعية",
+      "achievementAlerts": "تنبيهات الإنجازات"
+    }
+  },
+  "recentActivity": {
+    "title": "النشاط الأخير",
+    "timeLabel": "{{day}}، {{time}}",
+    "types": {
+      "quizCompleted": "أكمل اختبار هياكل البيانات",
+      "moduleStarted": "بدأ وحدة تصميم قواعد البيانات",
+      "streakAchieved": "حقق سلسلة لمدة 12 يوما",
+      "projectCompleted": "أكمل مشروع تطوير الويب"
+    },
+    "timestamps": {
+      "today": "اليوم",
+      "yesterday": "أمس"
+    }
+  },
+  "accountSettings": {
+    "title": "الحساب",
+    "buttons": {
+      "changePassword": "تغيير كلمة المرور",
+      "privacySettings": "إعدادات الخصوصية",
+      "exportData": "تصدير البيانات",
+      "deleteAccount": "حذف الحساب"
+    },
+    "deleteModal": {
+      "title": "حذف الحساب",
+      "warning": "هذا الإجراء نهائي ولا يمكن التراجع عنه. ستفقد جميع بياناتك وتقدمك وإنجازاتك إلى الأبد.",
+      "cancel": "إلغاء",
+      "confirm": "حذف"
+    }
+  },
+  "achievements": {
+    "title": "الإنجازات",
+    "description": "لقد فتحت {{unlocked}} من أصل {{total}} إنجازا. استمر!",
+    "viewAll": "عرض كل الإنجازات"
   }
 }

@@ -6,35 +6,26 @@ import PeopleProfileHeader from "./PeopleProfileHeader";
 import PeopleProfileSidebar from "./PeopleProfileSidebar";
 import PeopleProfileSubjects from "./PeopleProfileSubjects";
 import { useQuery } from "@tanstack/react-query";
-import api from "../../../middleware/api";
+import api from "../../middleware/api";
 import { useTranslation } from "react-i18next";
 
-
-
-
-async function getProfileByID(id){
-  const response=await api.get(`user/profile/${id}`)
-  return response.data
+async function getProfileByID(id) {
+  const response = await api.get(`user/profile/${id}`);
+  return response.data;
 }
 
-
 function PeopleProfile() {
-const { t, i18n } = useTranslation("profile");
+  const { t, i18n } = useTranslation("profile");
 
-const { id } = useParams();
+  const { id } = useParams();
 
-const {data,isLoading,error}=useQuery({
-  queryKey:['user',id],
-  queryFn:()=>getProfileByID(id),
-  retry:1
-})
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user", id],
+    queryFn: () => getProfileByID(id),
+    retry: 1,
+  });
 
-
-
-  
   const navigate = useNavigate();
-
-
 
   const containerVariants = {
     hidden: { opacity: 0, y: 14 },
@@ -47,54 +38,58 @@ const {data,isLoading,error}=useQuery({
 
   const itemVariants = {
     hidden: { opacity: 0, y: 12 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.45, ease: "easeOut" },
+    },
   };
 
   const glassPanel =
     "rounded-[28px] border border-white/20 bg-white/8 backdrop-blur-2xl shadow-[0_22px_70px_rgba(14,11,26,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/14";
 
+  if (isLoading) return <p>{t("loading")}</p>;
 
+  if (error) return <p>{error.response.data.message}</p>;
+  console.log(data);
 
-    if(isLoading)
-      return <p>{t("loading")}</p>
-    
-    if(error)
-      return <p>{error.response.data.message}</p>
-    console.log(data)
+  const locale = i18n.language?.startsWith("ar") ? "ar-EG" : "en-US";
 
-    const locale = i18n.language?.startsWith("ar") ? "ar-EG" : "en-US";
+  const nextLvlXP = Math.pow(data.data.user.level, 2) * 100;
+  const currLvlXP = Math.pow(data.data.user.level - 1, 2) * 100;
+  const xpInLevel = Math.max(0, data.data.user.currentXP - currLvlXP);
 
-    const nextLvlXP = Math.pow(data.data.user.level, 2) * 100;
-    const currLvlXP = Math.pow(data.data.user.level - 1, 2) * 100;
-    const xpInLevel = Math.max(0, data.data.user.currentXP - currLvlXP);
-
-    const d=data.data
-    const user = {
+  const d = data.data;
+  const user = {
     fullName: d.user.fullName,
     level: d.user.level,
     xpProgress: Math.min(100, (xpInLevel / (nextLvlXP - currLvlXP)) * 100),
-    summary: d.summary? d.summary:t("fallback.summary"),
-    joinedAt: new Date(d.user.createdAt).toLocaleDateString(locale, { year: 'numeric', month: 'short' }),
+    summary: d.summary ? d.summary : t("fallback.summary"),
+    joinedAt: new Date(d.user.createdAt).toLocaleDateString(locale, {
+      year: "numeric",
+      month: "short",
+    }),
     streak: d.user.currentStreak || 0,
     xpToNext: Math.max(0, nextLvlXP - d.user.currentXP),
-    subjects: d.user.subjects && d.user.subjects.length > 0 ? d.user.subjects : [],
+    subjects:
+      d.user.subjects && d.user.subjects.length > 0 ? d.user.subjects : [],
     badges: [
       t("badges.earlyAdopter"),
       t("badges.solver"),
       t("badges.tenDayStreak"),
     ],
-    bio: d.user.bio?d.user.bio : t("fallback.bio"),
+    bio: d.user.bio ? d.user.bio : t("fallback.bio"),
   };
 
-  
   const progressRing = user.xpProgress;
-  
-  const isFriendshipPending = !d.friendship || d.friendship?.status === "pending";
-const isOutgoingRequest = d.friendship?.status === "pending"
-  && d.friendship.receiverId === id
 
-const isIncomingRequest = d.friendship?.status === "pending"
-  && d.friendship.requesterId === id
+  const isFriendshipPending =
+    !d.friendship || d.friendship?.status === "pending";
+  const isOutgoingRequest =
+    d.friendship?.status === "pending" && d.friendship.receiverId === id;
+
+  const isIncomingRequest =
+    d.friendship?.status === "pending" && d.friendship.requesterId === id;
   return (
     <Motion.div
       variants={containerVariants}

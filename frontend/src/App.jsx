@@ -16,8 +16,9 @@ import SubjectRegister from "./pages/SubjectRegister/subjectRegister.jsx";
 import Body from "./comp/layout/Body.jsx";
 import ProtectedRoute from "./comp/auth/ProtectedRoute.jsx";
 import ErrorFallback from "./comp/error/ErrorFallback.jsx";
-import PeopleProfile from "./pages/Profile/PeopleProfile/PeopleProfile.jsx";
+import PeopleProfile from "./pages/PeopleProfile/PeopleProfile.jsx";
 import AISchedule from "./pages/AISchedule/AISchedule.jsx";
+import Profile from "./pages/Profile/Profile.jsx";
 const router = createBrowserRouter([
   // ✅ PUBLIC ROUTES WITH BODY LAYOUT
   {
@@ -52,7 +53,7 @@ const router = createBrowserRouter([
   // ✅ PROTECTED ROUTES WITH BODY LAYOUT
   {
     element: <ProtectedRoute />,
-    errorElement: <ErrorFallback />,  // ✅ ADD THIS
+    errorElement: <ErrorFallback />, // ✅ ADD THIS
     children: [
       {
         element: <Body />,
@@ -74,7 +75,10 @@ const router = createBrowserRouter([
             path: "/dashboard/progress",
             element: <Progress />,
           },
-         
+          {
+            path: "/dashboard/myprofile",
+            element: <Profile />,
+          },
         ],
       },
     ],
@@ -83,12 +87,11 @@ const router = createBrowserRouter([
   // ✅ PROTECTED ROUTES WITHOUT BODY LAYOUT
   {
     element: <ProtectedRoute />,
-    errorElement: <ErrorFallback />,  // ✅ ADD THIS
+    errorElement: <ErrorFallback />, // ✅ ADD THIS
     children: [
       {
-        path:'/schedule-generation',
-        element:<AISchedule/>
-
+        path: "/schedule-generation",
+        element: <AISchedule />,
       },
       {
         path: "/dashboard/timer",
@@ -98,10 +101,10 @@ const router = createBrowserRouter([
         path: "/dashboard/ai",
         element: <Chatbot />,
       },
-       {
-            path:"/dashboard/profile/:id",
-            element:<PeopleProfile/>
-          }
+      {
+        path: "/dashboard/profile/:id",
+        element: <PeopleProfile />,
+      },
     ],
   },
 ]);
