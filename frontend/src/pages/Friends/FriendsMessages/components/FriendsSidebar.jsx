@@ -15,14 +15,13 @@ function FriendsSidebar({
   selectedFriendId,
   unreadByFriend,
   onSelectFriend,
-  userStatus,
+  userStatus
 }) {
   const normalizedSelectedFriendId = selectedFriendId?.toString?.() ?? selectedFriendId;
   const normalizedUserStatus =
     typeof userStatus === "string"
       ? { status: userStatus, lastActivityDate: null }
       : userStatus;
-
   const totalUnread = filteredFriends.reduce((sum, item) => {
     const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
     if (!friendId) return sum;
@@ -121,7 +120,7 @@ function FriendsSidebar({
                       : item.friend.lastActivityDate;
 
                   const renderedActivity = friendActivityLabel(activityTimestamp, isSelectedFriendOnline);
-
+                  
                   return (
                     <Motion.button
                       key={friend._id}

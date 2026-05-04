@@ -110,7 +110,7 @@ const userSchema = new mongoose.Schema(
     },
     notificationSettings: {
       // want to discuss the notification settings
-      emailNotification: { type: Boolean, default: true },
+      emailNotifications: { type: Boolean, default: true },
       studyReminders: { type: Boolean, default: true },
       weeklyReports: { type: Boolean, default: true },
     },

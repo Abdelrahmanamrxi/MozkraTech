@@ -274,6 +274,7 @@ function useFriendsMessages(selected) {
         payload.conversationId?.toString() === selected?.conversationId?.toString();
 
       const normalizedStatus = normalizeStatus(payload.status)
+      // console.log(normalizedStatus)
       if (normalizedStatus && isCurrentConversation) {
         setUserStatus(normalizedStatus)
       }
@@ -321,7 +322,6 @@ function useFriendsMessages(selected) {
     socket.on("markAsReadConfirmed", ({ conversationId, status }) => {
       const isCurrentConversation =
         conversationId?.toString() === selected?.conversationId?.toString();
-
       const normalizedStatus = normalizeStatus(status);
       if (normalizedStatus && isCurrentConversation) {
         setUserStatus(normalizedStatus);
@@ -346,7 +346,7 @@ function useFriendsMessages(selected) {
       if (normalizedStatus && isCurrentConversation) {
         setUserStatus(normalizedStatus)
       }
-
+      
       setMessages((prev) =>
         prev.map((msg) =>
           msg.conversationId?.toString() === conversationId?.toString() && msg.from === "me"
@@ -421,6 +421,7 @@ function useFriendsMessages(selected) {
    * - `error`: any error from the initial conversation load.
    * - `olderLoadError`: any error from loading older message pages.
    */
+ 
   return {
     status,
     socketConnectionStatus: status,
@@ -433,7 +434,7 @@ function useFriendsMessages(selected) {
     isLoadingOlder,
     isLoading,
     error,
-    olderLoadError,
+    olderLoadError
   };
 
 }

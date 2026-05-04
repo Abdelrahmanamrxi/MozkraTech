@@ -1,5 +1,6 @@
 import { authSocket } from "../../middleware/auth.js";
 import conversationModel from "../../DB/models/Conversation.model.js";
+import userModel from "../../DB/models/user.model.js";
 import messageModel from "../../DB/models/message.model.js";
 import { connectioUser } from "./chat.socket.service.js";
 import { setUserOnline } from "./chat.socket.service.js";
@@ -61,7 +62,7 @@ export const sendMessage = async (socket) => {
     conversation.lastMessage = newMessage._id;
     await conversation.save();
     const receiverStatus = userStatus.get(destId.toString())
-
+    console.log(userStatus.get(destId.toString(),receiverStatus))
     socket.emit("successMessage", {
       conversationId: conversation._id,
       message: newMessage.content,
@@ -118,8 +119,8 @@ export const markAsRead = async (socket) => {
       (participant) => participant.user.toString() === userId,
     );
 
-    const status = userStatus.get(userId);
-
+    const currentUserStatus = userStatus.get(userId);
+  
     if (!isParticipant) {
       return socket.emit("sendError", {
         message: "Not allowed to update this conversation",
@@ -148,14 +149,35 @@ export const markAsRead = async (socket) => {
       },
     );
 
-    // Emit confirmation back to the current user
+    const currentStatusPayload =
+      currentUserStatus ||
+      ({
+        status: "online",
+        lastActivityDate: Date.now(),
+      });
+
+    let otherParticipantStatus = userStatus.get(
+      otherParticipant.user.toString(),
+    );
+
+    if (!otherParticipantStatus) {
+      const friend = await userModel.findById(otherParticipant.user).select(
+        "lastActivityDate",
+      );
+      otherParticipantStatus = {
+        status: "offline",
+        lastActivityDate: friend?.lastActivityDate || null,
+      };
+    }
+
+    // Emit confirmation back to the current user with the friend's status
     socket.emit("markAsReadConfirmed", {
       conversationId,
       unReadCount: 0,
-      status,
+      status: otherParticipantStatus,
     });
 
-    // Notify the sender that their messages have been read
+    // Notify the sender that their messages have been read, include reader status
     const otherParticipantSocketId = connectioUser.get(
       otherParticipant.user.toString(),
     );
@@ -163,7 +185,7 @@ export const markAsRead = async (socket) => {
     if (otherParticipantSocketId) {
       socket.to(otherParticipantSocketId).emit("messagesMarkedAsRead", {
         conversationId,
-        status,
+        status: currentStatusPayload,
       });
     }
   });

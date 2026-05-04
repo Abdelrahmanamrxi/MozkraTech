@@ -63,12 +63,7 @@ const mockProfileData = {
       key: "weeklyReports",
       labelKey: "preferences.labels.weeklyReports",
       enabled: true,
-    },
-    {
-      key: "achievementAlerts",
-      labelKey: "preferences.labels.achievementAlerts",
-      enabled: false,
-    },
+    }
   ],
 
   achievements: {

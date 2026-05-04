@@ -17,9 +17,8 @@ function Profile() {
 
       <div className="flex flex-col lg:flex-row gap-8 mt-10 items-start">
         {/* Left column */}
-        <div className="flex-1 flex flex-col gap-8 w-full">
+        <div className="flex-1 flex flex-col gap-8  w-full">
           <PersonalInformation mockProfileData={mockProfileData} />
-          <RecentActivity mockProfileData={mockProfileData} />
         </div>
 
         {/* Right column */}

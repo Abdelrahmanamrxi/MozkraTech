@@ -20,11 +20,10 @@ function ChatHeader({
       ? { status: userStatus, lastActivityDate: null }
       : userStatus;
 
-  const fallbackStatus = friendActivityLabel(lastActivityDate);
-  const activityStatus = normalizedUserStatus?.status || fallbackStatus;
-  const isOnline = normalizedUserStatus?.status
-    ? normalizedUserStatus.status === "online"
-    : fallbackStatus === "online";
+  const isOnline = normalizedUserStatus?.status === "online";
+  const effectiveLastActivity =
+    normalizedUserStatus?.lastActivityDate || lastActivityDate;
+  const activityStatus = friendActivityLabel(effectiveLastActivity, isOnline);
 
   return (
     <div className="px-4 py-3 border-b border-[#9B7EDE]/20 flex items-center justify-between shrink-0">

@@ -39,10 +39,9 @@ export const registerAccount = async (socket) => {
     if (data.statusCode != 200) {
         return socket.emit("authError", data);
     }
-    console.log(connectioUser);
     connectioUser.set(data.user._id.toString(), socket.id);
     setUserOnline(data.user._id.toString())
-    console.log(connectioUser);
+    console.log(userStatus);
     return "done";
 };
 

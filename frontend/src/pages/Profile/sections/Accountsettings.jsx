@@ -73,16 +73,6 @@ const accountButtons = [
     danger: false,
   },
   {
-    icon: Shield,
-    labelKey: "accountSettings.buttons.privacySettings",
-    danger: false,
-  },
-  {
-    icon: Download,
-    labelKey: "accountSettings.buttons.exportData",
-    danger: false,
-  },
-  {
     icon: Trash2,
     labelKey: "accountSettings.buttons.deleteAccount",
     danger: true,

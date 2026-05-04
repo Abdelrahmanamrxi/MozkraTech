@@ -15,6 +15,7 @@ import ChatPanel from "./components/ChatPanel";
  */
 async function getFriends(search) {
   const response = await api.get(`/friends?search=${search}`);
+  console.log(response)
   return response.data;
 }
 
@@ -88,7 +89,7 @@ export default function FriendsMessages() {
     isLoadingOlder,
     isLoading: chatIsLoading,
     error: chatError,
-    olderLoadError,
+    olderLoadError
   } = useFriendsMessages(selected);
   // Normalize friend list data and avoid recomputing on every render.
   const friendItems = useMemo(() => data?.friends ?? [], [data?.friends]);
@@ -130,7 +131,7 @@ export default function FriendsMessages() {
       return changed ? next : prev;
     });
   }, [friendItems]);
-
+  
   const latestMessageByFriend = useMemo(() => {
     return messages.reduce((acc, msg) => {
       const friendId = msg.friendId?.toString();
@@ -406,6 +407,9 @@ export default function FriendsMessages() {
     }
   }, [selectedMessages.length, selected?.conversationId, isLoadingOlder]);
 
+
+
+  console.log()
   return (
     <div className="mt-2 font-Inter">
       <div className="flex items-center justify-center p-2 sm:p-4">
