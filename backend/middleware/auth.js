@@ -27,12 +27,21 @@ export const authentication = asyncHandler(async (req, res, next) => {
     return next(new HttpException("Access Denied", 401));
   }
 
-  const user = await userModel.findById(decoded.id);
+  const user = await userModel.findById(decoded.id).select("_id email role isVerified isSubjectVerified");
 
   if (!user) {
     return next(new HttpException("User Not Found", 404));
   }
 
+  {/**
+    if(!user.isSubjectVerified){
+      res.status(403).json({
+        success:false,
+        message:"Please fill in your subjects or courses to access.",
+        code:"SUBJECT_REGISTER"
+      })
+    }
+    */}
   if (
     user.passwordChangeAt &&
     user.passwordChangeAt.getTime() / 1000 > decoded.iat

@@ -372,28 +372,8 @@ export const getProfile = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new HttpException("User Not Found", 404));
   }
-
-  const friendships = await friendshipModel
-    .find({
-      status: "accepted",
-      $or: [{ requesterId: user._id }, { receiverId: user._id }],
-    })
-    .populate([
-      { path: "requesterId", select: "fullName image email" },
-      { path: "receiverId", select: "fullName image email" },
-    ]);
-
-  const friendsList = friendships.map((f) => {
-    return f.requesterId._id.toString() === user._id.toString()
-      ? f.receiverId
-      : f.requesterId;
-  });
-
   return res.status(200).json({
     message: "getUsers success",
-    user: {
-      ...user._doc,
-      friends: friendsList,
-    },
+    user:user,
   });
 });

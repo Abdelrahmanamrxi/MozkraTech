@@ -33,6 +33,27 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: 100,
     },
+    plan:{
+      name:{
+        type:String,
+        default:"free",
+        enum:['free','premium','pro']
+      },
+      limits:{
+        aiScheduleLimit:{
+          type:Number,
+          default:0
+        },
+        aiChatLimit:{
+          type:Number,
+          default:0,
+        },
+        docLimit:{
+          type:Number,
+          default:0
+        }
+      }  
+    },
     email: {
       type: String,
       required: true,
@@ -139,6 +160,11 @@ const userSchema = new mongoose.Schema(
         default: 15,
         min: 1,
       },
+    },
+    isSubjectVerified:{
+      type:Boolean,
+      default:false,
+      required:true
     },
     OTPEmailExpiresAt: {
       type: Date,

@@ -9,6 +9,7 @@ const subjectSchema = new mongoose.Schema(
     },
     difficulty: {
       type: String,
+      enum:['hard','medium','easy'],
       required: true,
       trim: true,
     },

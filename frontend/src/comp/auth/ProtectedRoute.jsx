@@ -24,6 +24,7 @@ function ProtectedRoute() {
           {},
           { withCredentials: true }
         )
+        console.log(response)
         dispatch(setAccessToken(response.data.accessToken))
       } catch (err) {
         console.log(err)

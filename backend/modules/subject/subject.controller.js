@@ -11,7 +11,7 @@ export const createSubject = asyncHandler(async (req, res, next) => {
 
   const subject = await SubjectModel.create({
     name,
-    difficulty,
+    difficulty:difficulty.toLowerCase(),
     interestLevel,
     subjectType,
     hoursPerWeek,
@@ -20,7 +20,10 @@ export const createSubject = asyncHandler(async (req, res, next) => {
 
   await userModel.findByIdAndUpdate(userId, {
     $addToSet: { subjects: subject._id },
-  });
+     $set:{isSubjectVerified:true},
+  },
+   { new: true }
+);
 
   return res
     .status(201)

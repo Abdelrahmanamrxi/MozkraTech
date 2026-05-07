@@ -101,7 +101,9 @@ export const login = asyncHandler(async (req, res, next) => {
     const refreshToken = await generateToken({
         payload: {
             email,
-            id: user._id
+            id: user._id,
+            isVerified:user.isVerified,
+            isSubjectVerified:user.isSubjectVerified
         },
             SIGNATURE: process.env.JWT_SECRET,
             option: {expiresIn: "3d"}
@@ -150,6 +152,8 @@ export const login = asyncHandler(async (req, res, next) => {
       id: user._id,
       email: user.email,
       role: user.role,
+      isSubjectVerified:user.isSubjectVerified,
+      isVerified:user.isVerified
     },
     SIGNATURE: process.env.JWT_SECRET,
     option: { expiresIn: "15m" }
@@ -238,14 +242,19 @@ const client = new OAuth2Client();
         const accessToken = await generateToken({
         payload: {
             email,
-            id: user._id},
+            id: user._id,
+            isVerified:user.isVerified,
+            isSubjectVerified:user.isSubjectVerified
+        },
         SIGNATURE: process.env.JWT_SECRET,
         option: {expiresIn: "15m"}
     });
     const refreshToken = await generateToken({
         payload: {
             email,
-            id: user._id
+            id: user._id,
+            isVerified:user.isVerified,
+            isSubjectVerified:user.isSubjectVerified
         },
             SIGNATURE: process.env.JWT_SECRET,
             option: {expiresIn: "3d"}
@@ -286,14 +295,19 @@ const client = new OAuth2Client();
     const accessToken = await generateToken({
         payload: {
             email,
-            id: user._id},
+            id: user._id,
+            isVerified:user.isVerified,
+            isSubjectVerified:user.isSubjectVerified
+        },
         SIGNATURE: process.env.JWT_SECRET,
         option: {expiresIn: "15m"}
     });
     const refreshToken = await generateToken({
         payload: {
             email,
-            id: user._id
+            id: user._id,
+            isVerified:user.isVerified,
+            isSubjectVerified:user.isSubjectVerified
         },
             SIGNATURE: process.env.JWT_SECRET,
             option: {expiresIn: "3d"}

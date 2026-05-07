@@ -1,8 +1,15 @@
 /* eslint-disable no-unused-vars */
 import { motion } from "framer-motion";
 
-const SessionCard = ({ session, index, day, onDragStart, onDropOnCard }) => {
+const parseDurationToHours = (str = "") => {
+  const h = str.match(/([\d.]+)h/i);
+  const m = str.match(/([\d.]+)m/i);
+  return (h ? parseFloat(h[1]) : 0) + (m ? parseFloat(m[1]) / 60 : 0) || 1;
+};
+
+const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMode }) => {
   const handleDragStart = (event) => {
+    if (!isEditMode) return;
     const target = event.currentTarget;
     const clone = target.cloneNode(true);
 
@@ -35,9 +42,16 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard }) => {
     e.preventDefault(); // ضروري للسماح بالـ Drop
   };
 
+  const durationHours = parseDurationToHours(session.duration);
+  const isCompact = durationHours <= 1;
+  const isTall = durationHours >= 1.5;
+  const timeClass = isCompact ? "text-[10px]" : "text-xs";
+  const subjectClass = isCompact ? "text-xs" : "text-sm";
+  const durationClass = isCompact ? "text-[10px]" : "text-xs";
+
   return (
     <motion.div
-      draggable
+      draggable={isEditMode}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDrop={(e) => {
@@ -49,11 +63,19 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       whileDrag={{ scale: 1.05, rotate: "2deg", zIndex: 50 }}
-      className={`${session.color} p-4 rounded-[16px] text-white cursor-grab active:cursor-grabbing shadow-lg transition-shadow hover:shadow-2xl`}
+      className={`${session.color} h-full ${
+        isCompact ? "p-3" : "p-4"
+      } rounded-[16px] text-white ${
+        isEditMode ? "cursor-grab active:cursor-grabbing" : "cursor-default"
+      } shadow-lg transition-shadow hover:shadow-2xl flex flex-col ${
+        isTall ? "justify-between" : "gap-2"
+      }`}
     >
-      <p className="text-xs font-Inter opacity-90">{session.time}</p>
-      <p className="font-semibold text-sm mt-2">{session.subject}</p>
-      <p className="text-xs opacity-80 mt-1">{session.duration}</p>
+      <p className={`${timeClass} font-Inter opacity-90`}>{session.time}</p>
+      <p className={`${subjectClass} font-semibold`}>{session.subject}</p>
+      <p className={`${durationClass} opacity-80 ${isTall ? "mt-auto" : ""}`}>
+        {session.duration}
+      </p>
     </motion.div>
   );
 };

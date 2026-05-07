@@ -437,7 +437,7 @@ const SubjectRegister = () => {
         weeklyGoalHours,
         weeklyStudyHours: totalWeeklyHours,
       });
-      navigate("/dashboard");
+      navigate("/dashboard",{replace:true});
     } catch (err) {
       console.log(err)
       setSaveError("Failed to save data.");
@@ -505,14 +505,7 @@ const SubjectRegister = () => {
                 )}
               </AnimatePresence>
             </div>
-            <div className="bg-[#3D3555]/60 flex gap-5 flex-col border-t border-[#9B7EDE]/20 p-8 rounded-[24px]">
-           <p className="text-white font-Inter text-lg font-bold">Describe your week in detail — include tasks, deadlines, habits, and any preferences</p>
-           <p class="text-xs text-[#B8A7E5] mb-3">We’ll use this to generate your personalized weekly schedule.</p>
-                <textarea
-                       placeholder="Example: Work 9am–5pm daily, gym 3x/week after 6pm, study 2h/day. Meetings: Sunday 3pm. I’m busy on Monday (no tasks). Prefer mornings for focus, evenings to relax, sleep at 12am."
-                      className="w-full bg-primary-dark border border-white/20 rounded-[12px] h-[30vh]   p-10 px-5 py-4 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
-                      />
-                      </div>
+          
           </div>
 
           {/* RIGHT COLUMN */}

@@ -18,16 +18,18 @@ function FriendsSidebar({
   userStatus
 }) {
   const normalizedSelectedFriendId = selectedFriendId?.toString?.() ?? selectedFriendId;
+  console.log(userStatus)
   const normalizedUserStatus =
     typeof userStatus === "string"
       ? { status: userStatus, lastActivityDate: null }
-      : userStatus;
+      : {status:'offline'};
   const totalUnread = filteredFriends.reduce((sum, item) => {
     const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
     if (!friendId) return sum;
     return sum + (unreadByFriend[friendId] || 0);
   }, 0);
-
+  
+  
   function getLastMessagePreview(item) {
     const content = item.lastMessage?.content;
     if (!content) return t("messages.noMessagesYet");
@@ -119,7 +121,7 @@ function FriendsSidebar({
                       ? normalizedUserStatus.lastActivityDate
                       : item.friend.lastActivityDate;
 
-                  const renderedActivity = friendActivityLabel(activityTimestamp, isSelectedFriendOnline);
+                  const renderedActivity = normalizedUserStatus.status==="offline" ? "offline": friendActivityLabel(activityTimestamp, isSelectedFriendOnline);
                   
                   return (
                     <Motion.button
