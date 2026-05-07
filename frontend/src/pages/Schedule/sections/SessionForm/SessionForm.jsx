@@ -45,7 +45,7 @@ function SessionForm({ setShowAddSessionPopup }) {
   
   const [form, setForm] = useState({
     taskName: "",
-    subjectId: subjects[0]._id,
+    subjectId: '',
     dueDate: "",
     totalHours: "",
     priority: "",
