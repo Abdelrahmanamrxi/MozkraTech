@@ -20,6 +20,8 @@ export const updateStudyPreferences = asyncHandler(async (req, res, next) => {
     sessionDuration,
     breakDuration,
     preferredTime,
+    preferredTimeRange,
+    freeDays,
     weeklyGoalHours,
     weeklyStudyHours,
   } = req.body;
@@ -30,6 +32,11 @@ export const updateStudyPreferences = asyncHandler(async (req, res, next) => {
   if (breakDuration !== undefined)
     update["timer.breakDuration"] = breakDuration;
   if (preferredTime !== undefined) update.preferredTime = preferredTime;
+  if (preferredTimeRange?.start !== undefined)
+    update["preferredTimeRange.start"] = preferredTimeRange.start;
+  if (preferredTimeRange?.end !== undefined)
+    update["preferredTimeRange.end"] = preferredTimeRange.end;
+  if (freeDays !== undefined) update.freeDays = [...new Set(freeDays)];
   if (weeklyGoalHours !== undefined) update.weeklyGoalHours = weeklyGoalHours;
   if (weeklyStudyHours !== undefined)
     update.weeklyStudyHours = weeklyStudyHours;

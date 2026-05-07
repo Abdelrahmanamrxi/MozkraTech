@@ -314,9 +314,14 @@ const SubjectRegister = () => {
       addSubject: "Add Subject",
       studyPreferences: "Study Preferences",
       preferredTime: "Preferred Study Time",
+      preferredTimeRange: "Preferred Study Time Range",
+      weeklyGoalHours:"Weekly Goal Hours",
+      from: "From",
+      to: "To",
+      freeDays: "Days I'm Free",
+      freeDaysHint: "Select all days you’re usually available.",
       sessionDuration: "Session Duration (minutes)",
       breakDuration: "Break Duration (minutes)",
-      weeklyGoal: "Weekly Study Goal (hours)",
       studyProfile: "Your Study Profile",
       subjects: "Subjects",
       weeklyHours: "Weekly Hours",
@@ -331,9 +336,14 @@ const SubjectRegister = () => {
       addSubject: "ضيف مادة",
       studyPreferences: "تفضيلات المذاكرة",
       preferredTime: "وقت المذاكرة المفضل",
+      weeklyGoalHours: "ساعات الهدف الأسبوعية",
+      preferredTimeRange: "نطاق وقت المذاكرة",
+      from: "من",
+      to: "إلى",
+      freeDays: "الأيام اللي أنا فاضي فيها",
+      freeDaysHint: "اختار كل الأيام اللي غالباً بتكون متاح فيها.",
       sessionDuration: "مدة الجلسة (دقائق)",
       breakDuration: "مدة الراحة (دقائق)",
-      weeklyGoal: "هدف المذاكرة الأسبوعي (ساعات)",
       studyProfile: "ملف مذاكرتك",
       subjects: "المواد",
       weeklyHours: "الساعات الأسبوعية",
@@ -352,29 +362,52 @@ const SubjectRegister = () => {
   const [showAddSubject, setShowAddSubject] = useState(false);
   const [sessionDuration, setSessionDuration] = useState(60);
   const [breakDuration, setBreakDuration] = useState(15);
-  const [weeklyGoalHours, setWeeklyGoalHours] = useState(25);
-  const [preferredTime, setPreferredTime] = useState("morning");
+  const [weeklyGoalHours,setHours]=useState(1)
+  const [preferredStartTime, setPreferredStartTime] = useState("08:00");
+  const [preferredEndTime, setPreferredEndTime] = useState("22:00");
+  const [freeDays, setFreeDays] = useState(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
 
-  const timeOptions = [
-    {
-      value: "morning",
-      label: isRTL ? "الصبح (٦ ص - ١٢ م)" : "Morning (6AM - 12PM)",
-    },
-    {
-      value: "afternoon",
-      label: isRTL ? "الظهر (١٢ م - ٦ م)" : "Afternoon (12PM - 6PM)",
-    },
-    {
-      value: "evening",
-      label: isRTL ? "المساء (٦ م - ١٢ ص)" : "Evening (6PM - 12AM)",
-    },
-    {
-      value: "night",
-      label: isRTL ? "الليل (١٢ ص - ٦ ص)" : "Night (12AM - 6AM)",
-    },
+  const dayOptions = [
+    { value: "Monday", label: isRTL ? "الاثنين" : "Mon" },
+    { value: "Tuesday", label: isRTL ? "الثلاثاء" : "Tue" },
+    { value: "Wednesday", label: isRTL ? "الأربعاء" : "Wed" },
+    { value: "Thursday", label: isRTL ? "الخميس" : "Thu" },
+    { value: "Friday", label: isRTL ? "الجمعة" : "Fri" },
+    { value: "Saturday", label: isRTL ? "السبت" : "Sat" },
+    { value: "Sunday", label: isRTL ? "الأحد" : "Sun" },
   ];
+
+  const timeToMinutes = (timeStr) => {
+    if (typeof timeStr !== "string") return 0;
+    const [h, m] = timeStr.split(":").map((x) => parseInt(x, 10));
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return 0;
+    return h * 60 + m;
+  };
+
+  // Map a preferred range to the backend enum: morning/afternoon/evening/night.
+  const derivePreferredTimeEnum = (start, end) => {
+    const startMin = timeToMinutes(start);
+    const endMinRaw = timeToMinutes(end);
+    const endMin = endMinRaw <= startMin ? endMinRaw + 24 * 60 : endMinRaw;
+    const mid = ((startMin + endMin) / 2) % (24 * 60);
+
+    if (mid >= 6 * 60 && mid < 12 * 60) return "morning";
+    if (mid >= 12 * 60 && mid < 18 * 60) return "afternoon";
+    if (mid >= 18 * 60 && mid < 24 * 60) return "evening";
+    return "night";
+  };
+
+  const toggleFreeDay = (day) => {
+    setFreeDays((prev) => {
+      if (prev.includes(day)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((d) => d !== day);
+      }
+      return [...prev, day];
+    });
+  };
 
   useEffect(() => {
     let isActive = true;
@@ -433,9 +466,14 @@ const SubjectRegister = () => {
       await api.patch("/user/study-preferences", {
         sessionDuration,
         breakDuration,
-        preferredTime,
-        weeklyGoalHours,
+        preferredTime: derivePreferredTimeEnum(preferredStartTime, preferredEndTime),
+        preferredTimeRange: {
+          start: preferredStartTime,
+          end: preferredEndTime,
+        },
+        freeDays,
         weeklyStudyHours: totalWeeklyHours,
+        weeklyGoalHours:weeklyGoalHours
       });
       navigate("/dashboard",{replace:true});
     } catch (err) {
@@ -518,16 +556,64 @@ const SubjectRegister = () => {
               </p>
               <div className="flex flex-col gap-4">
                 <div className={isRTL ? "text-right" : ""}>
-                  <label className="text-xs text-[#B8A7E5] mb-1.5 block font-medium">
-                    {t.preferredTime}
+                  <label className="text-sm text-[#B8A7E5] mb-3 block font-medium">
+                    {t.preferredTimeRange}
                   </label>
-                  <FormDropdown
-                    options={timeOptions}
-                    value={preferredTime}
-                    onChange={setPreferredTime}
-                    isRTL={isRTL}
-                  />
+                  <div
+                    className={`flex flex-col sm:flex-row gap-3 ${
+                      isRTL ? "sm:flex-row-reverse" : ""
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <p className="text-[10px] text-[#B8A7E5]/80 mb-1">{t.from}</p>
+                      <input
+                        type="time"
+                        value={preferredStartTime}
+                        onChange={(e) => setPreferredStartTime(e.target.value)}
+                        className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[10px] text-[#B8A7E5]/80 mb-1">{t.to}</p>
+                      <input
+                        type="time"
+                        value={preferredEndTime}
+                        onChange={(e) => setPreferredEndTime(e.target.value)}
+                        className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
+                      />
+                    </div>
+                  </div>
                 </div>
+
+                {/* Free Days multi-select */}
+                <div className={isRTL ? "text-right" : ""}>
+                  <label className="text-sm  text-[#B8A7E5] mb-3 block font-medium">
+                    {t.freeDays}
+                  </label>
+                  <div className={`flex flex-wrap gap-2  ${isRTL ? "justify-end" : ""}`}>
+                    {dayOptions.map((d) => {
+                      const selected = freeDays.includes(d.value);
+                      return (
+                        <button
+                          key={d.value}
+                          type="button"
+                          onClick={() => toggleFreeDay(d.value)}
+                          className={`px-3 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
+                            selected
+                              ? "bg-primary-dark border-primary-dark/40 text-white"
+                              : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
+                          }`}
+                        >
+                          {d.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-[#B8A7E5]/70 mt-2 mb-3">
+                    {t.freeDaysHint}
+                  </p>
+                </div>
+
                 {/* Number Inputs */}
                 {[
                   {
@@ -543,14 +629,14 @@ const SubjectRegister = () => {
                     min: 5,
                   },
                   {
-                    label: t.weeklyGoal,
-                    val: weeklyGoalHours,
-                    set: setWeeklyGoalHours,
-                    min: 1,
-                  },
+                    label:t.weeklyGoalHours,
+                    val:weeklyGoalHours,
+                    set:setHours,
+                    min:1
+                  }
                 ].map((input, i) => (
                   <div key={i} className={isRTL ? "text-right" : ""}>
-                    <label className="text-xs text-[#B8A7E5] mb-1.5 block font-medium">
+                    <label className="text-sm text-[#B8A7E5] mb-1.5 block font-medium">
                       {input.label}
                     </label>
                     <input

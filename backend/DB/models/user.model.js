@@ -15,6 +15,17 @@ export const roleTypes = {
   admin: "admin",
 };
 
+const timeHHmm = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const weekDays = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 const userSchema = new mongoose.Schema(
   {
     fullName: {
@@ -143,6 +154,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["morning", "afternoon", "evening", "night"],
       default: "morning",
+    },
+    preferredTimeRange: {
+      start: {
+        type: String,
+        default: "08:00",
+        match: timeHHmm,
+      },
+      end: {
+        type: String,
+        default: "22:00",
+        match: timeHHmm,
+      },
+    },
+    freeDays: {
+      type: [String],
+      enum: weekDays,
+      default: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     },
     weeklyGoalHours: {
       type: Number,

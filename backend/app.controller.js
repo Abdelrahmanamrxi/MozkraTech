@@ -11,7 +11,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 import limiter from "./middleware/rateLimiter.js";
 import chatRouter from "./modules/chat/chat.route.js";
-import scheduleRouter from "./modules/schedule/schedule.route.js";
+import sessionRouter from "./modules/sessions/session.route.js";
 
 const bootstrap = async (app, express) => {
   // 1. Body parsers
@@ -45,7 +45,7 @@ const bootstrap = async (app, express) => {
   app.use("/api/v1/chat", chatRouter);
   app.use("/api/v1/friends", friendsRouter);
   app.use("/api/v1/notifications",notificationRouter)
-  app.use('/api/v1/schedule',scheduleRouter)
+  app.use('/api/v1/sessions',sessionRouter)
 
   // 6. Error handling (last)
   app.use(errorHandler);

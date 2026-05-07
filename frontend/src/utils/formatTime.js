@@ -34,3 +34,29 @@ export function formatRelativeTime(timestamp, t) {
   
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
+
+/* ── helpers ── */
+export function to24(time12) {
+  const [time, period] = time12.split(" ");
+  let [h, m] = time.split(":").map(Number);
+  if (period === "AM" && h === 12) h = 0;
+  if (period === "PM" && h !== 12) h += 12;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+export function to12(time24) {
+  let [h, m] = time24.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2, "0")} ${period}`;
+}
+
+export function calcDuration(start, end) {
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  const diff = (eh * 60 + em) - (sh * 60 + sm);
+  if (diff <= 0) return "—";
+  const h = Math.floor(diff / 60);
+  const min = diff % 60;
+  return h > 0 ? (min > 0 ? `${h}h ${min}m` : `${h}h`) : `${min}m`;
+}

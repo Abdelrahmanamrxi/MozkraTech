@@ -25,6 +25,27 @@ export const updateStudyPreferencesSchema = joi.object({
       preferredTime: joi
         .string()
         .valid("morning", "afternoon", "evening", "night"),
+      preferredTimeRange: joi.object({
+        start: joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
+        end: joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
+      }),
+      freeDays: joi
+        .array()
+        .items(
+          joi
+            .string()
+            .valid(
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday",
+            ),
+        )
+        .min(1)
+        .max(7),
       weeklyGoalHours: joi.number().integer().min(1).max(100),
       weeklyStudyHours: joi.number().integer().min(0),
     })

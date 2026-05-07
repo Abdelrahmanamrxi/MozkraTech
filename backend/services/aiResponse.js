@@ -2,7 +2,7 @@ import Groq from "groq-sdk"
 import { scheduleSystemPrompt } from "../utils/systemPrompts/systemPrompts.js"
 import HttpException from "../utils/HttpException.js"
 const groq=new Groq({apiKey:process.env.GROQ_API_KEY})
-export const generateAIScheduleResponse=async(userPreferences,subjects,weeklyDescription)=>{
+export const generateAISessionResponse=async(userPreferences,subjects,weeklyDescription)=>{
     try{
     
         const response=await groq.chat.completions.create({
@@ -65,43 +65,73 @@ export const generateAIScheduleResponse=async(userPreferences,subjects,weeklyDes
           }
         },
 
-        schedule: {
-          type: "array",
-          minItems: 1,
-          items: {
-            type: "object",
-            additionalProperties: false,
-            properties: {
-              day: { type: "string" },
-              sessions: {
-                type: "array",
-                minItems: 1,
-                items: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    subjectId: { type: "string" },
-                    startTime: { type: "string",format:"date-time" },
-                    endTime: { type: "string",format:'date-time'},
-                    status: {
-                      type: "string",
-                      enum: ["scheduled"]
-                    },
-                    reason: { type: "string" }
-                  },
-                  required: [
-                    "subjectId",
-                    "startTime",
-                    "endTime",
-                    "status",
-                    "reason"
-                  ]
-                }
-              }
-            },
-            required: ["day", "sessions"]
+       schedule: {
+  type: "object",
+  additionalProperties: false,
+
+  properties: {
+    weekStart: {
+      type: "string",
+      format: "date-time"
+    },
+
+    weekEnd: {
+      type: "string",
+      format: "date-time"
+    },
+
+    sessions: {
+      type: "array",
+      minItems: 1,
+
+      items: {
+        type: "object",
+        additionalProperties: false,
+
+        properties: {
+          name: {
+            type: "string"
+          },
+
+          subjectId: {
+            type: "string"
+          },
+
+          startTime: {
+            type: "string",
+            format: "date-time"
+          },
+
+          endTime: {
+            type: "string",
+            format: "date-time"
+          },
+
+          status: {
+            type: "string",
+            enum: [
+              "scheduled",
+              "completed",
+              "missed",
+              "rescheduled"
+            ]
           }
         },
+        required: [
+          "subjectId",
+          "startTime",
+          "endTime",
+          "status",
+          "name"
+        ]
+      }
+    }
+  },
+  required: [
+    "weekStart",
+    "weekEnd",
+    "sessions"
+  ]},
         reasonForThisSummary: { type: "string" },
       },
       

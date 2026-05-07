@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import Body from "../../comp/layout/Body";
 import { FilterIcon, TipBackgroundIcon } from "../../comp/ui/Icons";
-import { PlusIcon,Bot } from "lucide-react";
+import { PlusIcon,Bot, CalendarDays } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import ScheduleSummary from "./sections/ScheduleSummary";
 import { useState } from "react";
-import SessionForm from "./sections/SessionForm";
+import SessionForm from "./sections/SessionForm/SessionForm";
 import { useTranslation } from "react-i18next";
 import DayColumn from "./DayColumn";
 import TimeRuler from "./TimeRuler";
@@ -251,14 +251,13 @@ const dayLabelsAr = {
 // ─────────────────────────────────────────────────────────────────────────────
 const Schedule = () => {
   // The full week of sessions, keyed by day name.
-  const [scheduleData, setScheduleData] = useState(initialScheduleData);
-   console.log(scheduleData)
-  // Which day column is currently highlighted during a drag (or null).
+  const [scheduleData, setScheduleData] = useState(() => Object.fromEntries(days.map((day) => [day, []])));
+
+  // Which day column is currently  during a drag (or null).
   const [dragOverDay, setDragOverDay] = useState(null);
 
   // { day, session } of the session being edited, or null when no modal is open.
   const [editingSession, setEditingSession] = useState(null);
-
   const [showFilterPopup,     setShowFilterPopup]     = useState(false);
   const [showAddSessionPopup, setShowAddSessionPopup] = useState(false);
   const [filterSubject,       setFilterSubject]       = useState("All");
@@ -267,6 +266,7 @@ const Schedule = () => {
   const { i18n } = useTranslation();
   const lang = i18n.language === "ar" ? "ar" : "en";
   const t    = labelsMap[lang];
+  const isScheduleEmpty = days.every((day) => (scheduleData[day] || []).length === 0);
 
   // ── Drop handler ──────────────────────────────────────────────────────────
 
@@ -372,7 +372,7 @@ const Schedule = () => {
 
           <div className="flex flex-row gap-3 items-center mt-3">
             {/* Edit / Confirm */}
-            <motion.button
+           {scheduleData.length>0? <motion.button
               onClick={() => {
                 if (isEditMode) {
                   setEditingSession(null);
@@ -387,7 +387,7 @@ const Schedule = () => {
               }`}
             >
               {isEditMode ? t.confirmSchedule : t.editSchedule}
-            </motion.button>
+            </motion.button>: ''}
 
             <LiquidGlassButton
               className="text-white gap-2 text-center px-4 py-2 h-10 flex items-center justify-center"
@@ -400,15 +400,14 @@ const Schedule = () => {
 
         <div className="flex flex-row gap-3 mt-4 text-white relative">
           {/* Filter */}
-          <motion.button
+        {scheduleData.length>0?  <motion.button
             onClick={() => setShowFilterPopup(!showFilterPopup)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-[#3D3555] border-t border-[#9B7EDE]/20 rounded-full flex gap-2 font-Inter text-sm items-center px-4 py-2"
           >
             <FilterIcon /> {t.filterButton}
-          </motion.button>
-
+          </motion.button>:""}
 
           <AnimatePresence>
             {showFilterPopup && (
@@ -451,7 +450,7 @@ const Schedule = () => {
         </div>
       </div>
 
-      {/* ── Add session modal (original SessionForm, unchanged) ── */}
+      {/* ── Add task modal ── */}
       <AnimatePresence>
         {showAddSessionPopup && (
           <SessionForm setShowAddSessionPopup={setShowAddSessionPopup} />
@@ -477,57 +476,92 @@ const Schedule = () => {
 
       <ScheduleSummary />
 
-      {/* ── Weekly grid ── */}
-      <div className="bg-[#3D3555]/60 p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-12 overflow-x-auto">
-        <p className="text-2xl font-semibold mb-8">{t.weeklySchedule}</p>
-
-        <div className="flex gap-2 min-w-[1000px] lg:min-w-0">
-          {/* Time ruler — fixed width on the left */}
-          <TimeRuler
-            HOUR_TICKS={HOUR_TICKS}
-            GRID_HEIGHT={GRID_HEIGHT}
-            hourToPx={hourToPx}
-            fmtHourLabel={fmtHourLabel}
-          />
-
-          <LayoutGroup>
-            <div className="grid grid-cols-7 gap-3 flex-1">
-              {days.map((day) => {
-                // Apply subject filter for display only.
-                // We still pass allSessions for overlap checking.
-                const daySessions = scheduleData[day].filter(
-                  (s) => filterSubject === "All" || s.subject === filterSubject
-                );
-
-                return (
-                  <DayColumn
-                    key={day}
-                    day={day}
-                    lang={lang}
-                    t={t}
-                    sessions={daySessions}
-                    isEditMode={isEditMode}
-                    dragOverDay={dragOverDay}
-                    setDragOverDay={setDragOverDay}
-                    onDrop={handleDrop}
-                    onEditSession={(day, session) => setEditingSession({ day, session })}
-                    dayLabelsAr={dayLabelsAr}
-                    parseTimeToHours={parseTimeToHours}
-                    parseDurationToHours={parseDurationToHours}
-                    hourToPx={hourToPx}
-                    pxToSnappedHour={pxToSnappedHour}
-                    GRID_HEIGHT={GRID_HEIGHT}
-                    HALF_TICKS={HALF_TICKS}
-                    HOUR_HEIGHT_PX={HOUR_HEIGHT_PX}
-                  />
-                );
-              })}
+      {isScheduleEmpty ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-12 rounded-[32px] border border-white/10 bg-[#1F1737]/80 p-10 shadow-[0_30px_80px_rgba(0,0,0,0.25)] backdrop-blur-2xl"
+        >
+          <div className="flex flex-col lg:flex-row gap-8 items-center">
+            <div className="flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-br from-[#9B7EDE]/20 to-[#52466B]/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#7C5FBD] text-2xl text-white shadow-lg shadow-[#7C5FBD]/30">
+                <CalendarDays/>
+              </div>
             </div>
-          </LayoutGroup>
-        </div>
-      </div>
+            <div className="flex-1 space-y-4">
+              <div>
+                <p className="text-3xl font-semibold text-white">Your schedule is empty</p>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#B8A7E5]">
+                  Add sessions to visualize your week or use smart schedule generation to bootstrap a study plan automatically.
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-center sm:flex-row sm:justify-start gap-3">
+                <motion.button
+                  onClick={() => setShowAddSessionPopup(true)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-full bg-[#9B7EDE] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#9B7EDE]/20 w-auto"
+                >
+                  Add First Task
+                </motion.button>
+                <LiquidGlassButton
+                  className="h-12 px-5 py-3 text-white gap-2 text-sm w-auto"
+                  icon={Bot}
+                  
+                >
+                  Generate Schedule
+                </LiquidGlassButton>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        <div className="bg-[#3D3555]/60 relative p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-12 overflow-x-auto">
+          <p className="text-2xl font-semibold mb-8">{t.weeklySchedule}</p>
+          <div className="flex gap-2 min-w-[1000px] lg:min-w-0">
+            {/* Time ruler — fixed width on the left */}
+            <TimeRuler
+              HOUR_TICKS={HOUR_TICKS}
+              GRID_HEIGHT={GRID_HEIGHT}
+              hourToPx={hourToPx}
+              fmtHourLabel={fmtHourLabel}
+            />
 
-      {/* ── Pro Tip ── */}
+            <LayoutGroup>
+              <div className="grid grid-cols-7 gap-3 flex-1">
+                {days.map((day) => {
+                  const daySessions = scheduleData[day].filter(
+                    (s) => filterSubject === "All" || s.subject === filterSubject
+                  );
+
+                  return (
+                    <DayColumn
+                      key={day}
+                      day={day}
+                      lang={lang}
+                      t={t}
+                      sessions={daySessions}
+                      isEditMode={isEditMode}
+                      dragOverDay={dragOverDay}
+                      setDragOverDay={setDragOverDay}
+                      onDrop={handleDrop}
+                      onEditSession={(day, session) => setEditingSession({ day, session })}
+                      dayLabelsAr={dayLabelsAr}
+                      parseTimeToHours={parseTimeToHours}
+                      parseDurationToHours={parseDurationToHours}
+                      hourToPx={hourToPx}
+                      pxToSnappedHour={pxToSnappedHour}
+                      GRID_HEIGHT={GRID_HEIGHT}
+                      HALF_TICKS={HALF_TICKS}
+                      HOUR_HEIGHT_PX={HOUR_HEIGHT_PX}
+                    />
+                  );
+                })}
+              </div>
+            </LayoutGroup>
+          </div>
+        </div>
+      )}
       <div className="border-t flex flex-col lg:flex-row font-Inter text-white items-center gap-4 rounded-[24px] p-6 border-[#9B7EDE]/30 mt-8 mb-16 bg-gradient-to-br from-[#9B7EDE]/10 to-transparent">
         <TipBackgroundIcon />
         <div className="flex flex-col gap-1">

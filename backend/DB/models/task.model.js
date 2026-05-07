@@ -16,6 +16,7 @@ const taskSchema=new mongoose.Schema({
         enum:["ongoing","completed"],
         default:"ongoing"
     },
+    name:{type:String,required:true},
     // This the due date for the task not the session ! (eg. Calculus )
     dueDate:{
         type:Date,
