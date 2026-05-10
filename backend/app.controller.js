@@ -12,6 +12,7 @@ import cookieParser from "cookie-parser";
 import limiter from "./middleware/rateLimiter.js";
 import chatRouter from "./modules/chat/chat.route.js";
 import sessionRouter from "./modules/sessions/session.route.js";
+import taskRouter from "./modules/task/task.routes.js"
 
 const bootstrap = async (app, express) => {
   // 1. Body parsers
@@ -39,6 +40,7 @@ const bootstrap = async (app, express) => {
   app.use(limiter);
 
   // 5. Routes
+  
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/user", userRouter);
   app.use("/api/v1/subjects", subjectRouter);
@@ -46,6 +48,7 @@ const bootstrap = async (app, express) => {
   app.use("/api/v1/friends", friendsRouter);
   app.use("/api/v1/notifications",notificationRouter)
   app.use('/api/v1/sessions',sessionRouter)
+  app.use("/api/v1/tasks",taskRouter)
 
   // 6. Error handling (last)
   app.use(errorHandler);
