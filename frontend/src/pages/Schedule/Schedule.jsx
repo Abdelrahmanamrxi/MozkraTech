@@ -1,396 +1,397 @@
 /* eslint-disable no-unused-vars */
-import Body from "../../comp/layout/Body";
 import { FilterIcon, TipBackgroundIcon } from "../../comp/ui/Icons";
-import { PlusIcon,Bot, CalendarDays } from "lucide-react";
+import { PlusIcon, Bot, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import ScheduleSummary from "./sections/ScheduleSummary";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import SessionForm from "./sections/SessionForm/SessionForm";
 import { useTranslation } from "react-i18next";
 import DayColumn from "./DayColumn";
 import TimeRuler from "./TimeRuler";
 import EditSessionModal from "./EditSessionModal";
-import LiquidGlassButton from "@/comp/ui/LiquidGlassButton"
+import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
+import { dayLabelsAr,labelsMap,DAY_NAMES,DAY_SHORT,DAY_SHORT_AR
+  ,TODAY,MIN_WEEK_START,getWeekStart,MAX_WEEK_START,getWeekDates,
+  dateKey,TODAY_KEY,fmtFullDate,fmtMonthYear,SESSION_COLORS
+ } from "./utils/utility";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GRID CONFIG
-// These three constants control the entire time grid layout.
-//
-//   TIME_START_HOUR  – first hour shown on the ruler (7 = 7 AM)
-//   TIME_END_HOUR    – last  hour shown on the ruler (22 = 10 PM)
-//   HOUR_HEIGHT_PX   – how tall one hour is in pixels.
-//                      A 2-hour session will be exactly 2 × HOUR_HEIGHT_PX tall,
-//                      so it spans from its start-line to the line 2 rows below it.
-//                      (e.g. 8 AM line → 10 AM line = 3 visible lines, 2 rows apart)
-//   SNAP_MINUTES     – drag snaps to this interval (30 = snap to :00 or :30)
-// ─────────────────────────────────────────────────────────────────────────────
-const TIME_START_HOUR = 8; 
-const TIME_END_HOUR   = 24;
-const HOUR_HEIGHT_PX  = 80;   // 1 hr = 80 px  →  2 hr card = 160 px (spans 3 lines)
-const SNAP_MINUTES    = 30;
+import { TIME_START_HOUR,TIME_END_HOUR,parseTimeToHours,parseDurationToHours
+  ,hoursToTimeString,HOUR_TICKS,HALF_TICKS,GRID_HEIGHT,pxToSnappedHour,hourToPx,HOUR_HEIGHT_PX
+  ,fmtHourLabel
+ } from "./utils/timeUtility";
 
-const TOTAL_HOURS = TIME_END_HOUR - TIME_START_HOUR;      // 15 hours total
-const GRID_HEIGHT = TOTAL_HOURS * HOUR_HEIGHT_PX;         // total column height in px
-
-// One tick every 30 minutes for the grid lines inside each column.
-const HALF_TICKS = Array.from(
-  { length: TOTAL_HOURS * 2 + 1 },
-  (_, i) => TIME_START_HOUR + i * 0.5
-);
-// Subset: whole-hour ticks used by the left ruler labels.
-const HOUR_TICKS = HALF_TICKS.filter((h) => Number.isInteger(h));
-
-// Available colours a session can have (shown in the edit modal colour picker).
-const SESSION_COLORS = [
-  "bg-[#9B7EDE]",
-  "bg-[#7C5FBD]",
-  "bg-[#52466B]",
-  "bg-[#C084FC]",
-  "bg-[#818CF8]",
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TIME UTILITIES
-// Pure functions – no side effects, easy to unit-test.
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * "9:30 AM" or "1:00 PM"  →  fractional 24-hour number (9.5 or 13.0).
- * Used to convert a session's time string into a number we can do maths on.
- */
-function parseTimeToHours(str = "") {
-  const m = str.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!m) return TIME_START_HOUR;
-  let h = parseInt(m[1], 10);
-  const min = parseInt(m[2], 10);
-  const mer = m[3].toUpperCase();
-  if (mer === "PM" && h !== 12) h += 12;
-  if (mer === "AM" && h === 12) h = 0;
-  return h + min / 60;
-}
-
-/**
- * "2h" | "1.5h" | "90m"  →  float number of hours (2, 1.5, 1.5).
- * Accepts any combination of hours and minutes.
- */
-function parseDurationToHours(str = "") {
-  const h = str.match(/([\d.]+)h/i);
-  const m = str.match(/([\d.]+)m/i);
-  return (h ? parseFloat(h[1]) : 0) + (m ? parseFloat(m[1]) / 60 : 0) || 1;
-}
-
-/**
- * Fractional 24-hour number  →  top-offset in pixels from the top of the grid.
- * Example: hour 9.5 (9:30 AM) with TIME_START_HOUR=7 and HOUR_HEIGHT_PX=80:
- *   (9.5 - 7) × 80 = 200 px from the top.
- */
-function hourToPx(hour) {
-  return (hour - TIME_START_HOUR) * HOUR_HEIGHT_PX;
-}
-
-/**
- * Raw pixel offset from grid top  →  fractional 24-hour, snapped to SNAP_MINUTES.
- * Used during drag-over to compute the preview line and final drop position.
- */
-function pxToSnappedHour(px) {
-  const raw     = TIME_START_HOUR + px / HOUR_HEIGHT_PX;
-  const step    = SNAP_MINUTES / 60;                         // 0.5 for 30-min snap
-  const snapped = Math.round(raw / step) * step;
-  // clamp so the card can't start after the last hour minus one step
-  return Math.max(TIME_START_HOUR, Math.min(TIME_END_HOUR - step, snapped));
-}
-
-/**
- * Fractional 24-hour  →  "8:00 AM" label string (used by the ruler).
- */
-function fmtHourLabel(h) {
-  const h12  = h % 12 === 0 ? 12 : h % 12;
-  const ampm = h < 12 ? "AM" : "PM";
-  return `${h12}:00 ${ampm}`;
-}
-
-/**
- * Fractional 24-hour  →  "8:30 AM" card time string.
- * This is the inverse of parseTimeToHours and is used to write the new time
- * back to the session object after a drag.
- */
-function hoursToTimeString(h) {
-  const hour24 = Math.floor(h);
-  const mins   = Math.round((h - hour24) * 60);
-  const ampm   = hour24 < 12 ? "AM" : "PM";
-  const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
-  return `${hour12}:${String(mins).padStart(2, "0")} ${ampm}`;
-}
-
+// 
 // ─────────────────────────────────────────────────────────────────────────────
 // OVERLAP DETECTION
 // ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Returns true if placing `candidate` in `sessions` would cause a time overlap
- * with any existing session (excluding the session whose id === excludeId,
- * so a card being moved doesn't collide with its own old position).
- *
- * Two sessions overlap when one starts before the other ends:
- *   aStart < bEnd  &&  aEnd > bStart
- */
 function wouldOverlap(sessions, candidate, excludeId = null) {
   const cStart = parseTimeToHours(candidate.time);
   const cEnd   = cStart + parseDurationToHours(candidate.duration);
-
   return sessions
-    .filter((s) => s.id !== excludeId)          // ignore the card being moved
+    .filter((s) => s.id !== excludeId)
     .some((s) => {
       const sStart = parseTimeToHours(s.time);
       const sEnd   = sStart + parseDurationToHours(s.duration);
-      // standard interval-overlap test
       return cStart < sEnd && cEnd > sStart;
     });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// INITIAL DATA
+// SEED DATA — places sample sessions on the current week's actual dates
 // ─────────────────────────────────────────────────────────────────────────────
+function buildInitialData() {
+  const ws = getWeekStart(TODAY);
+  const perDay = {
+    Monday:    [
+      { id:"monday-1",    time:"8:00 AM",  subject:"Data Structures",     duration:"2h",   color:"bg-[#9B7EDE]" },
+      { id:"monday-2",    time:"11:00 AM", subject:"Web Development",      duration:"1.5h", color:"bg-[#7C5FBD]" },
+    ],
+    Tuesday:   [
+      { id:"tuesday-1",   time:"9:00 AM",  subject:"Algorithm Design",     duration:"2h",   color:"bg-[#9B7EDE]" },
+      { id:"tuesday-2",   time:"1:00 PM",  subject:"Database Systems",     duration:"2h",   color:"bg-[#7C5FBD]" },
+    ],
+    Wednesday: [
+      { id:"wednesday-1", time:"8:00 AM",  subject:"Computer Networks",    duration:"2h",   color:"bg-[#9B7EDE]" },
+      { id:"wednesday-2", time:"12:00 PM", subject:"English Literature",   duration:"1h",   color:"bg-[#7C5FBD]" },
+      { id:"wednesday-3", time:"3:00 PM",  subject:"Project Work",         duration:"2h",   color:"bg-[#52466B]" },
+    ],
+    Thursday:  [
+      { id:"thursday-1",  time:"10:00 AM", subject:"Software Engineering", duration:"2h",   color:"bg-[#9B7EDE]" },
+      { id:"thursday-2",  time:"2:00 PM",  subject:"Mathematics",          duration:"1.5h", color:"bg-[#7C5FBD]" },
+    ],
+    Friday:    [
+      { id:"friday-1",    time:"9:00 AM",  subject:"Operating Systems",    duration:"2h",   color:"bg-[#9B7EDE]" },
+      { id:"friday-2",    time:"1:00 PM",  subject:"Group Study",          duration:"2h",   color:"bg-[#52466B]" },
+    ],
+    Saturday:  [],
+    Sunday:    [
+      { id:"sunday-1",    time:"11:00 AM", subject:"Self Study",           duration:"2h",   color:"bg-[#52466B]" },
+    ],
+  };
+  const out = {};
+  DAY_NAMES.forEach((name, i) => {
+    const d = new Date(ws);
+    d.setDate(d.getDate() + i);
+    out[dateKey(d)] = perDay[name] || [];
+  });
+  return out;
+}
 
-const initialScheduleData = {
-  Monday: [
-    { id: "monday-1",    time: "8:00 AM",  subject: "Data Structures",     duration: "2h",   color: "bg-[#9B7EDE]" },
-    { id: "monday-2",    time: "11:00 AM", subject: "Web Development",      duration: "1.5h", color: "bg-[#7C5FBD]" },
-  ],
-  Tuesday: [
-    { id: "tuesday-1",   time: "9:00 AM",  subject: "Algorithm Design",     duration: "2h",   color: "bg-[#9B7EDE]" },
-    { id: "tuesday-2",   time: "1:00 PM",  subject: "Database Systems",     duration: "2h",   color: "bg-[#7C5FBD]" },
-  ],
-  Wednesday: [
-    { id: "wednesday-1", time: "8:00 AM",  subject: "Computer Networks",    duration: "2h",   color: "bg-[#9B7EDE]" },
-    { id: "wednesday-2", time: "12:00 PM", subject: "English Literature",   duration: "1h",   color: "bg-[#7C5FBD]" },
-    { id: "wednesday-3", time: "3:00 PM",  subject: "Project Work",         duration: "2h",   color: "bg-[#52466B]" },
-  ],
-  Thursday: [
-    { id: "thursday-1",  time: "10:00 AM", subject: "Software Engineering", duration: "2h",   color: "bg-[#9B7EDE]" },
-    { id: "thursday-2",  time: "2:00 PM",  subject: "Mathematics",          duration: "1.5h", color: "bg-[#7C5FBD]" },
-  ],
-  Friday: [
-    { id: "friday-1",    time: "9:00 AM",  subject: "Operating Systems",    duration: "2h",   color: "bg-[#9B7EDE]" },
-    { id: "friday-2",    time: "1:00 PM",  subject: "Group Study",          duration: "2h",   color: "bg-[#52466B]" },
-  ],
-  Saturday: [],
-  Sunday: [
-    { id: "sunday-1",    time: "11:00 AM", subject: "Self Study",           duration: "2h",   color: "bg-[#52466B]" },
-  ],
-};
-
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// i18n LABELS
-// Add a new key to both "en" and "ar" whenever you need a new translatable string.
+// TODAY BANNER  — always anchored to real today, shown above the grid
 // ─────────────────────────────────────────────────────────────────────────────
+const TodayBanner = ({ sessionCount, t, lang, isCurrentWeek }) => {
+  const locale  = lang === "ar" ? "ar-EG" : "en-US";
+  const dateStr = fmtFullDate(TODAY, locale);
 
-const labelsMap = {
-  en: {
-    pageTitle:      "My Schedule",
-    pageSubtitle:   "Plan and manage your study sessions",
-    filterButton:   "Filter",
-    editSchedule:   "Edit",
-    confirmSchedule:"Confirm",
-    editHint:       "Click Edit to move sessions.",
-    filterHeader:   "Filter by Subject",
-    addSession:     "Add Task",
-    weeklySchedule: "Weekly Schedule",
-    noSessions:     "No sessions scheduled",
-    proTip:         "Pro Tip",
-    proTipText:     "Schedule your most challenging subjects during your peak productivity hours. Most students perform best in the morning (8–11 AM) or late afternoon (3–5 PM).",
-    all:            "All",
-    editSession:    "Edit Session",
-    subject:        "Subject",
-    time:           "Time",
-    duration:       "Duration",
-    cancel:         "Cancel",
-    confirm:        "Confirm",
-    overlapError:   "That time slot overlaps another session.",
-  },
-  ar: {
-    pageTitle:      "جدولي",
-    pageSubtitle:   "نظم جلسات مذاكرتك وخطط ليها",
-    filterButton:   "فلتر",
-    editSchedule:   "تعديل",
-    confirmSchedule:"تأكيد",
-    editHint:       "اضغط تعديل لتحريك الجلسات.",
-    filterHeader:   "فلتر بالمادة",
-    addSession:     "ضيف مهمة",
-    weeklySchedule: "جدول الأسبوع",
-    noSessions:     "مفيش جلسات",
-    proTip:         "نصيحة",
-    proTipText:     "حاول تحط أصعب المواد في ساعات النشاط بتاعتك.",
-    all:            "الكل",
-    editSession:    "تعديل الجلسة",
-    subject:        "المادة",
-    time:           "الوقت",
-    duration:       "المدة",
-    cancel:         "إلغاء",
-    confirm:        "تأكيد",
-    overlapError:   "هذا الوقت متداخل مع جلسة تانية.",
-  },
-};
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="flex justify-center  mb-5"
+    >
+      <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#9B7EDE]/12 border border-[#9B7EDE]/25 backdrop-blur-sm flex-wrap justify-center">
+        {/* Live pulse */}
+        <span className="relative flex h-2 w-2 flex-shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9B7EDE] opacity-60" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C084FC]" />
+        </span>
 
-const dayLabelsAr = {
-  Monday:"الاثنين", Tuesday:"الثلاثاء", Wednesday:"الأربعاء",
-  Thursday:"الخميس", Friday:"الجمعة", Saturday:"السبت", Sunday:"الأحد",
+        <span className="text-[#C084FC] text-[10px] font-extrabold uppercase tracking-widest">
+          {t.today}
+        </span>
+
+        <span className="w-px h-3 bg-white/20 flex-shrink-0 hidden sm:block" />
+
+        <span className="text-white/80 text-xs font-medium">{dateStr}</span>
+
+        {isCurrentWeek && sessionCount > 0 && (
+          <>
+            <span className="w-px h-3 bg-white/20 flex-shrink-0 hidden sm:block" />
+            <span className="text-[#B8A7E5] text-[11px]">{sessionCount} {t.sessions}</span>
+          </>
+        )}
+      </div>
+    </motion.div>
+  );
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EDIT SESSION MODAL
-// Opens when the user clicks the pencil icon on any session card.
+// WEEK NAVIGATION BAR  — prev / next week arrows + month label + "Today" jump
+// ─────────────────────────────────────────────────────────────────────────────
+const WeekNav = ({ weekStart, onPrev, onNext, onToday, canPrev, canNext, isCurrentWeek, t, lang }) => {
+  const locale    = lang === "ar" ? "ar-EG" : "en-US";
+  const weekDates = getWeekDates(weekStart);
+
+  // Label: "May 2026" or "Apr – May 2026" when week spans two months
+  const startLabel = weekDates[0].toLocaleDateString(locale, { month:"short", day:"numeric" });
+  const endLabel   = weekDates[6].toLocaleDateString(locale, { month:"short", day:"numeric", year:"numeric" });
+  const label      = `${startLabel} – ${endLabel}`;
+
+  return (
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* Prev week */}
+      <motion.button
+        onClick={onPrev}
+        disabled={!canPrev}
+        whileHover={canPrev ? { scale: 1.1 } : {}}
+        whileTap={canPrev ? { scale: 0.9 } : {}}
+        className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-150 flex-shrink-0 ${
+          canPrev
+            ? "border-[#9B7EDE]/35 bg-[#3D3555]/60 text-[#B8A7E5] hover:bg-[#9B7EDE]/20 hover:text-white hover:border-[#9B7EDE]/55 cursor-pointer"
+            : "border-white/6 text-white/12 cursor-not-allowed"
+        }`}
+      >
+        <ChevronLeft size={14} />
+      </motion.button>
+
+      {/* Date range label */}
+      <span className="text-white/75 text-xs sm:text-sm font-medium select-none min-w-[150px] text-center">
+        {label}
+      </span>
+
+      {/* Next week */}
+      <motion.button
+        onClick={onNext}
+        disabled={!canNext}
+        whileHover={canNext ? { scale: 1.1 } : {}}
+        whileTap={canNext ? { scale: 0.9 } : {}}
+        className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-150 flex-shrink-0 ${
+          canNext
+            ? "border-[#9B7EDE]/35 bg-[#3D3555]/60 text-[#B8A7E5] hover:bg-[#9B7EDE]/20 hover:text-white hover:border-[#9B7EDE]/55 cursor-pointer"
+            : "border-white/6 text-white/12 cursor-not-allowed"
+        }`}
+      >
+        <ChevronRight size={14} />
+      </motion.button>
+
+      {/* Jump to today — only when viewing a different week */}
+      <AnimatePresence>
+        {!isCurrentWeek && (
+          <motion.button
+            key="today-jump"
+            initial={{ opacity: 0, scale: 0.85, x: -4 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.85, x: -4 }}
+            onClick={onToday}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-[10px] sm:text-[11px] font-bold px-3 py-1.5 rounded-full bg-[#9B7EDE]/20 border border-[#9B7EDE]/40 text-[#C084FC] hover:bg-[#9B7EDE]/35 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+          >
+            ↩ {t.today}
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DAY COLUMN HEADER  — day abbreviation + date number circle
+// ─────────────────────────────────────────────────────────────────────────────
+const DayHeader = ({ date, dayName, isToday, lang }) => {
+  const shortMap  = lang === "ar" ? DAY_SHORT_AR : DAY_SHORT;
+  const dayNum    = date.getDate();
+  const isWeekend = dayName === "Saturday" || dayName === "Sunday";
+
+  return (
+    <div className={`flex flex-col items-center gap-1 pb-2.5 ${isWeekend ? "opacity-55" : ""}`}>
+      <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${isToday ? "text-[#C084FC]" : "text-white/40"}`}>
+        {shortMap[dayName]}
+      </span>
+      <span
+        className={`
+          flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full
+          text-xs sm:text-sm font-bold transition-all select-none
+          ${isToday
+            ? "bg-[#9B7EDE] text-white shadow-lg shadow-[#9B7EDE]/55 ring-2 ring-[#C084FC]/35"
+            : "text-white/65 hover:bg-white/8"
+          }
+        `}
+      >
+        {dayNum}
+      </span>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WEEK DOT SCRUBBER  — clickable dots showing ±4 weeks around today
+// ─────────────────────────────────────────────────────────────────────────────
+const WeekScrubber = ({ currentWeekStart, weekStart, setWeekStart }) => {
+  const offsets = Array.from({ length: 9 }, (_, i) => i - 4); // -4 … +4
+
+  return (
+    <div className="flex justify-center items-center gap-1.5 mt-5 pt-4 border-t border-white/6">
+      {offsets.map((offset) => {
+        const ws = new Date(currentWeekStart);
+        ws.setDate(ws.getDate() + offset * 7);
+        if (ws.getTime() < MIN_WEEK_START.getTime()) return null;
+        if (ws.getTime() > MAX_WEEK_START.getTime()) return null;
+
+        const isSelected    = ws.getTime() === weekStart.getTime();
+        const isThisWeek    = offset === 0;
+        const label = ws.toLocaleDateString("en-US", { month:"short", day:"numeric" });
+
+        return (
+          <button
+            key={offset}
+            onClick={() => setWeekStart(new Date(ws))}
+            title={label}
+            className={`rounded-full transition-all duration-200 cursor-pointer ${
+              isSelected
+                ? isThisWeek
+                  ? "w-5 h-2 bg-[#9B7EDE]"
+                  : "w-5 h-2 bg-[#7C5FBD]"
+                : isThisWeek
+                ? "w-2 h-2 bg-[#9B7EDE]/45 hover:bg-[#9B7EDE]/75 ring-1 ring-[#9B7EDE]/50"
+                : "w-2 h-2 bg-white/15 hover:bg-white/35"
+            }`}
+          />
+        );
+      }).filter(Boolean)}
+    </div>
+  );
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SCHEDULE  (root component)
-// Owns all schedule data state and the two callbacks that mutate it:
-//   handleDrop    — drag-and-drop (move / retime a session)
-//   handleEdit    — confirm edits from EditSessionModal
-// Everything else is passed down as props.
 // ─────────────────────────────────────────────────────────────────────────────
 const Schedule = () => {
-  // The full week of sessions, keyed by day name.
-  const [scheduleData, setScheduleData] = useState(() => Object.fromEntries(days.map((day) => [day, []])));
-
-  // Which day column is currently  during a drag (or null).
-  const [dragOverDay, setDragOverDay] = useState(null);
-
-  // { day, session } of the session being edited, or null when no modal is open.
-  const [editingSession, setEditingSession] = useState(null);
+  // Sessions keyed by "YYYY-MM-DD"
+  const [scheduleData,        setScheduleData]        = useState(() => buildInitialData());
+  const [dragOverDay,         setDragOverDay]         = useState(null);
+  const [editingSession,      setEditingSession]      = useState(null);
   const [showFilterPopup,     setShowFilterPopup]     = useState(false);
   const [showAddSessionPopup, setShowAddSessionPopup] = useState(false);
   const [filterSubject,       setFilterSubject]       = useState("All");
   const [isEditMode,          setIsEditMode]          = useState(false);
 
+  // Current visible week (Monday of that week)
+  const [weekStart, setWeekStart] = useState(() => getWeekStart(TODAY));
+
   const { i18n } = useTranslation();
   const lang = i18n.language === "ar" ? "ar" : "en";
   const t    = labelsMap[lang];
-  const isScheduleEmpty = days.every((day) => (scheduleData[day] || []).length === 0);
 
-  // ── Drop handler ──────────────────────────────────────────────────────────
+  // Derived values
+  const weekDates        = useMemo(() => getWeekDates(weekStart), [weekStart]);
+  const currentWeekStart = useMemo(() => getWeekStart(TODAY), []);
+  const isCurrentWeek    = weekStart.getTime() === currentWeekStart.getTime();
+  const canPrev          = weekStart.getTime() > MIN_WEEK_START.getTime();
+  const canNext          = weekStart.getTime() < MAX_WEEK_START.getTime();
+  const todaySessionCount = (scheduleData[TODAY_KEY] || []).length;
+  const isScheduleEmpty  = Object.values(scheduleData).every((arr) => arr.length === 0);
 
-  /**
-   * Called by DayColumn when a card is dropped.
-   *
-   * @param {DragEvent}  event
-   * @param {string}     toDay        — destination day column
-   * @param {number|null} targetIndex — index of the card dropped onto (or null)
-   * @param {number}     snappedHour  — cursor Y converted to a snapped 24-h float
-   */
-  const handleDrop = (event, toDay, targetIndex = null, snappedHour = null) => {
-   
+  // ── Week navigation ───────────────────────────────────────────────────────
+  const goToPrevWeek = useCallback(() => {
+    if (!canPrev) return;
+    setWeekStart((prev) => {
+      const d = new Date(prev);
+      d.setDate(d.getDate() - 7);
+      return d.getTime() < MIN_WEEK_START.getTime() ? new Date(MIN_WEEK_START) : d;
+    });
+  }, [canPrev]);
+
+  const goToNextWeek = useCallback(() => {
+    if (!canNext) return;
+    setWeekStart((prev) => {
+      const d = new Date(prev);
+      d.setDate(d.getDate() + 7);
+      return d.getTime() > MAX_WEEK_START.getTime() ? new Date(MAX_WEEK_START) : d;
+    });
+  }, [canNext]);
+
+  const goToToday = useCallback(() => setWeekStart(getWeekStart(TODAY)), []);
+
+  // ── Drop handler — dateKeys replace day names ─────────────────────────────
+  const handleDrop = useCallback((event, toDateKey, targetIndex = null, snappedHour = null) => {
     event.preventDefault();
     const raw = event.dataTransfer.getData("application/json");
     if (!raw) return;
-
     try {
-      const { fromDay, sourceIndex } = JSON.parse(raw);
-
+      const { fromDay: fromDateKey, sourceIndex } = JSON.parse(raw);
       setScheduleData((prev) => {
         const next       = { ...prev };
-        const sourceList = [...next[fromDay]];
+        const sourceList = [...(next[fromDateKey] || [])];
         const movedItem  = { ...sourceList[sourceIndex] };
 
-        if (fromDay === toDay) {
-          // ── SAME-DAY DRAG: update time, keep everything else ─────────────
-          // Resolve the new start time from the cursor Y (snappedHour).
-          // If the user dropped on top of another card, use that card's start
-          // time as the anchor instead of the raw cursor position.
+        if (fromDateKey === toDateKey) {
           let newHour = snappedHour ?? parseTimeToHours(movedItem.time);
           if (targetIndex !== null && targetIndex !== sourceIndex) {
-            newHour = parseTimeToHours(next[toDay][targetIndex].time);
+            newHour = parseTimeToHours((next[toDateKey] || [])[targetIndex]?.time ?? movedItem.time);
           }
-
           const updated = { ...movedItem, time: hoursToTimeString(newHour) };
-
-          // ── Overlap guard ──
-          // Don't commit the move if it would collide with another session.
-          if (wouldOverlap(next[fromDay], updated, movedItem.id)) return prev;
-
-          const list = [...next[fromDay]];
+          if (wouldOverlap(next[fromDateKey], updated, movedItem.id)) return prev;
+          const list = [...(next[fromDateKey] || [])];
           list[sourceIndex] = updated;
-          next[fromDay] = list;
-
+          next[fromDateKey] = list;
         } else {
-          // ── CROSS-DAY DRAG: move card to a different day ─────────────────
           sourceList.splice(sourceIndex, 1);
-          const destList = [...next[toDay]];
-
-          const updated = snappedHour
+          const destList = [...(next[toDateKey] || [])];
+          const updated  = snappedHour
             ? { ...movedItem, time: hoursToTimeString(snappedHour) }
             : movedItem;
-
           if (targetIndex !== null) {
-            // Swap the dragged card with the card it was dropped on.
             const [targetItem] = destList.splice(targetIndex, 1, updated);
             sourceList.splice(sourceIndex, 0, targetItem);
           } else {
-            // ── Overlap guard ──
             if (wouldOverlap(destList, updated)) return prev;
             destList.push(updated);
           }
-
-          next[fromDay] = sourceList;
-          next[toDay]   = destList;
+          next[fromDateKey] = sourceList;
+          next[toDateKey]   = destList;
         }
-
         return next;
       });
     } catch (err) {
       console.error("Drop error:", err);
     }
-  };
+  }, []);
 
   // ── Edit handler ──────────────────────────────────────────────────────────
-
-  /**
-   * Called when the user confirms an edit in EditSessionModal.
-   * Replaces the old session object with the updated one in-place.
-   */
-  const handleEdit = (updatedSession) => {
-    const { day } = editingSession;
+  const handleEdit = useCallback((updatedSession) => {
+    const { dateKey: dk } = editingSession;
     setScheduleData((prev) => ({
       ...prev,
-      [day]: prev[day].map((s) =>
+      [dk]: (prev[dk] || []).map((s) =>
         s.id === updatedSession.id ? updatedSession : s
       ),
     }));
     setEditingSession(null);
-  };
-  
-  // ── Render ────────────────────────────────────────────────────────────────
+  }, [editingSession]);
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────
   return (
-    <section className="min-h-screen p-7 lg:p-14 pt-12 lg:pt-20">
+    <section className="min-h-screen p-4 sm:p-7 lg:p-14 pt-10 lg:pt-20">
 
       {/* ── Page header ── */}
       <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
         <div className="flex flex-col font-Inter gap-2">
-          <p className="text-3xl font-semibold text-white">{t.pageTitle}</p>
+          <p className="text-2xl sm:text-3xl font-semibold text-white">{t.pageTitle}</p>
           <p className="text-xs text-[#B8A7E5]">{t.pageSubtitle}</p>
-
-          <div className="flex flex-row gap-3 items-center mt-3">
-            {/* Edit / Confirm */}
-           {scheduleData.length>0? <motion.button
-              onClick={() => {
-                if (isEditMode) {
-                  setEditingSession(null);
-                  setDragOverDay(null);
-                }
-                setIsEditMode((prev) => !prev);
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`rounded-full cursor-pointer gap-2 font-Inter text-sm items-center px-6 py-2 h-10 transition-colors border border-white/10 ${
-                isEditMode ? "bg-[#7C5FBD] text-white" : "bg-[#3D3555] text-white"
-              }`}
-            >
-              {isEditMode ? t.confirmSchedule : t.editSchedule}
-            </motion.button>: ''}
-
+          <div className="flex flex-row gap-3 items-center mt-3 flex-wrap">
+            {!isScheduleEmpty && (
+              <motion.button
+                onClick={() => {
+                  if (isEditMode) { setEditingSession(null); setDragOverDay(null); }
+                  setIsEditMode((p) => !p);
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`rounded-full cursor-pointer font-Inter text-sm px-5 py-2 h-9 transition-colors border border-white/10 ${
+                  isEditMode ? "bg-[#7C5FBD] text-white" : "bg-[#3D3555] text-white"
+                }`}
+              >
+                {isEditMode ? t.confirmSchedule : t.editSchedule}
+              </motion.button>
+            )}
             <LiquidGlassButton
-              className="text-white gap-2 text-center px-4 py-2 h-10 flex items-center justify-center"
+              className="text-white gap-2 px-4 py-2 h-9 flex items-center justify-center text-sm"
               icon={Bot}
             >
               Generate Schedule
@@ -398,73 +399,65 @@ const Schedule = () => {
           </div>
         </div>
 
-        <div className="flex flex-row gap-3 mt-4 text-white relative">
-          {/* Filter */}
-        {scheduleData.length>0?  <motion.button
-            onClick={() => setShowFilterPopup(!showFilterPopup)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-[#3D3555] border-t border-[#9B7EDE]/20 rounded-full flex gap-2 font-Inter text-sm items-center px-4 py-2"
-          >
-            <FilterIcon /> {t.filterButton}
-          </motion.button>:""}
+        <div className="flex flex-row gap-3 mt-3 text-white relative flex-wrap">
+          {!isScheduleEmpty && (
+            <motion.button
+              onClick={() => setShowFilterPopup(!showFilterPopup)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#3D3555] border-t border-[#9B7EDE]/20 rounded-full flex gap-2 font-Inter text-sm items-center px-4 py-2"
+            >
+              <FilterIcon /> {t.filterButton}
+            </motion.button>
+          )}
 
           <AnimatePresence>
             {showFilterPopup && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-12 left-0 bg-[#2F2844] border border-white/10 rounded-[16px] p-4 w-48 z-50 shadow-2xl"
+                exit={{ opacity: 0, y: -8 }}
+                className="absolute top-12 right-0 sm:right-auto sm:left-0 bg-[#2F2844] border border-white/10 rounded-[16px] p-4 w-48 z-50 shadow-2xl"
               >
                 <div className="space-y-1">
-                  {["All", "Data Structures", "Web Development", "Mathematics", "Algorithm Design"].map(
-                    (subject) => (
-                      <button
-                        key={subject}
-                        onClick={() => { setFilterSubject(subject); setShowFilterPopup(false); }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                          filterSubject === subject
-                            ? "bg-[#9B7EDE] text-white"
-                            : "text-[#B8A7E5] hover:bg-white/5"
-                        }`}
-                      >
-                        {subject === "All" ? t.all : subject}
-                      </button>
-                    )
-                  )}
+                  {["All","Data Structures","Web Development","Mathematics","Algorithm Design"].map((subj) => (
+                    <button
+                      key={subj}
+                      onClick={() => { setFilterSubject(subj); setShowFilterPopup(false); }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                        filterSubject === subj ? "bg-[#9B7EDE] text-white" : "text-[#B8A7E5] hover:bg-white/5"
+                      }`}
+                    >
+                      {subj === "All" ? t.all : subj}
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Add session */}
           <motion.button
             onClick={() => setShowAddSessionPopup(true)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-[#9B7EDE] flex gap-2 items-center px-4 py-2 rounded-full text-sm"
           >
-            <PlusIcon size={18} /> {t.addSession}
+            <PlusIcon size={16} /> {t.addSession}
           </motion.button>
         </div>
       </div>
 
-      {/* ── Add task modal ── */}
+      {/* ── Modals ── */}
       <AnimatePresence>
         {showAddSessionPopup && (
           <SessionForm setShowAddSessionPopup={setShowAddSessionPopup} />
         )}
       </AnimatePresence>
-
-      {/* ── Edit session modal ── */}
       <AnimatePresence>
         {editingSession && (
           <EditSessionModal
             session={editingSession.session}
-            // Pass ALL sessions in that day (not just filtered) so the overlap
-            // check works correctly regardless of the active filter.
-            daysessions={scheduleData[editingSession.day]}
+            daysessions={scheduleData[editingSession.dateKey] || []}
             onConfirm={handleEdit}
             onCancel={() => setEditingSession(null)}
             t={t}
@@ -476,100 +469,173 @@ const Schedule = () => {
 
       <ScheduleSummary />
 
+      {/* ── Empty state ── */}
       {isScheduleEmpty ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-12 rounded-[32px] border border-white/10 bg-[#1F1737]/80 p-10 shadow-[0_30px_80px_rgba(0,0,0,0.25)] backdrop-blur-2xl"
+          className="mt-10 rounded-[32px] border border-white/10 bg-[#1F1737]/80 p-8 sm:p-10 shadow-[0_30px_80px_rgba(0,0,0,0.25)] backdrop-blur-2xl"
         >
           <div className="flex flex-col lg:flex-row gap-8 items-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-br from-[#9B7EDE]/20 to-[#52466B]/10">
-              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#7C5FBD] text-2xl text-white shadow-lg shadow-[#7C5FBD]/30">
-                <CalendarDays/>
+            <div className="flex h-20 w-20 items-center justify-center rounded-[24px] bg-gradient-to-br from-[#9B7EDE]/20 to-[#52466B]/10">
+              <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-[#7C5FBD] text-white shadow-lg shadow-[#7C5FBD]/30">
+                <CalendarDays size={22} />
               </div>
             </div>
             <div className="flex-1 space-y-4">
               <div>
-                <p className="text-3xl font-semibold text-white">Your schedule is empty</p>
+                <p className="text-2xl sm:text-3xl font-semibold text-white">Your schedule is empty</p>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#B8A7E5]">
                   Add sessions to visualize your week or use smart schedule generation to bootstrap a study plan automatically.
                 </p>
               </div>
-              <div className="flex flex-col items-center justify-center sm:flex-row sm:justify-start gap-3">
+              <div className="flex flex-wrap gap-3">
                 <motion.button
                   onClick={() => setShowAddSessionPopup(true)}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="rounded-full bg-[#9B7EDE] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#9B7EDE]/20 w-auto"
+                  className="rounded-full bg-[#9B7EDE] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#9B7EDE]/20"
                 >
                   Add First Task
                 </motion.button>
-                <LiquidGlassButton
-                  className="h-12 px-5 py-3 text-white gap-2 text-sm w-auto"
-                  icon={Bot}
-                  
-                >
+                <LiquidGlassButton className="h-10 px-5 text-white gap-2 text-sm" icon={Bot}>
                   Generate Schedule
                 </LiquidGlassButton>
               </div>
             </div>
           </div>
         </motion.div>
+
       ) : (
-        <div className="bg-[#3D3555]/60 relative p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-12 overflow-x-auto">
-          <p className="text-2xl font-semibold mb-8">{t.weeklySchedule}</p>
-          <div className="flex gap-2 min-w-[1000px] lg:min-w-0">
-            {/* Time ruler — fixed width on the left */}
-            <TimeRuler
-              HOUR_TICKS={HOUR_TICKS}
-              GRID_HEIGHT={GRID_HEIGHT}
-              hourToPx={hourToPx}
-              fmtHourLabel={fmtHourLabel}
+        /* ── Schedule grid ── */
+        <div className="bg-[#3D3555]/60 relative p-4 sm:p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-10">
+
+          {/* Header: "Weekly Schedule" + week nav arrows */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+            <p className="text-xl sm:text-2xl font-semibold">{t.weeklySchedule}</p>
+            <WeekNav
+              weekStart={weekStart}
+              onPrev={goToPrevWeek}
+              onNext={goToNextWeek}
+              onToday={goToToday}
+              canPrev={canPrev}
+              canNext={canNext}
+              isCurrentWeek={isCurrentWeek}
+              t={t}
+              lang={lang}
             />
-
-            <LayoutGroup>
-              <div className="grid grid-cols-7 gap-3 flex-1">
-                {days.map((day) => {
-                  const daySessions = scheduleData[day].filter(
-                    (s) => filterSubject === "All" || s.subject === filterSubject
-                  );
-
-                  return (
-                    <DayColumn
-                      key={day}
-                      day={day}
-                      lang={lang}
-                      t={t}
-                      sessions={daySessions}
-                      isEditMode={isEditMode}
-                      dragOverDay={dragOverDay}
-                      setDragOverDay={setDragOverDay}
-                      onDrop={handleDrop}
-                      onEditSession={(day, session) => setEditingSession({ day, session })}
-                      dayLabelsAr={dayLabelsAr}
-                      parseTimeToHours={parseTimeToHours}
-                      parseDurationToHours={parseDurationToHours}
-                      hourToPx={hourToPx}
-                      pxToSnappedHour={pxToSnappedHour}
-                      GRID_HEIGHT={GRID_HEIGHT}
-                      HALF_TICKS={HALF_TICKS}
-                      HOUR_HEIGHT_PX={HOUR_HEIGHT_PX}
-                    />
-                  );
-                })}
-              </div>
-            </LayoutGroup>
           </div>
+
+          {/* Today banner — always shows real today */}
+          <TodayBanner
+            sessionCount={todaySessionCount}
+            t={t}
+            lang={lang}
+            isCurrentWeek={isCurrentWeek}
+          />
+
+          {/* Grid — horizontal scroll on narrow viewports */}
+          <div className="overflow-x-auto -mx-1 px-1 pb-1">
+            <div className="flex gap-2" style={{ minWidth: "760px" }}>
+
+              <TimeRuler
+                HOUR_TICKS={HOUR_TICKS}
+                GRID_HEIGHT={GRID_HEIGHT}
+                hourToPx={hourToPx}
+                fmtHourLabel={fmtHourLabel}
+              />
+
+              <LayoutGroup>
+                <div className="grid grid-cols-7 gap-2 flex-1">
+                  {weekDates.map((date, i) => {
+                    const dk        = dateKey(date);
+                    const dayName   = DAY_NAMES[i];
+                    const isToday   = dk === TODAY_KEY;
+                    
+
+                    const daySessions = (scheduleData[dk] || []).filter(
+                      (s) => filterSubject === "All" || s.subject === filterSubject
+                    );
+
+                    return (
+                      <div
+                        key={dk}
+                        className={`
+                          relative rounded-[16px] pt-1 transition-all duration-300
+                          ${isToday
+                            ? "ring-2 ring-[#9B7EDE]/50 ring-offset-2 ring-offset-[#3D3555]/60"
+                            : ""
+                          }
+                         
+                        `}
+                      >
+                        {/* Floating "Today" pill above the column */}
+                        {isToday && (
+                          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                            <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider px-2 py-[3px] rounded-full bg-[#9B7EDE] text-white shadow-lg shadow-[#9B7EDE]/50 whitespace-nowrap">
+                              <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                              {t.today}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Day header: abbr + date number */}
+                        <DayHeader
+                          date={date}
+                          dayName={dayName}
+                          isToday={isToday}
+                          lang={lang}
+                        />
+
+                        {/* Time grid column — "day" prop now carries the dateKey */}
+                        <DayColumn
+                          day={dk}
+                          displayDay={dayName}
+                          lang={lang}
+                          t={t}
+                          sessions={daySessions}
+                          isEditMode={isEditMode}
+                          dragOverDay={dragOverDay}
+                          setDragOverDay={setDragOverDay}
+                          onDrop={handleDrop}
+                          onEditSession={(dk, session) =>
+                            setEditingSession({ dateKey: dk, session })
+                          }
+                          dayLabelsAr={dayLabelsAr}
+                          parseTimeToHours={parseTimeToHours}
+                          parseDurationToHours={parseDurationToHours}
+                          hourToPx={hourToPx}
+                          pxToSnappedHour={pxToSnappedHour}
+                          GRID_HEIGHT={GRID_HEIGHT}
+                          HALF_TICKS={HALF_TICKS}
+                          HOUR_HEIGHT_PX={HOUR_HEIGHT_PX}
+                          isToday={isToday}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </LayoutGroup>
+            </div>
+          </div>
+
+          {/* Dot scrubber — shows ±4 weeks around today */}
+          <WeekScrubber
+            currentWeekStart={currentWeekStart}
+            weekStart={weekStart}
+            setWeekStart={setWeekStart}
+          />
         </div>
       )}
-      <div className="border-t flex flex-col lg:flex-row font-Inter text-white items-center gap-4 rounded-[24px] p-6 border-[#9B7EDE]/30 mt-8 mb-16 bg-gradient-to-br from-[#9B7EDE]/10 to-transparent">
+
+      {/* ── Pro tip ── */}
+      <div className="border-t flex flex-col lg:flex-row font-Inter text-white items-start lg:items-center gap-4 rounded-[24px] p-5 sm:p-6 border-[#9B7EDE]/30 mt-8 mb-16 bg-gradient-to-br from-[#9B7EDE]/10 to-transparent">
         <TipBackgroundIcon />
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-lg">{t.proTip}</p>
+          <p className="font-semibold text-base sm:text-lg">{t.proTip}</p>
           <p className="text-xs leading-relaxed text-[#B8A7E5]">{t.proTipText}</p>
         </div>
       </div>
-
     </section>
   );
 };

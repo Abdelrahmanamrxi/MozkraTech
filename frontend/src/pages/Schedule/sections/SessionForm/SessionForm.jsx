@@ -2,18 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Pencil, Check, Clock, Trash2, Plus } from "lucide-react";
+import { X, Pencil, Check, Clock, Trash2, Plus, Loader } from "lucide-react";
 import api from "../../../../middleware/api";
 import { useQuery } from "@tanstack/react-query";
 import AddSessionModal from "./sections/AddSessionModal";
 import SessionRow from "./sections/SessionRow";
+import { useMutation } from "@tanstack/react-query";
+import { daysOfWeek,calculateDuration,formatTimeFrom24,getDayFromISO,generateId } from "../../../../utils/formatTime";
 
 
-function generateId() {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
 
-const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// Helper function to convert ISO time to 12-hour format
 
 async function getUserSubjects(){
   try{
@@ -24,6 +23,27 @@ async function getUserSubjects(){
     return err.response?.data.message
   }
 }
+
+  const validators = {
+  name: (v) => !v.trim() && "Task name is required.",
+  dueDate: (v) => {
+    if (!v) return "Due date is required.";
+    const selectedDate = new Date(v);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) return "Due date cannot be before today.";
+    return false;
+  },
+  subjectId: (v) => !v && "Subject is required.",
+  totalHours:(v)=>!v && "Total Task Hours is required.",
+  studyHours:(v)=>!v && "Fill in your maximum study hours per day.",
+  priority:(v)=>!v && "Please choose the priority of your task.",
+
+}
+
+
+
+
 
 
 
@@ -44,32 +64,64 @@ function SessionForm({ setShowAddSessionPopup }) {
   const subjects = data?.subjects ?? [];
   
   const [form, setForm] = useState({
-    taskName: "",
+    name: "",
     subjectId: '',
     dueDate: "",
     totalHours: "",
     priority: "",
+    studyHours:""
   });
-  console.log(form)
+  const [Error,setError]=useState({})
   const [sessions, setSessions] = useState([]);
+  const[scheduleCreatedMessage,setMessage]=useState("")
 
   const [showAddModal, setShowAddModal] = useState(false);
 
+  function validateForm(form,type){
+    let errors={}
+   for(const key in validators){
+    const error=validators[key](form[key])
+    if(error){
+      errors[key]=error
+    }
+  
+   }
+     if(sessions.length<=0 && type==="createSchedule"){
+      errors["sessions"]='Please add a session to create your schedule.'
+    }
+   
+   // Additional validation for totalHours against selectedSubject
+   if (form.totalHours && selectedSubject) {
+     const hours = Number(form.totalHours);
+     if (hours > selectedSubject.hoursPerWeek) {
+       errors.totalHours = `Maximum hours for this subject is ${selectedSubject.hoursPerWeek} hours per week.`;
+     }
+   }
+   
+   return errors
+  }
+
+ 
+
+
   useEffect(() => {
     if (!form.subjectId && subjects.length > 0) {
-      setForm((prev) => ({ ...prev, subjectId: subjects[0].id }));
+      setForm((prev) => ({ ...prev, subjectId: subjects[0]._id }));
     }
   }, [subjects, form.subjectId]);
 
   const selectedSubject =
-    subjects.find((s) => s.id === form.subjectId) || subjects[0] || null;
+    subjects.find((s) => s._id === form.subjectId) || subjects[0] || null;
 
   // Save sessions to localStorage when they change
 
   const totalHoursValue = Number(form.totalHours) || 6;
   const breakdownText = `${totalHoursValue} hours split into ${sessions.length} sessions`;
 
-  const updateField = (key, value) => setForm((p) => ({ ...p, [key]: value }));
+  const updateField = (key, value) => {
+    setForm((p) => ({ ...p, [key]: value }));
+    setError((prev) => ({ ...prev, [key]: "" }));
+  };
 
   // Session CRUD operations
   const updateSession = (updatedSession) => {
@@ -83,14 +135,92 @@ function SessionForm({ setShowAddSessionPopup }) {
   const addSession = (newSession) => {
     setSessions(prev => [...prev, newSession]);
   };
+  console.log(selectedSubject)
+ console.log(sessions)
+ 
+   async function generateSessions(){
+   
+    setError({})
+    const errors=validateForm(form)
+    setError(errors)
+    if(Object.keys(errors).length>0)
+      return;
+  
+      const response=await api.get(`/sessions/availability?dueDate=${form.dueDate}&totalHours=${form.totalHours}&studyHours=${form.studyHours}&subjectId=${form.subjectId}`)
+      return response.data
+    
+   
+  }
 
- console.log(subjects)
+
+  async function createSchedule(){
+   
+    const response=await api.post('/sessions/schedule',{task:form,sessions:sessions})
+    return response.data
+  }
+
+  function handleCreateSchedule(){
+    setError({})
+    const errors=validateForm(form,"createSchedule")
+    if(Object.keys(errors).length>0){
+      setError(errors)
+      return
+    }
+    scheduleMutation.mutate()
+  }
+
+
+
+  const mutation=useMutation({
+    mutationFn:generateSessions,
+    onSuccess:(data)=>{
+      console.log(data)
+      const recommendedSessions = data?.recommendedSessions?.sessions || [];
+      const transformedSessions = recommendedSessions.map(session => ({
+        id:generateId(),
+        name: session.name || "",
+        day: getDayFromISO(session.startTime),
+        start: formatTimeFrom24(session.startTime),
+        end: formatTimeFrom24(session.endTime),
+        duration: calculateDuration(session.startTime, session.endTime),
+        startTime: session.startTime,
+        endTime: session.endTime,
+        subjectId: session.subjectId
+      }));
+      setSessions(transformedSessions);
+    },
+    onError:(error)=>{
+      const errorMsg = error?.response?.data?.message || error?.message || 'Failed to generate sessions';
+      setError(prev => ({ ...prev, server: errorMsg }));
+    }
+  })
+
+  const scheduleMutation=useMutation({
+    mutationFn:createSchedule,
+    onSuccess:(data)=>{
+      console.log(data)
+      setMessage(data?.message || 'Schedule created successfully!')
+    },
+    onError:(error)=>{
+      const errorMsg = error?.response?.data?.message || error?.message || 'Failed to create schedule';
+      setError(prev => ({ ...prev, server: errorMsg }));
+    }
+  })
+    function handleCreationSchedule(){
+    setError({})
+    const errors=validateForm(form,"createSchedule")
+    setError(errors)
+    if(Object.keys(errors).length>0)
+      return;
+    scheduleMutation.mutate()
+  }
+
   
 
   /* ── Shared input classes ── */
   const inputCls =
     "w-full rounded-[12px] border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/25 focus:border-[#9B7EDE]/50 focus:outline-none focus:ring-1 focus:ring-[#9B7EDE]/20 transition";
-
+ 
   return (
     <>
       {/* ── Scoped styles injected once ── */}
@@ -147,6 +277,9 @@ function SessionForm({ setShowAddSessionPopup }) {
           onClick={(e) => e.stopPropagation()}
           className="sf-scroll bg-gradient-to-br from-[#1B142D] via-[#1A1530] to-[#141022] font-poppins border border-white/10 rounded-[24px] p-6 sm:p-8 max-w-2xl w-full shadow-2xl max-h-[85vh] overflow-y-auto space-y-6"
         >
+          
+          {!scheduleCreatedMessage ? (
+            <>
           {/* HEADER */}
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -168,14 +301,17 @@ function SessionForm({ setShowAddSessionPopup }) {
           {/* FORM */}
           <div className="rounded-[20px] border border-white/10 bg-white/5 p-4 sm:p-5 space-y-4">
             <p className="text-[11px] uppercase tracking-[0.2em] text-[#B8A7E5]">Task Input</p>
+            <div className="flex flex-col">
 
             <input
               type="text"
-              value={form.taskName}
-              onChange={(e) => updateField("taskName", e.target.value)}
+              value={form.name}
+              onChange={(e) => updateField("name", e.target.value)}
               placeholder="Task Name"
               className={inputCls}
-            />
+              />
+            {Error.name&&<p className="text-red-600 text-xs mt-2 font-Inter">{Error.name}</p>}
+              </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
@@ -191,18 +327,22 @@ function SessionForm({ setShowAddSessionPopup }) {
                   className={`${inputCls} sf-select`}
                   disabled={isLoading || isFetching || subjects.length === 0}
                 >
+                   <option disabled={true} value="">Choose subject</option>
                   {isLoading ? (
                     <option>Loading subjects...</option>
                   ) : error ? (
                     <option>Error loading subjects</option>
                   ) : (
+                    
                     subjects.map((subject) => (
+                      
                       <option key={subject._id} value={subject._id}>
                         {subject.name}
                       </option>
                     ))
                   )}
                 </select>
+                 {Error.subjectId&&<p className="text-red-600 text-xs  font-Inter">{Error.subjectId}</p>}
               </div>
                
               <div className="flex flex-col gap-2">
@@ -210,36 +350,85 @@ function SessionForm({ setShowAddSessionPopup }) {
                 <input
                   type="date"
                   value={form.dueDate}
+                  min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => updateField("dueDate", e.target.value)}
                   className={`${inputCls} sf-date`}
                 />
+                  {Error.dueDate&&<p className="text-red-600 text-xs  font-Inter">{Error.dueDate}</p>}
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-xs uppercase tracking-[0.2em] text-[#B8A7E5]">
+                  Total Hours {selectedSubject && `(Max: ${selectedSubject.hoursPerWeek}h/week)`}
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max={selectedSubject?.hoursPerWeek || 168}
+                  step="0.5"
+                  value={form.totalHours}
+                  onChange={(e) => updateField("totalHours", e.target.value)}
+                  placeholder="Total Hours"
+                  className={inputCls}
+                />
+                {Error.totalHours && <p className="text-red-600 text-xs font-Inter">{Error.totalHours}</p>}
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs uppercase tracking-[0.2em] text-[#B8A7E5]">Priority</label>
+                <select
+                  value={form.priority}
+                  onChange={(e) => updateField("priority", e.target.value)}
+                  className={`${inputCls} sf-select`}
+                >
+                  <option value="" disabled>
+                    Select priority
+                  </option>
+                  {["Low", "Medium", "High"].map((l) => (
+                    <option key={l} value={l.toLocaleLowerCase()}>{l}</option>
+                  ))}
+                </select>
+                {Error.priority && <p className="text-red-600 text-xs font-Inter">{Error.priority}</p>}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
               <input
                 type="number"
                 min="1"
                 step="0.5"
-                value={form.totalHours}
-                onChange={(e) => updateField("totalHours", e.target.value)}
-                placeholder="Total Hours"
+                value={form.studyHours}
+                onChange={(e) => updateField("studyHours", e.target.value)}
+                placeholder="Your Maximum Study Hours in a day."
                 className={inputCls}
               />
-              <select
-                value={form.priority}
-                onChange={(e) => updateField("priority", e.target.value)}
-                className={`${inputCls} sf-select`}
-              >
-                <option value="" disabled>
-                  Priority
-                </option>
-                {["Low", "Medium", "High"].map((l) => (
-                  <option key={l} value={l}>{l}</option>
-                ))}
-              </select>
+              {Error.studyHours && <p className="text-red-600 text-xs font-Inter">{Error.studyHours}</p>}
             </div>
+
+
           </div>
+
+          {/* GLOBAL ERROR */}
+          {Error.server && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="rounded-[12px] border border-red-500/30 bg-red-500/10 p-3 flex items-start gap-3"
+            >
+              <div className="w-1 h-1 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></div>
+              <p className="text-xs text-red-300">{Error.server}</p>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setError(prev => ({ ...prev, server: "" }))}
+                className="ml-auto text-red-400 hover:text-red-300 transition"
+              >
+                <X className="w-3 h-3" />
+              </motion.button>
+            </motion.div>
+          )}
 
           {/* SESSIONS */}
           <div className="rounded-[20px] border border-white/10 bg-white/5 p-4 sm:p-5">
@@ -263,23 +452,37 @@ function SessionForm({ setShowAddSessionPopup }) {
               </div>
             </div>
 
-            <div className="space-y-3">
-              {sessions.length === 0 ? (
-                <p className="text-center text-white/40 text-sm py-6">
-                  No sessions added. Click "Add Session" to create one.
-                </p>
-              ) : (
-                sessions.map((session) => (
-                  <SessionRow
-                    key={session.id}
-                    session={session}
-                   
-                    onUpdate={updateSession}
-                    onDelete={deleteSession}
-                  />
-                ))
-              )}
-            </div>
+            {mutation.isPending ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-3">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <Loader className="w-8 h-8 text-[#9B7EDE]" />
+                </motion.div>
+                <p className="text-sm text-[#B8A7E5]">Generating sessions...</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sessions.length === 0 ? (
+                  <p className="text-center text-white/40 text-sm py-6">
+                    No sessions added. Click "Add Session" to create one.
+                  </p>
+                ) : (
+                  sessions.map((session) => (
+                    <SessionRow
+                      key={session.id}
+                      session={session}
+                     
+                      onUpdate={updateSession}
+                      onDelete={deleteSession}
+                    />
+                  ))
+                )}
+              </div>
+             
+            )}
+         {Error.sessions && <p className="text-center font-Inter text-red-700">{Error.sessions}</p>}
           </div>
 
           {/* BREAKDOWN */}
@@ -291,25 +494,64 @@ function SessionForm({ setShowAddSessionPopup }) {
           {/* ACTIONS */}
           <div className="flex flex-col sm:flex-row gap-3">
             <motion.button
+              onClick={handleCreateSchedule}
+              disabled={scheduleMutation.isPending}
               whileTap={{ scale: 0.97 }}
-              className="flex-1 px-4 py-3 rounded-[12px] bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition"
+              className="flex-1 px-4 py-3 rounded-[12px] bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Task & Schedule
+              {scheduleMutation.isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Loader className="w-4 h-4" />
+                  </motion.div>
+                  Creating...
+                </span>
+              ) : (
+                "Create Task & Schedule"
+              )}
             </motion.button>
             <motion.button
+              onClick={()=>{mutation.mutate()}}
+              disabled={mutation.isPending}
               whileTap={{ scale: 0.97 }}
-              className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 bg-white/5 text-sm text-[#B8A7E5] hover:bg-white/10 transition"
+              className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 bg-white/5 text-sm text-[#B8A7E5] hover:bg-white/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Regenerate Sessions
+              Generate Sessions
             </motion.button>
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={() => setShowAddSessionPopup(false)}
-              className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 text-sm text-white/60 hover:text-white/90 transition"
+              disabled={scheduleMutation.isPending || mutation.isPending}
+              className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 text-sm text-white/60 hover:text-white/90 transition disabled:opacity-50"
             >
               Cancel
             </motion.button>
           </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="w-16 h-16 rounded-full bg-green-500/20 border border-green-500 flex items-center justify-center"
+              >
+                <Check className="w-8 h-8 text-green-400" />
+              </motion.div>
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-white">{scheduleCreatedMessage}</h3>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setShowAddSessionPopup(false)}
+                className="px-6 py-2 rounded-[12px] bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition"
+              >
+                Close
+              </motion.button>
+            </div>
+          )}
         </motion.div>
       </motion.div>
 
@@ -318,6 +560,7 @@ function SessionForm({ setShowAddSessionPopup }) {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={addSession}
+        selectedSubject={selectedSubject}
         
         defaultDay={sessions.length > 0 ? sessions[sessions.length - 1].day : "Mon"}
       />
