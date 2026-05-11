@@ -60,3 +60,36 @@ export function calcDuration(start, end) {
   const min = diff % 60;
   return h > 0 ? (min > 0 ? `${h}h ${min}m` : `${h}h`) : `${min}m`;
 }
+
+{/** This Utlity is for SessionForm */}
+export const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+export function formatTimeFrom24(isoString) {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  return date.toLocaleTimeString("en-US", { 
+    hour: "2-digit", 
+    minute: "2-digit", 
+    hour12: true 
+  });
+}
+
+// Helper function to get day name from ISO string
+export function getDayFromISO(isoString) {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  return daysOfWeek[date.getDay()];
+}
+
+// Helper function to calculate duration in hours
+export function calculateDuration(startTime, endTime) {
+  if (!startTime || !endTime) return "";
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  const diffMs = end - start;
+  const diffHours = diffMs / (1000 * 60 * 60);
+  return `${diffHours.toFixed(1)}h`;
+}
+
+export function generateId() {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}

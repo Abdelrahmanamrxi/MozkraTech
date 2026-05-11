@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import HttpException from "../../utils/HttpException.js"
 
 const sessionSchema = new mongoose.Schema({
     userId:{
@@ -21,7 +22,9 @@ const sessionSchema = new mongoose.Schema({
         ref:"Subject",
         required:true
     },
-
+    duration:{
+        type:Number
+    },
     startTime:{
         type:Date,
         required:true
@@ -44,6 +47,28 @@ const sessionSchema = new mongoose.Schema({
 })
 
 sessionSchema.index({userId:1,taskId:1})
+
+sessionSchema.pre('save',async function(next){
+    if(!this.isModified("startTime") && !this.isModified("endTime"))
+    return 
+
+    if(this.startTime>this.endTime)
+    throw new HttpException("End Time must be after Start Time",400)
+
+    const collection=await this.constructor.findOne({
+        _id:{$ne:this._id},
+        userId:this.userId,
+        status:{$in:['scheduled']},
+        startTime:{$lt:this.endTime},
+        endTime:{$gt:this.startTime}
+    })
+    if(collection)
+    throw new HttpException(`Conflict Session Already Exists,${this.startTime} To ${this.endTime} Already Exists`,400)
+
+
+})
+
+
 
 const sessionModel=mongoose.model('Session',sessionSchema)
 

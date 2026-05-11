@@ -42,6 +42,10 @@ const taskSchema=new mongoose.Schema({
     hoursSpent:{
         type:Number,
         default:0
+    },
+    studyHours:{
+        type:Number,
+        default:1
     }
 
 },{timestamps:true})

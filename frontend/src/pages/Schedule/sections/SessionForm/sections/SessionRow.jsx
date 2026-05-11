@@ -1,28 +1,62 @@
 import { useState } from "react";
 import { to24,to12 } from "@/utils/formatTime";
 import { calcDuration } from "@/utils/formatTime";
-import { Pencil,Trash2 } from "lucide-react";
+import { Pencil,Trash2,Clock,Edit,Check } from "lucide-react";
+// eslint-disable-next-line no-unused-vars
 import { motion,AnimatePresence } from "framer-motion";
-const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function getFormattedDate(isoString) {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", { 
+    month: "short", 
+    day: "numeric", 
+    year: "numeric" 
+  });
+}
+
+function getDateFromISO(isoString) {
+  if (!isoString) return new Date().toISOString().split("T")[0];
+  const date = new Date(isoString);
+  return date.toISOString().split("T")[0];
+}
+
+function getDayNameFromDateString(dateString) {
+  if (!dateString) return "Mon";
+  // Parse the date string (YYYY-MM-DD format) as local date, not UTC
+  const [year, month, day] = dateString.split("-");
+  const date = new Date(year, parseInt(month) - 1, parseInt(day));
+  return daysOfWeek[date.getDay()];
+}
 
 function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
     name: session.name,
     day: session.day,
+    date: getDateFromISO(session.startTime),
     start: to24(session.start),
     end: to24(session.end),
   });
 
   const save = () => {
     const dur = calcDuration(draft.start, draft.end);
+    const startDateTime = new Date(`${draft.date}T${draft.start}:00Z`).toISOString();
+    const endDateTime = new Date(`${draft.date}T${draft.end}:00Z`).toISOString();
+    
+    // Recalculate day from the new date
+    const newDay = getDayNameFromDateString(draft.date);
+    
     const updatedSession = {
       ...session,
       name: draft.name,
-      day: draft.day,
+      day: newDay,
       start: to12(draft.start),
       end: to12(draft.end),
       duration: dur,
+      startTime: startDateTime,
+      endTime: endDateTime,
     };
     onUpdate(updatedSession);
     setEditing(false);
@@ -32,6 +66,7 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
     setDraft({
       name: session.name,
       day: session.day,
+      date: getDateFromISO(session.startTime),
       start: to24(session.start),
       end: to24(session.end),
     });
@@ -44,6 +79,10 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
       <div className="flex justify-between items-center">
         <div className="text-white text-sm">
           <span className="font-semibold">{session.day}</span>
+          <span className="mx-2 text-white/30">·</span>
+          <span className="text-white/80 text-xs">
+            {getFormattedDate(session.startTime)}
+          </span>
           <span className="mx-2 text-white/30">·</span>
           <span className="text-white/80">
             {session.start} → {session.end}
@@ -99,21 +138,16 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
                 />
               </div>
 
-              {/* Day selector */}
+              {/* Date picker */}
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-widest text-white/30">Day</p>
-               <select
-  value={draft.day}
-  onChange={(e) => setDraft((p) => ({ ...p, day: e.target.value }))}
-  className="w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-[#9B7EDE]/50 focus:outline-none focus:ring-1 focus:ring-[#9B7EDE]/20 transition sf-select"
->
-  {daysOfWeek.map((day) => (
-    <option key={day} value={day} className="bg-[#1B142D] text-white">
-      {day}
-    </option>
-  ))}
-</select>
-
+                <p className="text-[10px] uppercase tracking-widest text-white/30">Date</p>
+                <input
+                  type="date"
+                  value={draft.date}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => setDraft((p) => ({ ...p, date: e.target.value }))}
+                  className="w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-[#9B7EDE]/50 focus:outline-none focus:ring-1 focus:ring-[#9B7EDE]/20 transition [color-scheme:dark]"
+                />
               </div>
 
               {/* Time pickers */}

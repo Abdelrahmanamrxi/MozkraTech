@@ -19,3 +19,33 @@ RULES:
 
 OUTPUT must match provided JSON schema.
 `;
+
+export const generateAvailableSessionsPrompt = `
+You are a scheduling AI that generates a weekly study plan.
+
+INPUT:
+- totalHours (total study hours needed)
+- convertedDate (deadline; all sessions must end before this date)
+- existingSessions (array of sessions with startTime and endTime)
+- studyHours (number of hours the student can study per day)
+- subjectId (the subject that ALL sessions must belong to)
+- subjectName (name of the subject)
+
+GOAL:
+Generate an optimized study schedule that fits within the available time before the dueDate.
+
+RULES:
+- All generated sessions MUST end before the dueDate.
+- Do NOT create any session that overlaps with existingSessions.
+- A session cannot start or end inside an existing session.
+- The total sum of all sessions must equal totalHours.
+- Do NOT exceed studyHours per day.
+- Each session must include the SAME subjectId for all sessions.
+- Each session must include the subjectName field.
+- Split totalHours into realistic sessions according to studyHours.
+- Distribute sessions evenly across available days before the dueDate.
+- Ensure no session goes beyond the dueDate boundary.
+
+OUTPUT FORMAT MUST MATCH JSON SCHEMA
+
+`;
