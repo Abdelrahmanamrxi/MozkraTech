@@ -12,7 +12,8 @@ import cookieParser from "cookie-parser";
 import limiter from "./middleware/rateLimiter.js";
 import chatRouter from "./modules/chat/chat.route.js";
 import sessionRouter from "./modules/sessions/session.route.js";
-import taskRouter from "./modules/task/task.routes.js"
+import taskRouter from "./modules/task/task.routes.js";
+import path from "path";
 
 const bootstrap = async (app, express) => {
   // 1. Body parsers
@@ -26,10 +27,10 @@ const bootstrap = async (app, express) => {
   // 2. CORS (must be early)
   app.use(
     cors({
-       origin: [process.env.FRONTEND_URL,"http://localhost:5174"],
-    //origin: "*",
-       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-       credentials: true,
+      origin: [process.env.FRONTEND_URL, "http://localhost:5174"],
+      //origin: "*",
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      credentials: true,
     }),
   );
 
@@ -39,16 +40,19 @@ const bootstrap = async (app, express) => {
   // 4. Rate limiting
   app.use(limiter);
 
+  // 4.1 Static uploads
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
   // 5. Routes
-  
+
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/user", userRouter);
   app.use("/api/v1/subjects", subjectRouter);
   app.use("/api/v1/chat", chatRouter);
   app.use("/api/v1/friends", friendsRouter);
-  app.use("/api/v1/notifications",notificationRouter)
-  app.use('/api/v1/sessions',sessionRouter)
-  app.use("/api/v1/tasks",taskRouter)
+  app.use("/api/v1/notifications", notificationRouter);
+  app.use("/api/v1/sessions", sessionRouter);
+  app.use("/api/v1/tasks", taskRouter);
 
   // 6. Error handling (last)
   app.use(errorHandler);

@@ -63,7 +63,22 @@
       "phone": "Phone",
       "location": "Location",
       "summary": "Summary",
-      "bio": "Bio"
+      "bio": "Bio",
+      "profilePhoto": "Profile Photo"
+    },
+    "photo": {
+      "alt": "Profile photo",
+      "change": "Change Photo",
+      "remove": "Remove Photo",
+      "helper": "JPG, PNG, or WEBP. Max 5 MB.",
+      "invalidType": "Only JPG, PNG, and WEBP images are allowed",
+      "tooLarge": "Profile image must be smaller than 5 MB",
+      "cropTitle": "Crop your photo",
+      "zoom": "Zoom",
+      "cancel": "Cancel",
+      "use": "Use Photo",
+      "processing": "Processing...",
+      "processingError": "Failed to process the image"
     },
     "buttons": {
       "cancel": "Cancel",

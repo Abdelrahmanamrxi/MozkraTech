@@ -1,16 +1,104 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Edit2, Calculator, X, Save } from "lucide-react";
+import {
+  User,
+  Edit2,
+  Calculator,
+  X,
+  Save,
+  ImagePlus,
+  Trash2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import api from "../../../middleware/api";
+import ProfileImageCropper from "./ProfileImageCropper";
+import { buildAssetUrl } from "../../../utils/assetUrl";
+
+const MAX_PROFILE_IMAGE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_PROFILE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 const EditProfileModal = ({ user, onClose, onSave }) => {
-  const [form, setForm] = useState({ ...user });
+  const initialPreview = user?.profileImage
+    ? buildAssetUrl(user.profileImage)
+    : "";
+  const [form, setForm] = useState({
+    ...user,
+    profileImageFile: null,
+    profileImagePreview: initialPreview,
+    removeProfileImage: false,
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [imageError, setImageError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(initialPreview);
+  const [cropImageSrc, setCropImageSrc] = useState("");
+  const [showCropper, setShowCropper] = useState(false);
+  const fileInputRef = useRef(null);
   const { t } = useTranslation("profile");
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleSelectFile = (event) => {
+    setImageError("");
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) return;
+    if (!ALLOWED_PROFILE_IMAGE_TYPES.includes(file.type)) {
+      setImageError(t("editProfile.photo.invalidType"));
+      return;
+    }
+    if (file.size > MAX_PROFILE_IMAGE_BYTES) {
+      setImageError(t("editProfile.photo.tooLarge"));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result?.toString() || "");
+      setShowCropper(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropConfirm = (file) => {
+    if (previewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    const nextPreview = URL.createObjectURL(file);
+    setPreviewUrl(nextPreview);
+    setForm((prev) => ({
+      ...prev,
+      profileImageFile: file,
+      profileImagePreview: nextPreview,
+      removeProfileImage: false,
+    }));
+    setShowCropper(false);
+    setCropImageSrc("");
+  };
+
+  const handleRemovePhoto = () => {
+    if (previewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    setPreviewUrl("");
+    setForm((prev) => ({
+      ...prev,
+      profileImageFile: null,
+      profileImagePreview: "",
+      removeProfileImage: true,
+    }));
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -57,6 +145,61 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
           >
             <X className="w-5 h-5 text-[#B8A7E5]" />
           </motion.button>
+        </div>
+
+        <div className="mb-5 rounded-2xl border border-white/15 bg-white/5 p-4">
+          <p className="text-sm text-[#B8A7E5] mb-3 font-medium">
+            {t("editProfile.labels.profilePhoto")}
+          </p>
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 overflow-hidden rounded-full border border-white/25 bg-white/10 flex items-center justify-center">
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt={t("editProfile.photo.alt")}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <User size={26} className="text-white/60" />
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/20"
+              >
+                <ImagePlus size={14} />
+                {t("editProfile.photo.change")}
+              </button>
+              {previewUrl ? (
+                <button
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  className="inline-flex items-center gap-2 rounded-full border border-red-400/40 bg-red-400/15 px-4 py-1.5 text-xs font-semibold text-red-100 hover:bg-red-400/25"
+                >
+                  <Trash2 size={14} />
+                  {t("editProfile.photo.remove")}
+                </button>
+              ) : (
+                <p className="text-[11px] text-white/50">
+                  {t("editProfile.photo.helper")}
+                </p>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleSelectFile}
+                className="hidden"
+              />
+            </div>
+          </div>
+          {imageError && (
+            <p className="mt-3 text-xs text-red-300" role="alert">
+              {imageError}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -144,6 +287,19 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
             <Save size={14} /> {t("editProfile.buttons.save")}
           </motion.button>
         </div>
+
+        <AnimatePresence>
+          {showCropper && cropImageSrc && (
+            <ProfileImageCropper
+              imageSrc={cropImageSrc}
+              onCancel={() => {
+                setShowCropper(false);
+                setCropImageSrc("");
+              }}
+              onConfirm={handleCropConfirm}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
   );
@@ -154,9 +310,13 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
   const { t } = useTranslation("profile");
   const navigate = useNavigate();
   const displayTitle = user.titleKey ? t(user.titleKey) : user.title;
+  const profileImageUrl = user?.profileImage
+    ? buildAssetUrl(user.profileImage)
+    : "";
 
   const handleSaveProfile = async (form) => {
     const payload = {};
+    let nextProfileImage = undefined;
 
     const name = typeof form?.name === "string" ? form.name.trim() : "";
     if (name.length >= 3) {
@@ -182,10 +342,43 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
       await api.patch("/user/update-profile", payload);
     }
 
+    if (form?.profileImageFile) {
+      const formData = new FormData();
+      formData.append("profileImage", form.profileImageFile);
+      const { data } = await api.patch("/user/profile-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      nextProfileImage = data?.profileImage ?? "";
+    } else if (form?.removeProfileImage) {
+      await api.delete("/user/profile-image");
+      nextProfileImage = null;
+    }
+
+    if (nextProfileImage !== undefined) {
+      window.dispatchEvent(
+        new CustomEvent("profile-image-updated", {
+          detail: nextProfileImage,
+        }),
+      );
+    }
+
     if (typeof onUserRefresh === "function") {
       await onUserRefresh();
     } else {
-      onUserChange((prev) => ({ ...prev, ...form }));
+      const {
+        profileImageFile,
+        profileImagePreview,
+        removeProfileImage,
+        ...safeForm
+      } = form;
+      const nextLocalProfileImage = removeProfileImage
+        ? null
+        : profileImagePreview || user.profileImage;
+      onUserChange((prev) => ({
+        ...prev,
+        ...safeForm,
+        profileImage: nextLocalProfileImage,
+      }));
     }
   };
 
@@ -194,8 +387,16 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
       <div className="bg-gradient-to-br from-[#9B7EDE]/60 to-[#7C5FBD]/40 border-t border-[#9B7EDE]/40 rounded-[24px] p-6 lg:p-8 font-Inter">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center flex-shrink-0">
-              <User size={32} className="text-white" />
+            <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {profileImageUrl ? (
+                <img
+                  src={profileImageUrl}
+                  alt={t("editProfile.photo.alt")}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <User size={32} className="text-white" />
+              )}
             </div>
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-white">

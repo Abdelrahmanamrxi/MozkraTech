@@ -8,6 +8,7 @@ const mockProfileData = {
     location: "New York, USA",
     bio: "",
     summary: "",
+    profileImage: null,
     memberSince: "January 2024",
     badges: [
       "badges.activeLearner",
