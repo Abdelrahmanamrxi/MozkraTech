@@ -90,6 +90,10 @@ const router = createBrowserRouter([
     errorElement: <ErrorFallback />, // ✅ ADD THIS
     children: [
       {
+        path: "/edit-subjects",
+        element: <SubjectRegister isEdit />,
+      },
+      {
         path: "/schedule-generation",
         element: <AISchedule />,
       },

@@ -6,6 +6,8 @@ const mockProfileData = {
     email: "mohamed.ahmed@example.com",
     phone: "+1 (555) 123-4567",
     location: "New York, USA",
+    bio: "",
+    summary: "",
     memberSince: "January 2024",
     badges: [
       "badges.activeLearner",
@@ -63,7 +65,7 @@ const mockProfileData = {
       key: "weeklyReports",
       labelKey: "preferences.labels.weeklyReports",
       enabled: true,
-    }
+    },
   ],
 
   achievements: {

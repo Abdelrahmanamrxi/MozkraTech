@@ -3,6 +3,7 @@ import { asyncHandler } from "../../utils/asyncHandler/index.js";
 import HttpException from "../../utils/HttpException.js";
 import friendshipModel from "../../DB/models/friendship.model.js";
 import { notificationModel } from "../../DB/models/notifications.model.js";
+import bcrypt from "bcrypt";
 // ----------------------------------updateProfile-------------------------------------------
 export const updateProfile = asyncHandler(async (req, res, next) => {
   const user = req.user._id;
@@ -54,6 +55,63 @@ export const updateStudyPreferences = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     message: "Study preferences updated successfully",
     user: updatedUser,
+  });
+});
+
+// ----------------------------------changePassword-------------------------------------------
+export const changePassword = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await userModel.findOne({ _id: userId, isDeleted: false });
+  if (!user) {
+    return next(new HttpException("User Not Found", 404));
+  }
+
+  if (user.provider !== "system") {
+    return next(
+      new HttpException("Password change not available for this account", 400),
+    );
+  }
+
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    return next(new HttpException("Current password is incorrect", 400));
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    newPassword,
+    +process.env.SALT_ROUNDS,
+  );
+  user.password = hashedPassword;
+  user.changePasswordAt = new Date();
+  await user.save();
+
+  return res.status(200).json({
+    message: "Password changed successfully",
+  });
+});
+
+// ----------------------------------deleteAccount-------------------------------------------
+export const deleteAccount = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+
+  const user = await userModel.findOne({ _id: userId, isDeleted: false });
+  if (!user) {
+    return next(new HttpException("User Not Found", 404));
+  }
+
+  user.isDeleted = true;
+  user.isVerified = false;
+  await user.save();
+
+  res.clearCookie("refreshToken", {
+    sameSite: "strict",
+    httpOnly: true,
+  });
+
+  return res.status(200).json({
+    message: "Account deleted successfully",
   });
 });
 
@@ -381,6 +439,6 @@ export const getProfile = asyncHandler(async (req, res, next) => {
   }
   return res.status(200).json({
     message: "getUsers success",
-    user:user,
+    user: user,
   });
 });

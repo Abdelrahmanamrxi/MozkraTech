@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   updateProfile,
   updateStudyPreferences,
+  changePassword,
+  deleteAccount,
   getProfileByID,
   dashboard,
   addFriend,
@@ -15,6 +17,8 @@ import { validation } from "../../middleware/validation.js";
 import {
   updateProfileSchema,
   updateStudyPreferencesSchema,
+  changePasswordSchema,
+  deleteAccountSchema,
   getProfileByIDSchema,
   searchForUsersSchema,
   addFriendSchema,
@@ -41,6 +45,18 @@ userRouter.patch(
   authentication,
   validation(updateStudyPreferencesSchema),
   updateStudyPreferences,
+);
+userRouter.patch(
+  "/change-password",
+  authentication,
+  validation(changePasswordSchema),
+  changePassword,
+);
+userRouter.patch(
+  "/delete-account",
+  authentication,
+  validation(deleteAccountSchema),
+  deleteAccount,
 );
 userRouter.get(
   "/profile/:id",

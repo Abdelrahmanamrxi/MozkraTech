@@ -37,33 +37,43 @@ const userSchema = new mongoose.Schema(
     summary: {
       type: String,
       trim: true,
-      minLength: 30,
+      default: "",
+      validate: {
+        validator: function (v) {
+          // If value is provided and not empty, it must be at least 30 chars
+          if (v && v.length > 0) {
+            return v.length >= 30;
+          }
+          return true; // Empty strings are allowed
+        },
+        message: "Summary must be at least 30 characters long if provided",
+      },
     },
     bio: {
       type: String,
       trim: true,
       minLength: 100,
     },
-    plan:{
-      name:{
-        type:String,
-        default:"free",
-        enum:['free','premium','pro']
+    plan: {
+      name: {
+        type: String,
+        default: "free",
+        enum: ["free", "premium", "pro"],
       },
-      limits:{
-        aiScheduleLimit:{
-          type:Number,
-          default:0
+      limits: {
+        aiScheduleLimit: {
+          type: Number,
+          default: 0,
         },
-        aiChatLimit:{
-          type:Number,
-          default:0,
+        aiChatLimit: {
+          type: Number,
+          default: 0,
         },
-        docLimit:{
-          type:Number,
-          default:0
-        }
-      }  
+        docLimit: {
+          type: Number,
+          default: 0,
+        },
+      },
     },
     email: {
       type: String,
@@ -189,10 +199,10 @@ const userSchema = new mongoose.Schema(
         min: 1,
       },
     },
-    isSubjectVerified:{
-      type:Boolean,
-      default:false,
-      required:true
+    isSubjectVerified: {
+      type: Boolean,
+      default: false,
+      required: true,
     },
     OTPEmailExpiresAt: {
       type: Date,

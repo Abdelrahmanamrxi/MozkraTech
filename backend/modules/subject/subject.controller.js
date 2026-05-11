@@ -5,25 +5,27 @@ import HttpException from "../../utils/HttpException.js";
 
 export const createSubject = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
-  console.log(req.user._id)
+  console.log(req.user._id);
   const { name, difficulty, interestLevel, subjectType, hoursPerWeek } =
     req.body;
 
   const subject = await SubjectModel.create({
     name,
-    difficulty:difficulty.toLowerCase(),
+    difficulty: difficulty.toLowerCase(),
     interestLevel,
     subjectType,
     hoursPerWeek,
     userId,
   });
 
-  await userModel.findByIdAndUpdate(userId, {
-    $addToSet: { subjects: subject._id },
-     $set:{isSubjectVerified:true},
-  },
-   { new: true }
-);
+  await userModel.findByIdAndUpdate(
+    userId,
+    {
+      $addToSet: { subjects: subject._id },
+      $set: { isSubjectVerified: true },
+    },
+    { new: true },
+  );
 
   return res
     .status(201)
@@ -33,7 +35,9 @@ export const createSubject = asyncHandler(async (req, res, next) => {
 export const getUserSubjects = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
 
-  const subjects = await SubjectModel.find({ userId }).sort({
+  const subjects = await SubjectModel.find({
+    $or: [{ userId }, { user: userId }],
+  }).sort({
     createdAt: -1,
   });
 
@@ -48,7 +52,7 @@ export const deleteSubject = asyncHandler(async (req, res, next) => {
 
   const subject = await SubjectModel.findOneAndDelete({
     _id: subjectId,
-    user: userId,
+    $or: [{ userId }, { user: userId }],
   });
 
   if (!subject) {

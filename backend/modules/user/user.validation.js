@@ -9,7 +9,8 @@ export const updateProfileSchema = joi.object({
       .pattern(/^[A-Za-z\s]+$/),
     location: joi.string(),
     gender: joi.string().valid("male", "female", "other"),
-    bio: joi.string(),
+    bio: joi.string().allow(""),
+    summary: joi.string().allow(""),
     gpa: joi.number().min(0).max(4).messages({
       "number.min": "GPA cannot be less than 0",
       "number.max": "GPA cannot be more than 4",
@@ -26,8 +27,14 @@ export const updateStudyPreferencesSchema = joi.object({
         .string()
         .valid("morning", "afternoon", "evening", "night"),
       preferredTimeRange: joi.object({
-        start: joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
-        end: joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
+        start: joi
+          .string()
+          .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+          .required(),
+        end: joi
+          .string()
+          .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+          .required(),
       }),
       freeDays: joi
         .array()
@@ -50,6 +57,24 @@ export const updateStudyPreferencesSchema = joi.object({
       weeklyStudyHours: joi.number().integer().min(0),
     })
     .min(1),
+});
+
+export const changePasswordSchema = joi.object({
+  body: joi.object({
+    currentPassword: joi.string().required(),
+    newPassword: joi
+      .string()
+      .required()
+      .min(8)
+      .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
+    confirmPassword: joi.string().valid(joi.ref("newPassword")).required(),
+  }),
+});
+
+export const deleteAccountSchema = joi.object({
+  body: joi.object({}),
+  params: joi.object({}),
+  query: joi.object({}),
 });
 
 export const addFriendSchema = joi

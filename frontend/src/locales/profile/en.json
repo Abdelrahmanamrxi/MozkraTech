@@ -61,7 +61,9 @@
       "fullName": "Full Name",
       "email": "Email",
       "phone": "Phone",
-      "location": "Location"
+      "location": "Location",
+      "summary": "Summary",
+      "bio": "Bio"
     },
     "buttons": {
       "cancel": "Cancel",
@@ -75,7 +77,9 @@
       "email": "Email",
       "phone": "Phone",
       "location": "Location",
-      "memberSince": "Member Since"
+      "memberSince": "Member Since",
+      "summary": "Summary",
+      "bio": "Bio"
     }
   },
   "statsLabels": {
@@ -114,6 +118,14 @@
       "privacySettings": "Privacy Settings",
       "exportData": "Export Data",
       "deleteAccount": "Delete Account"
+    },
+    "changePasswordModal": {
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "cancel": "Cancel",
+      "save": "Update Password"
     },
     "deleteModal": {
       "title": "Delete Account",

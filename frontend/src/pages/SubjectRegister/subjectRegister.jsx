@@ -299,7 +299,7 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
 
 // ─── RegisterData (Main Page) ─────────────────────────────────────────────────
 
-const SubjectRegister = () => {
+const SubjectRegister = ({ isEdit = false }) => {
   const { i18n } = useTranslation();
   const lang = i18n.language === "ar" ? "ar" : "en";
   const navigate = useNavigate();
@@ -309,13 +309,15 @@ const SubjectRegister = () => {
       pageTitle: "Register Your Data",
       pageSubtitle:
         "Set up your subjects and study preferences to get personalized AI recommendations",
+      editPageTitle: "Edit Subjects",
+      editPageSubtitle: "Update your subjects and study preferences",
       mySubjects: "My Subjects",
       mySubjectsSubtitle: "Manage your courses and subjects",
       addSubject: "Add Subject",
       studyPreferences: "Study Preferences",
       preferredTime: "Preferred Study Time",
       preferredTimeRange: "Preferred Study Time Range",
-      weeklyGoalHours:"Weekly Goal Hours",
+      weeklyGoalHours: "Weekly Goal Hours",
       from: "From",
       to: "To",
       freeDays: "Days I'm Free",
@@ -331,6 +333,8 @@ const SubjectRegister = () => {
     ar: {
       pageTitle: "سجّل بياناتك",
       pageSubtitle: "حط موادك وتفضيلات مذاكرتك علشان تاخد توصيات AI شخصية",
+      editPageTitle: "تعديل المواد",
+      editPageSubtitle: "حدّث موادك وتفضيلات مذاكرتك",
       mySubjects: "موادي",
       mySubjectsSubtitle: "تحكم في كورساتك ومواد الدراسة",
       addSubject: "ضيف مادة",
@@ -353,6 +357,8 @@ const SubjectRegister = () => {
   };
 
   const t = labels[lang];
+  const pageTitle = isEdit ? t.editPageTitle : t.pageTitle;
+  const pageSubtitle = isEdit ? t.editPageSubtitle : t.pageSubtitle;
   const isRTL = lang === "ar";
 
   // ── State ──
@@ -360,12 +366,18 @@ const SubjectRegister = () => {
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
   const [subjectsError, setSubjectsError] = useState("");
   const [showAddSubject, setShowAddSubject] = useState(false);
-  const [sessionDuration, setSessionDuration] = useState(60);
-  const [breakDuration, setBreakDuration] = useState(15);
-  const [weeklyGoalHours,setHours]=useState(1)
+  const [sessionDuration, setSessionDuration] = useState("60");
+  const [breakDuration, setBreakDuration] = useState("15");
+  const [weeklyGoalHours, setHours] = useState("1");
   const [preferredStartTime, setPreferredStartTime] = useState("08:00");
   const [preferredEndTime, setPreferredEndTime] = useState("22:00");
-  const [freeDays, setFreeDays] = useState(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]);
+  const [freeDays, setFreeDays] = useState([
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+  ]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
 
@@ -384,6 +396,12 @@ const SubjectRegister = () => {
     const [h, m] = timeStr.split(":").map((x) => parseInt(x, 10));
     if (!Number.isFinite(h) || !Number.isFinite(m)) return 0;
     return h * 60 + m;
+  };
+
+  const toIntOrFallback = (value, fallback) => {
+    const parsed = parseInt(value, 10);
+    if (!Number.isFinite(parsed) || parsed < fallback) return fallback;
+    return parsed;
   };
 
   // Map a preferred range to the backend enum: morning/afternoon/evening/night.
@@ -410,12 +428,25 @@ const SubjectRegister = () => {
   };
 
   useEffect(() => {
+    if (!isEdit) {
+      setSubjects([]);
+      setSubjectsError("");
+      setIsLoadingSubjects(false);
+      setSessionDuration("60");
+      setBreakDuration("15");
+      setHours("1");
+      setPreferredStartTime("08:00");
+      setPreferredEndTime("22:00");
+      setFreeDays(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]);
+      return;
+    }
+
     let isActive = true;
     const loadSubjects = async () => {
       setIsLoadingSubjects(true);
       try {
         const { data } = await api.get("/subjects");
-        console.log(data)
+        console.log(data);
         if (isActive)
           setSubjects(Array.isArray(data?.subjects) ? data.subjects : []);
       } catch (err) {
@@ -424,11 +455,35 @@ const SubjectRegister = () => {
         if (isActive) setIsLoadingSubjects(false);
       }
     };
+    const loadPreferences = async () => {
+      try {
+        const { data } = await api.post("/user/get-profile");
+        const user = data?.user;
+        if (!isActive || !user) return;
+
+        if (Number.isFinite(user?.timer?.sessionDuration))
+          setSessionDuration(String(user.timer.sessionDuration));
+        if (Number.isFinite(user?.timer?.breakDuration))
+          setBreakDuration(String(user.timer.breakDuration));
+        if (Number.isFinite(user?.weeklyGoalHours))
+          setHours(String(user.weeklyGoalHours));
+        if (user?.preferredTimeRange?.start)
+          setPreferredStartTime(user.preferredTimeRange.start);
+        if (user?.preferredTimeRange?.end)
+          setPreferredEndTime(user.preferredTimeRange.end);
+        if (Array.isArray(user?.freeDays) && user.freeDays.length > 0)
+          setFreeDays(user.freeDays);
+      } catch (err) {
+        if (isActive) setSubjectsError("Failed to load study preferences.");
+      }
+    };
+
     loadSubjects();
+    loadPreferences();
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [isEdit]);
 
   const totalWeeklyHours = subjects.reduce(
     (sum, s) => sum + (s.hoursPerWeek || 0),
@@ -463,21 +518,28 @@ const SubjectRegister = () => {
       if (newSubjects.length > 0) {
         await Promise.all(newSubjects.map((s) => api.post("/subjects", s)));
       }
+      const normalizedSessionDuration = toIntOrFallback(sessionDuration, 15);
+      const normalizedBreakDuration = toIntOrFallback(breakDuration, 5);
+      const normalizedWeeklyGoalHours = toIntOrFallback(weeklyGoalHours, 1);
+
       await api.patch("/user/study-preferences", {
-        sessionDuration,
-        breakDuration,
-        preferredTime: derivePreferredTimeEnum(preferredStartTime, preferredEndTime),
+        sessionDuration: normalizedSessionDuration,
+        breakDuration: normalizedBreakDuration,
+        preferredTime: derivePreferredTimeEnum(
+          preferredStartTime,
+          preferredEndTime,
+        ),
         preferredTimeRange: {
           start: preferredStartTime,
           end: preferredEndTime,
         },
         freeDays,
         weeklyStudyHours: totalWeeklyHours,
-        weeklyGoalHours:weeklyGoalHours
+        weeklyGoalHours: normalizedWeeklyGoalHours,
       });
-      navigate("/dashboard",{replace:true});
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setSaveError("Failed to save data.");
     } finally {
       setIsSaving(false);
@@ -490,8 +552,8 @@ const SubjectRegister = () => {
         <div
           className={`flex flex-col font-Inter gap-2 mb-8 ${isRTL ? "text-right" : ""}`}
         >
-          <p className="text-3xl font-semibold text-white">{t.pageTitle}</p>
-          <p className="text-xs text-[#B8A7E5]">{t.pageSubtitle}</p>
+          <p className="text-3xl font-semibold text-white">{pageTitle}</p>
+          <p className="text-xs text-[#B8A7E5]">{pageSubtitle}</p>
         </div>
 
         <div
@@ -543,7 +605,6 @@ const SubjectRegister = () => {
                 )}
               </AnimatePresence>
             </div>
-          
           </div>
 
           {/* RIGHT COLUMN */}
@@ -565,7 +626,9 @@ const SubjectRegister = () => {
                     }`}
                   >
                     <div className="flex-1">
-                      <p className="text-[10px] text-[#B8A7E5]/80 mb-1">{t.from}</p>
+                      <p className="text-[10px] text-[#B8A7E5]/80 mb-1">
+                        {t.from}
+                      </p>
                       <input
                         type="time"
                         value={preferredStartTime}
@@ -574,7 +637,9 @@ const SubjectRegister = () => {
                       />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[10px] text-[#B8A7E5]/80 mb-1">{t.to}</p>
+                      <p className="text-[10px] text-[#B8A7E5]/80 mb-1">
+                        {t.to}
+                      </p>
                       <input
                         type="time"
                         value={preferredEndTime}
@@ -590,7 +655,9 @@ const SubjectRegister = () => {
                   <label className="text-sm  text-[#B8A7E5] mb-3 block font-medium">
                     {t.freeDays}
                   </label>
-                  <div className={`flex flex-wrap gap-2  ${isRTL ? "justify-end" : ""}`}>
+                  <div
+                    className={`flex flex-wrap gap-2  ${isRTL ? "justify-end" : ""}`}
+                  >
                     {dayOptions.map((d) => {
                       const selected = freeDays.includes(d.value);
                       return (
@@ -629,11 +696,11 @@ const SubjectRegister = () => {
                     min: 5,
                   },
                   {
-                    label:t.weeklyGoalHours,
-                    val:weeklyGoalHours,
-                    set:setHours,
-                    min:1
-                  }
+                    label: t.weeklyGoalHours,
+                    val: weeklyGoalHours,
+                    set: setHours,
+                    min: 1,
+                  },
                 ].map((input, i) => (
                   <div key={i} className={isRTL ? "text-right" : ""}>
                     <label className="text-sm text-[#B8A7E5] mb-1.5 block font-medium">
@@ -642,9 +709,13 @@ const SubjectRegister = () => {
                     <input
                       type="number"
                       value={input.val}
-                      onChange={(e) =>
-                        input.set(parseInt(e.target.value) || input.min)
-                      }
+                      onChange={(e) => input.set(e.target.value)}
+                      onBlur={() => {
+                        const parsed = parseInt(input.val, 10);
+                        if (!Number.isFinite(parsed) || parsed < input.min) {
+                          input.set(String(input.min));
+                        }
+                      }}
                       className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
                     />
                   </div>

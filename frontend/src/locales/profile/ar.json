@@ -61,7 +61,9 @@
       "fullName": "الاسم الكامل",
       "email": "البريد الإلكتروني",
       "phone": "رقم الهاتف",
-      "location": "الموقع"
+      "location": "الموقع",
+      "summary": "الملخص",
+      "bio": "النبذة"
     },
     "buttons": {
       "cancel": "إلغاء",
@@ -75,7 +77,9 @@
       "email": "البريد الإلكتروني",
       "phone": "رقم الهاتف",
       "location": "الموقع",
-      "memberSince": "عضو منذ"
+      "memberSince": "عضو منذ",
+      "summary": "الملخص",
+      "bio": "النبذة"
     }
   },
   "statsLabels": {
@@ -114,6 +118,14 @@
       "privacySettings": "إعدادات الخصوصية",
       "exportData": "تصدير البيانات",
       "deleteAccount": "حذف الحساب"
+    },
+    "changePasswordModal": {
+      "title": "تغيير كلمة المرور",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "cancel": "إلغاء",
+      "save": "تحديث كلمة المرور"
     },
     "deleteModal": {
       "title": "حذف الحساب",

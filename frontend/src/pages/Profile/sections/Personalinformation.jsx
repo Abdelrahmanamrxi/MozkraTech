@@ -1,6 +1,14 @@
 /* eslint-disable no-unused-vars */
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Calendar, Edit2 } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Edit2,
+  FileText,
+  Info,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const infoFields = [
@@ -12,10 +20,21 @@ const infoFields = [
     icon: Calendar,
     labelKey: "personalInfo.fields.memberSince",
   },
+  {
+    key: "summary",
+    icon: FileText,
+    labelKey: "personalInfo.fields.summary",
+    isLong: true,
+  },
+  {
+    key: "bio",
+    icon: Info,
+    labelKey: "personalInfo.fields.bio",
+    isLong: true,
+  },
 ];
 
-function PersonalInformation({ mockProfileData }) {
-  const { user } = mockProfileData;
+function PersonalInformation({ user }) {
   const { t } = useTranslation("profile");
 
   return (
@@ -34,26 +53,44 @@ function PersonalInformation({ mockProfileData }) {
       </div>
 
       <div className="flex flex-col gap-3">
-        {infoFields.map(({ key, icon: Icon, labelKey }) => (
-          <motion.div
-            key={key}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-4 bg-[#2F2844]/80 border border-white/10 rounded-[16px] px-4 py-3.5"
-          >
-            <div className="w-9 h-9 rounded-full bg-[#9B7EDE]/20 border border-[#9B7EDE]/30 flex items-center justify-center flex-shrink-0">
-              <Icon size={15} className="text-[#B8A7E5]" />
-            </div>
-            <div>
-              <p className="text-[10px] text-[#B8A7E5]/60 font-medium">
-                {t(labelKey)}
-              </p>
-              <p className="text-sm font-semibold text-white mt-0.5">
-                {user[key]}
-              </p>
-            </div>
-          </motion.div>
-        ))}
+        {infoFields.map(({ key, icon: Icon, labelKey, isLong }) => {
+          const fallback =
+            key === "summary"
+              ? t("fallback.summary")
+              : key === "bio"
+                ? t("fallback.bio")
+                : "";
+          const value = user[key] || fallback;
+
+          return (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              className={`flex gap-4 bg-[#2F2844]/80 border border-white/10 rounded-[16px] px-4 py-3.5 ${
+                isLong ? "items-start" : "items-center"
+              }`}
+            >
+              <div className="w-9 h-9 rounded-full bg-[#9B7EDE]/20 border border-[#9B7EDE]/30 flex items-center justify-center flex-shrink-0">
+                <Icon size={15} className="text-[#B8A7E5]" />
+              </div>
+              <div>
+                <p className="text-[10px] text-[#B8A7E5]/60 font-medium">
+                  {t(labelKey)}
+                </p>
+                <p
+                  className={`text-sm mt-0.5 ${
+                    isLong
+                      ? "text-white/90 leading-relaxed whitespace-pre-wrap"
+                      : "font-semibold text-white"
+                  }`}
+                >
+                  {value}
+                </p>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

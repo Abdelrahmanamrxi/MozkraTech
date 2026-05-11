@@ -3,14 +3,30 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Edit2, Calculator, X, Save } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import api from "../../../middleware/api";
 
 const EditProfileModal = ({ user, onClose, onSave }) => {
   const [form, setForm] = useState({ ...user });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const { t } = useTranslation("profile");
 
-  const handleSave = () => {
-    onSave(form);
-    onClose();
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveError("");
+    try {
+      await onSave(form);
+      onClose();
+    } catch (err) {
+      setSaveError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to save profile.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -27,7 +43,7 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ duration: 0.3 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-primary-dark/60 font-Inter backdrop-blur-2xl border border-white/20 rounded-[24px] p-8 max-w-md w-full shadow-2xl"
+        className="edit-profile-scroll bg-primary-dark/60 font-Inter backdrop-blur-2xl border border-white/20 rounded-[24px] p-5 sm:p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-white">
@@ -65,22 +81,49 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
               key: "location",
               type: "text",
             },
+            {
+              labelKey: "editProfile.labels.summary",
+              key: "summary",
+              type: "textarea",
+            },
+            {
+              labelKey: "editProfile.labels.bio",
+              key: "bio",
+              type: "textarea",
+            },
           ].map(({ labelKey, key, type }) => (
             <div key={key}>
               <label className="text-sm text-[#B8A7E5] mb-2 block font-medium">
                 {t(labelKey)}
               </label>
-              <input
-                type={type}
-                value={form[key] || ""}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, [key]: e.target.value }))
-                }
-                className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-4 py-3 text-white placeholder-white/40 focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all"
-              />
+              {type === "textarea" ? (
+                <textarea
+                  rows={1}
+                  value={form[key] || ""}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, [key]: e.target.value }))
+                  }
+                  className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-4 py-3 text-white placeholder-white/40 focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all resize-none"
+                />
+              ) : (
+                <input
+                  type={type}
+                  value={form[key] || ""}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, [key]: e.target.value }))
+                  }
+                  className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-[12px] px-4 py-3 text-white placeholder-white/40 focus:bg-white/15 focus:border-white/40 focus:ring-2 focus:ring-[#B8A7E5]/30 outline-none transition-all"
+                />
+              )}
             </div>
           ))}
         </div>
+
+        {saveError && (
+          <p className="mt-3 text-xs text-red-300" role="alert">
+            {saveError}
+          </p>
+        )}
 
         <div className="flex gap-3 mt-8">
           <motion.button
@@ -95,7 +138,8 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSave}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-lg hover:shadow-lg transition-all font-medium cursor-pointer"
+            disabled={isSaving}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-lg hover:shadow-lg transition-all font-medium cursor-pointer disabled:opacity-70"
           >
             <Save size={14} /> {t("editProfile.buttons.save")}
           </motion.button>
@@ -105,14 +149,45 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
   );
 };
 
-function ProfileHero({ mockProfileData }) {
-  const { user } = mockProfileData;
-  const [currentUser, setCurrentUser] = useState(user);
+function ProfileHero({ user, onUserChange, onUserRefresh }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const { t } = useTranslation("profile");
-  const displayTitle = currentUser.titleKey
-    ? t(currentUser.titleKey)
-    : currentUser.title;
+  const navigate = useNavigate();
+  const displayTitle = user.titleKey ? t(user.titleKey) : user.title;
+
+  const handleSaveProfile = async (form) => {
+    const payload = {};
+
+    const name = typeof form?.name === "string" ? form.name.trim() : "";
+    if (name.length >= 3) {
+      payload.fullName = name;
+    }
+
+    if (typeof form?.location === "string") {
+      const location = form.location.trim();
+      payload.location = location;
+    }
+
+    if (typeof form?.bio === "string") {
+      const bio = form.bio.trim();
+      payload.bio = bio;
+    }
+
+    if (typeof form?.summary === "string") {
+      const summary = form.summary.trim();
+      payload.summary = summary;
+    }
+
+    if (Object.keys(payload).length > 0) {
+      await api.patch("/user/update-profile", payload);
+    }
+
+    if (typeof onUserRefresh === "function") {
+      await onUserRefresh();
+    } else {
+      onUserChange((prev) => ({ ...prev, ...form }));
+    }
+  };
 
   return (
     <>
@@ -124,13 +199,13 @@ function ProfileHero({ mockProfileData }) {
             </div>
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-white">
-                {currentUser.name}
+                {user.name}
               </h1>
               <p className="text-sm text-[#D4C5F5] mt-0.5">
-                {displayTitle} • {t("hero.level", { level: currentUser.level })}
+                {displayTitle} • {t("hero.level", { level: user.level })}
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
-                {currentUser.badges.map((badgeKey) => (
+                {(user.badges || []).map((badgeKey) => (
                   <span
                     key={badgeKey}
                     className="text-[10px] font-semibold text-white bg-white/20 border border-white/30 rounded-full px-3 py-1"
@@ -153,6 +228,7 @@ function ProfileHero({ mockProfileData }) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/edit-subjects")}
               className="flex items-center gap-2 bg-[#9B7EDE] border border-[#B8A7E5]/30 text-white text-sm px-4 py-2 rounded-full font-medium hover:bg-[#8B6ECA] transition-all cursor-pointer"
             >
               <Edit2 size={15} /> {t("hero.actions.editSubjects")}
@@ -172,11 +248,9 @@ function ProfileHero({ mockProfileData }) {
       <AnimatePresence>
         {showEditModal && (
           <EditProfileModal
-            user={currentUser}
+            user={user}
             onClose={() => setShowEditModal(false)}
-            onSave={(updated) =>
-              setCurrentUser((prev) => ({ ...prev, ...updated }))
-            }
+            onSave={handleSaveProfile}
           />
         )}
       </AnimatePresence>
