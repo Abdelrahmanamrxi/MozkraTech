@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { to24,to12 } from "@/utils/formatTime";
-import { calcDuration } from "@/utils/formatTime";
+import { to24, to12, calcDuration, isoToLocalDateInputValue, isoToLocalTimeInputValue, localDateTimeToUtcIso, toLocalDateInputValue } from "@/utils/formatTime";
 import { Pencil,Trash2,Clock,Edit,Check } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
 import { motion,AnimatePresence } from "framer-motion";
@@ -17,9 +16,8 @@ function getFormattedDate(isoString) {
 }
 
 function getDateFromISO(isoString) {
-  if (!isoString) return new Date().toISOString().split("T")[0];
-  const date = new Date(isoString);
-  return date.toISOString().split("T")[0];
+  if (!isoString) return toLocalDateInputValue();
+  return isoToLocalDateInputValue(isoString);
 }
 
 function getDayNameFromDateString(dateString) {
@@ -36,14 +34,14 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
     name: session.name,
     day: session.day,
     date: getDateFromISO(session.startTime),
-    start: to24(session.start),
-    end: to24(session.end),
+    start: session.start ? to24(session.start) : isoToLocalTimeInputValue(session.startTime),
+    end: session.end ? to24(session.end) : isoToLocalTimeInputValue(session.endTime),
   });
 
   const save = () => {
     const dur = calcDuration(draft.start, draft.end);
-    const startDateTime = new Date(`${draft.date}T${draft.start}:00Z`).toISOString();
-    const endDateTime = new Date(`${draft.date}T${draft.end}:00Z`).toISOString();
+    const startDateTime = localDateTimeToUtcIso(draft.date, draft.start);
+    const endDateTime = localDateTimeToUtcIso(draft.date, draft.end);
     
     // Recalculate day from the new date
     const newDay = getDayNameFromDateString(draft.date);
@@ -67,8 +65,8 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
       name: session.name,
       day: session.day,
       date: getDateFromISO(session.startTime),
-      start: to24(session.start),
-      end: to24(session.end),
+      start: session.start ? to24(session.start) : isoToLocalTimeInputValue(session.startTime),
+      end: session.end ? to24(session.end) : isoToLocalTimeInputValue(session.endTime),
     });
     setEditing(false);
   };
@@ -144,7 +142,7 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
                 <input
                   type="date"
                   value={draft.date}
-                  min={new Date().toISOString().split("T")[0]}
+                  min={toLocalDateInputValue()}
                   onChange={(e) => setDraft((p) => ({ ...p, date: e.target.value }))}
                   className="w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-[#9B7EDE]/50 focus:outline-none focus:ring-1 focus:ring-[#9B7EDE]/20 transition [color-scheme:dark]"
                 />

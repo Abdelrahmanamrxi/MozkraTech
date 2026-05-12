@@ -7,8 +7,9 @@ import api from "../../../../middleware/api";
 import { useQuery } from "@tanstack/react-query";
 import AddSessionModal from "./sections/AddSessionModal";
 import SessionRow from "./sections/SessionRow";
-import { useMutation } from "@tanstack/react-query";
-import { daysOfWeek,calculateDuration,formatTimeFrom24,getDayFromISO,generateId } from "../../../../utils/formatTime";
+import { useMutation,useQueryClient } from "@tanstack/react-query";
+
+import { daysOfWeek, calculateDuration, formatTimeFrom24, getDayFromISO, generateId, toLocalDateTimeInputValue, localDateTimeInputToUtcIso } from "../../../../utils/formatTime";
 
 
 
@@ -49,6 +50,7 @@ async function getUserSubjects(){
 
 /* ── Main Form ── */
 function SessionForm({ setShowAddSessionPopup }) {
+  const queryClient=useQueryClient()
   const { data, isLoading, error, isFetching } = useQuery({
     queryKey: ["subjects"],
     queryFn: getUserSubjects,
@@ -60,6 +62,8 @@ function SessionForm({ setShowAddSessionPopup }) {
     refetchOnMount: false,
     keepPreviousData: true,
   });
+
+  const minDateTime = toLocalDateTimeInputValue();
 
   const subjects = data?.subjects ?? [];
   
@@ -138,7 +142,7 @@ function SessionForm({ setShowAddSessionPopup }) {
   console.log(selectedSubject)
  console.log(sessions)
  
-   async function generateSessions(){
+  async function generateSessions(){
    
     setError({})
     const errors=validateForm(form)
@@ -146,7 +150,9 @@ function SessionForm({ setShowAddSessionPopup }) {
     if(Object.keys(errors).length>0)
       return;
   
-      const response=await api.get(`/sessions/availability?dueDate=${form.dueDate}&totalHours=${form.totalHours}&studyHours=${form.studyHours}&subjectId=${form.subjectId}`)
+      const tzOffsetMinutes = new Date().getTimezoneOffset();
+      const dueDateUtc = localDateTimeInputToUtcIso(form.dueDate);
+      const response=await api.get(`/sessions/availability?dueDate=${encodeURIComponent(dueDateUtc)}&totalHours=${form.totalHours}&studyHours=${form.studyHours}&subjectId=${form.subjectId}&tzOffsetMinutes=${tzOffsetMinutes}`)
       return response.data
     
    
@@ -154,8 +160,16 @@ function SessionForm({ setShowAddSessionPopup }) {
 
 
   async function createSchedule(){
-   
-    const response=await api.post('/sessions/schedule',{task:form,sessions:sessions})
+    const taskPayload = {
+      ...form,
+      dueDate: localDateTimeInputToUtcIso(form.dueDate),
+    };
+    const normalizedSessions = sessions.map((session) => ({
+      ...session,
+      startTime: session.startTime ? new Date(session.startTime).toISOString() : session.startTime,
+      endTime: session.endTime ? new Date(session.endTime).toISOString() : session.endTime,
+    }));
+    const response=await api.post('/sessions/schedule',{task:taskPayload,sessions:normalizedSessions})
     return response.data
   }
 
@@ -176,18 +190,23 @@ function SessionForm({ setShowAddSessionPopup }) {
     onSuccess:(data)=>{
       console.log(data)
       const recommendedSessions = data?.recommendedSessions?.sessions || [];
-      const transformedSessions = recommendedSessions.map(session => ({
-        id:generateId(),
-        name: session.name || "",
-        day: getDayFromISO(session.startTime),
-        start: formatTimeFrom24(session.startTime),
-        end: formatTimeFrom24(session.endTime),
-        duration: calculateDuration(session.startTime, session.endTime),
-        startTime: session.startTime,
-        endTime: session.endTime,
-        subjectId: session.subjectId
-      }));
+      const transformedSessions = recommendedSessions.map(session => {
+        const startIso = session.startTime ? new Date(session.startTime).toISOString() : "";
+        const endIso = session.endTime ? new Date(session.endTime).toISOString() : "";
+        return {
+          id:generateId(),
+          name: session.name || "",
+          day: getDayFromISO(startIso),
+          start: formatTimeFrom24(startIso),
+          end: formatTimeFrom24(endIso),
+          duration: calculateDuration(startIso, endIso),
+          startTime: startIso,
+          endTime: endIso,
+          subjectId: session.subjectId
+        };
+      });
       setSessions(transformedSessions);
+      queryClient.invalidateQueries(['schedule'])
     },
     onError:(error)=>{
       const errorMsg = error?.response?.data?.message || error?.message || 'Failed to generate sessions';
@@ -348,11 +367,11 @@ function SessionForm({ setShowAddSessionPopup }) {
               <div className="flex flex-col gap-2">
                 <label className="text-xs uppercase tracking-[0.2em] text-[#B8A7E5]">Due Date</label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   value={form.dueDate}
-                  min={new Date().toISOString().split("T")[0]}
+                  min={minDateTime}
                   onChange={(e) => updateField("dueDate", e.target.value)}
-                  className={`${inputCls} sf-date`}
+                  className={`${inputCls} sf-datetime"`}
                 />
                   {Error.dueDate&&<p className="text-red-600 text-xs  font-Inter">{Error.dueDate}</p>}
               </div>

@@ -35,7 +35,13 @@ GOAL:
 Generate an optimized study schedule that fits within the available time before the dueDate.
 
 RULES:
+
+RULE:
+- "today" is the ONLY valid starting point for scheduling.
+- Never assume any other current date.
 - All generated sessions MUST end before the dueDate.
+- Use the Time Range to see which time he would study realistically.
+- Use the freeDays to put sessions in these days.
 - Do NOT create any session that overlaps with existingSessions.
 - A session cannot start or end inside an existing session.
 - The total sum of all sessions must equal totalHours.

@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React from 'react'
+import React, { useMemo } from 'react'
 import { FilterIcon, ScheduleIcon, OpenBookIcon, CalenderIcon, TipBackgroundIcon } from "@/comp/ui/Icons"
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
-function ScheduleSummary() {
+function ScheduleSummary({ metrics, scheduleData, weekStart }) {
   const { i18n } = useTranslation();
   const lang = i18n.language === 'ar' ? 'ar' : 'en';
   const labels = {
@@ -30,12 +30,32 @@ function ScheduleSummary() {
     },
   };
 
+  // Get today's date and count sessions for today
+  const today = useMemo(() => {
+    const date = new Date();
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const sessionsToday = scheduleData?.[dateStr] || [];
+    return sessionsToday.length;
+  }, [scheduleData]);
+
+  const totalHours = metrics?.totalHoursThisWeek || 0;
+  const avgDaily = metrics?.avgDailyHours || 0;
+  const subjectsCount = metrics?.uniqueSubjects || 0;
+  const upcomingDeadlines = metrics?.todaySessionCount || today;
+
+  // Format hours display
+  const formatHours = (hours) => {
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  };
+
   return (
       <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-row mt-6 lg:gap-3">
           <div className="flex bg-[#9B7EDE]/20 flex-col items-start border-t border-[#9B7EDE]/30 rounded-[24px] font-Inter lg:w-1/4 p-6">
             <ScheduleIcon />
             <p className="text-sm text-[#B8A7E5] mt-3">{labels[lang].week}</p>
-            <p className="font-bold text-white mt-2 text-2xl">28</p>
+            <p className="font-bold text-white mt-2 text-2xl">{totalHours.toFixed(1)}</p>
             <p className="text-[#B8A7E5]">{labels[lang].studyHours}</p>
           </div>
           <div className="flex bg-[#7C5FBD]/20 flex-col items-start border-t border-[#7C5FBD]/30 rounded-[24px] font-Inter lg:w-1/4 p-6">
@@ -50,21 +70,21 @@ function ScheduleSummary() {
               <path d="M16 8V16L21.3333 18.6667" stroke="#7C5FBD" strokeWidth="2.66667" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <p className="text-sm text-[#B8A7E5] mt-3">{labels[lang].avgDaily}</p>
-            <p className="font-bold text-white mt-2 text-2xl">4h</p>
+            <p className="font-bold text-white mt-2 text-2xl">{formatHours(avgDaily)}</p>
             <p className="text-[#B8A7E5]">{labels[lang].studyTime}</p>
           </div>
 
           <div className="flex bg-[#3D3555] flex-col items-start border-t border-[#7C5FBD]/20 rounded-[24px] font-Inter lg:w-1/4 p-6">
             <OpenBookIcon />
             <p className="text-sm text-[#B8A7E5] mt-3">{labels[lang].subjects}</p>
-            <p className="font-bold text-white mt-2 text-2xl">8</p>
+            <p className="font-bold text-white mt-2 text-2xl">{subjectsCount}</p>
             <p className="text-[#B8A7E5]">{labels[lang].activeCourses}</p>
           </div>
 
           <div className="flex bg-[#3D3555] flex-col items-start border-t border-[#7C5FBD]/20 rounded-[24px] font-Inter lg:w-1/4 p-6">
             <ScheduleIcon />
             <p className="text-sm text-[#B8A7E5] mt-3">{labels[lang].upcoming}</p>
-            <p className="font-bold text-white mt-2 text-2xl">5</p>
+            <p className="font-bold text-white mt-2 text-2xl">{upcomingDeadlines}</p>
             <p className="text-[#B8A7E5]">{labels[lang].deadlines}</p>
           </div>
         </div>

@@ -61,6 +61,44 @@ export function calcDuration(start, end) {
   return h > 0 ? (min > 0 ? `${h}h ${min}m` : `${h}h`) : `${min}m`;
 }
 
+const pad2 = (value) => String(value).padStart(2, "0");
+
+export function toLocalDateInputValue(date = new Date()) {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+}
+
+export function toLocalDateTimeInputValue(date = new Date()) {
+  return `${toLocalDateInputValue(date)}T${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+}
+
+export function isoToLocalDateInputValue(isoString) {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return "";
+  return toLocalDateInputValue(date);
+}
+
+export function isoToLocalTimeInputValue(isoString) {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+}
+
+export function localDateTimeToUtcIso(dateString, timeString) {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-").map(Number);
+  const [hour, minute] = (timeString || "00:00").split(":").map(Number);
+  const date = new Date(year, month - 1, day, hour, minute, 0, 0);
+  return date.toISOString();
+}
+
+export function localDateTimeInputToUtcIso(value) {
+  if (!value) return "";
+  const [dateString, timeString] = value.split("T");
+  return localDateTimeToUtcIso(dateString, timeString);
+}
+
 {/** This Utlity is for SessionForm */}
 export const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export function formatTimeFrom24(isoString) {

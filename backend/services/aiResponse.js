@@ -123,12 +123,18 @@ export const generateAISessionResponse = async (userId, userPreferences, subject
   }
 }
 export const generateAvailableSessions = async (
-  existingSessions,
-  convertedDate,
-  totalHours,
-  studyHours,
-  subjectId,
-  name
+  {
+
+    existingSessions,
+    dueDate,
+    totalHours,
+    studyHours,
+    subjectId,
+    name,
+    today,
+    freeDays,
+    timeRange
+  }
 ) => {
   try {
     const response = await groq.chat.completions.create({
@@ -147,11 +153,14 @@ Generate an optimized weekly study schedule.
 USER_DATA:
 ${JSON.stringify({
   existingSessions,
-  convertedDate,
+  dueDate,
   totalHours,
   studyHours,
   subjectId,
-  name
+  name,
+  today,
+  freeDays,
+  timeRange
 })}
 `
         }

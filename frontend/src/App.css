@@ -272,3 +272,23 @@ select {
 .google-button-wrapper button span {
   color: #fff !important;
 }
+
+.sf-datetime {
+  color-scheme: dark;
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: white;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.sf-datetime:focus {
+  border-color: rgba(155, 126, 222, 0.6);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(155, 126, 222, 0.15);
+}

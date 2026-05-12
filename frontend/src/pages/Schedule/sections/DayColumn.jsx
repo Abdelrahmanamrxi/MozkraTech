@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pencil } from "lucide-react";
-import SessionCard from "./sections/SessionCard";
+import { Pencil,Trash2,Check  } from "lucide-react";
+import SessionCard from "./SessionCard";
+import SessionDetailsModal from "./SessionDetailsModal";
+import DeleteSessionModal from "./DeleteSessionModal";
 
 const DayColumn = ({
   day,
@@ -11,9 +14,7 @@ const DayColumn = ({
   onDrop,
   onEditSession,
   isEditMode,
-  lang,
   t,
-  dayLabelsAr,
   parseTimeToHours,
   parseDurationToHours,
   hourToPx,
@@ -24,7 +25,11 @@ const DayColumn = ({
 }) => {
   const [previewPx, setPreviewPx] = useState(null);
   const [showEditHint, setShowEditHint] = useState(false);
-
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [deleteModal,setDelete]=useState(false)
+  const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches;
+  console.log(sessions)
   const columnRef = useRef(null);
 
   const getRelativeY = (e) => {
@@ -36,6 +41,7 @@ const DayColumn = ({
     if (!isEditMode) return;
     e.preventDefault();
     const y = getRelativeY(e);
+
     setPreviewPx(hourToPx(pxToSnappedHour(y)));
   };
 
@@ -46,6 +52,7 @@ const DayColumn = ({
 
   const handleDragLeave = (e) => {
     if (!isEditMode) return;
+    
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setDragOverDay(null);
       setPreviewPx(null);
@@ -55,21 +62,30 @@ const DayColumn = ({
   const handleDrop = (e, targetIndex = null) => {
     if (!isEditMode) return;
     e.preventDefault();
+
+  const data = JSON.parse(
+    e.dataTransfer.getData("application/json")
+  )
+
+  console.log(data)
+ 
     const y = getRelativeY(e);
     const snappedHour = pxToSnappedHour(y);
     setPreviewPx(null);
     setDragOverDay(null);
     onDrop(e, day, targetIndex, snappedHour);
+    console.log(targetIndex)
   };
 
   const isOver = isEditMode && dragOverDay === day;
 
+  const handleShowDetails = (session) => {
+    setSelectedSession(session);
+    setShowDetailsModal(true);
+  };
+
   return (
     <div className="flex flex-col">
-      <p className="text-center bg-[#52466B] rounded-[12px] px-2 py-2 text-[10px] font-bold text-white mb-4 uppercase tracking-wider">
-        {lang === "ar" ? dayLabelsAr[day] : day.slice(0, 3)}
-      </p>
-
       <div
         ref={columnRef}
         onDragOver={handleDragOver}
@@ -77,17 +93,19 @@ const DayColumn = ({
         onDragLeave={handleDragLeave}
         onDrop={(e) => handleDrop(e)}
         onMouseEnter={() => {
-          if (!isEditMode) setShowEditHint(true);
+          if (!isEditMode && canHover) setShowEditHint(true);
         }}
-        onMouseLeave={() => setShowEditHint(false)}
+        onMouseLeave={() => {
+          if (canHover) setShowEditHint(false);
+        }}
         style={{ height: GRID_HEIGHT }}
         className={`relative rounded-[20px] transition-all duration-150 ${
           isOver ? "bg-white/[0.07] ring-2 ring-[#9B7EDE]/60" : "bg-[#2a2242]/40"
         }`}
       >
         {!isEditMode && showEditHint && (
-          <div className="absolute top-2 left-2 right-2 z-20 pointer-events-none">
-            <div className="bg-black/50 text-[10px] text-white/80 px-2 py-1 rounded-full text-center">
+          <div className="absolute top-3 sm:top-2 left-2 right-2 z-20 pointer-events-none">
+            <div className="bg-black/50 text-[10px] sm:text-xs text-white/80 px-2 py-1 rounded-full text-center">
               {t.editHint}
             </div>
           </div>
@@ -112,11 +130,17 @@ const DayColumn = ({
 
         <AnimatePresence>
           {sessions.map((session, idx) => {
-            const startH = parseTimeToHours(session.time);
-            const durationH = parseDurationToHours(session.duration);
+           
+            const startH = parseTimeToHours(session.startTime);
+            const durationMinutes = (new Date(session.endTime) - new Date(session.startTime)) / (1000 * 60);
+            const durationH = Number.isFinite(durationMinutes) && durationMinutes > 0
+              ? durationMinutes / 60
+              : (typeof session.duration === "number"
+                ? session.duration
+                : parseDurationToHours(session.duration));
             const topPx = hourToPx(startH);
             const heightPx = durationH * HOUR_HEIGHT_PX;
-
+           
             return (
               <motion.div
                 key={session.id}
@@ -125,6 +149,7 @@ const DayColumn = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 320, damping: 28 }}
+                className="group"
                 style={{
                   position: "absolute",
                   top: topPx,
@@ -152,20 +177,39 @@ const DayColumn = ({
                     e.dataTransfer.effectAllowed = "move";
                   }}
                   onDropOnCard={(e, d, i) => handleDrop(e, i)}
+                  onShowDetails={handleShowDetails}
                 />
 
-                {isEditMode && (
+                {isEditMode && session.status!=="completed"  && (
                   <button
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
                       e.stopPropagation();
                       onEditSession(day, session);
                     }}
-                    className="absolute top-1.5 right-1.5 z-30 w-6 h-6 rounded-full bg-black/30 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                    className="absolute top-1.5 right-1.5 z-30 w-6 h-6 rounded-full bg-black/30 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     style={{ opacity: undefined }}
                     aria-label="Edit session"
                   >
-                    <Pencil size={11} />
+                     <Pencil size={11} />
+                  </button>
+                )}
+                
+                {isEditMode && (
+                  <button
+                    onClick={
+                      ()=>{
+                        setSelectedSession(session),
+                        setDelete(true)
+                      }
+                        
+                    }
+                    onMouseDown={(e) => e.stopPropagation()}
+                    className="absolute top-1.5 left-1.5 text-white z-30 w-6 h-6 rounded-full bg-black/30 hover:bg-black/60 flex items-center justify-center  hover:text-red-600 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                    style={{ opacity: undefined }}
+                    aria-label="Edit session"
+                  >
+                    <Trash2 size={11} />
                   </button>
                 )}
               </motion.div>
@@ -179,6 +223,17 @@ const DayColumn = ({
           </div>
         )}
       </div>
+
+      {/* Session Details Modal */}
+      <SessionDetailsModal
+        session={selectedSession}
+        isOpen={showDetailsModal}
+        onClose={() => {
+          setShowDetailsModal(false);
+          setSelectedSession(null);
+        }}
+      /> 
+      {deleteModal && selectedSession  && <DeleteSessionModal setDelete={setDelete} session={selectedSession} t={t}/>}
     </div>
   );
 };

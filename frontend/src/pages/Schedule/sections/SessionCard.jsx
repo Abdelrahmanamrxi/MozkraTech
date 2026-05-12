@@ -1,19 +1,29 @@
 /* eslint-disable no-unused-vars */
 import { motion } from "framer-motion";
+import { formatDuration, formatIsoTimeLabel } from "../utils/timeUtility";
+import { Info } from "lucide-react";
+import { useState } from "react";
 
-const parseDurationToHours = (str = "") => {
-  const h = str.match(/([\d.]+)h/i);
-  const m = str.match(/([\d.]+)m/i);
-  return (h ? parseFloat(h[1]) : 0) + (m ? parseFloat(m[1]) / 60 : 0) || 1;
+const parseDurationToHours = (startTime, endTime) => {
+  try {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    const minutes = (end - start) / (1000 * 60);
+    const hours = minutes / 60;
+    return hours;
+  } catch {
+    return 1;
+  }
 };
 
-const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMode }) => {
+const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMode, onShowDetails }) => {
+  const [showDetailBtn, setShowDetailBtn] = useState(false);
+  
   const handleDragStart = (event) => {
     if (!isEditMode) return;
     const target = event.currentTarget;
     const clone = target.cloneNode(true);
 
-    // تحسين شكل الـ Ghost Image أثناء السحب
     clone.style.position = "absolute";
     clone.style.top = "-9999px";
     clone.style.left = "-9999px";
@@ -39,15 +49,19 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMod
   };
 
   const handleDragOver = (e) => {
-    e.preventDefault(); // ضروري للسماح بالـ Drop
+    e.preventDefault();
   };
 
-  const durationHours = parseDurationToHours(session.duration);
+  const durationHours = parseDurationToHours(session.startTime, session.endTime);
   const isCompact = durationHours <= 1;
   const isTall = durationHours >= 1.5;
   const timeClass = isCompact ? "text-[10px]" : "text-xs";
   const subjectClass = isCompact ? "text-xs" : "text-sm";
   const durationClass = isCompact ? "text-[10px]" : "text-xs";
+  const statusBg = session.status === "scheduled" ? "bg-yellow-500/20 text-yellow-400" : 
+                   session.status === "missed" ? "bg-red-500/20 text-red-400" : 
+                   session.status === "completed" ? "bg-green-500/20 text-green-400" :
+                   "bg-gray-500/20 text-gray-400";
 
   return (
     <motion.div
@@ -55,27 +69,63 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMod
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDrop={(e) => {
-        e.stopPropagation(); // لمنع تداخل الحدث مع الـ container الأصلي
+        e.stopPropagation();
         onDropOnCard(e, day, index);
       }}
-      layout // خاصية من Framer Motion لعمل Transition ناعم عند تبديل الأماكن
+      onMouseEnter={() => setShowDetailBtn(true)}
+      onMouseLeave={() => setShowDetailBtn(false)}
+      layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       whileDrag={{ scale: 1.05, rotate: "2deg", zIndex: 50 }}
-      className={`${session.color} h-full ${
-        isCompact ? "p-3" : "p-4"
+      className={`bg-primary/75 h-full ${
+        isCompact ? "p-2 sm:p-3" : "p-3 sm:p-4"
       } rounded-[16px] text-white ${
-        isEditMode ? "cursor-grab active:cursor-grabbing" : "cursor-default"
-      } shadow-lg transition-shadow hover:shadow-2xl flex flex-col ${
+        isEditMode  ? "cursor-grab active:cursor-grabbing" : "cursor-default"
+      } shadow-lg transition-all hover:shadow-xl flex flex-col ${
         isTall ? "justify-between" : "gap-2"
-      }`}
+      } relative group overflow-hidden border border-white/10 hover:border-[#9B7EDE]/30`}
     >
-      <p className={`${timeClass} font-Inter opacity-90`}>{session.time}</p>
-      <p className={`${subjectClass} font-semibold`}>{session.subject}</p>
-      <p className={`${durationClass} opacity-80 ${isTall ? "mt-auto" : ""}`}>
-        {session.duration}
-      </p>
+      {/* Background gradient on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#9B7EDE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-[16px]" />
+
+      {/* Content container */}
+      <div className="relative z-10 flex flex-col h-full">
+        <p className={`${timeClass} font-Inter opacity-90 leading-tight`}>
+          {formatIsoTimeLabel(session.startTime)}
+        </p>
+        
+        <p className={`${subjectClass} font-semibold truncate  lg:whitespace-normal lg:overflow-visible lg:text-clip  `}>{session.name}</p>
+        
+        <div className={`flex flex-col ${isTall ? "mt-auto" : "gap-1"}`}>
+          <p className={`${durationClass} opacity-80 leading-tight`}>
+            {formatDuration(session.startTime, session.endTime)}
+          </p>
+          
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`text-[9px] px-2 py-1 rounded-full font-medium ${statusBg}`}>
+              {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Info button - appears on hover */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0 }}
+        animate={showDetailBtn ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onShowDetails) onShowDetails(session);
+        }}
+        className="absolute top-2 right-2 z-20 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#9B7EDE]/40 hover:bg-[#9B7EDE]/70 flex items-center justify-center text-white/80 hover:text-white transition-all shadow-lg"
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <Info size={14} />
+      </motion.button>
     </motion.div>
   );
 };

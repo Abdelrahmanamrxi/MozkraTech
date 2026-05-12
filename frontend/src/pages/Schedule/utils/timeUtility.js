@@ -1,4 +1,4 @@
-
+import {differenceInMinutes} from "date-fns"
 // GRID CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
 export const TIME_START_HOUR = 8;
@@ -22,6 +22,21 @@ export const HOUR_TICKS = HALF_TICKS.filter((h) => Number.isInteger(h));
 // TIME UTILITIES
 // ─────────────────────────────────────────────────────────────────────────────
 export function parseTimeToHours(str = "") {
+  // Handle ISO date strings as local time for display
+  if (str && (str.includes("T") || str.includes("-"))) {
+    const date = new Date(str);
+    if (!Number.isNaN(date.getTime())) {
+      return date.getHours() + date.getMinutes() / 60;
+    }
+  }
+  // Handle 24h "HH:MM" format
+  const hhmm = str.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  if (hhmm) {
+    const h = parseInt(hhmm[1], 10);
+    const m = parseInt(hhmm[2], 10);
+    return h + m / 60;
+  }
+  // Handle "HH:MM AM/PM" format
   const m = str.match(/(\d+):(\d+)\s*(AM|PM)/i);
   if (!m) return TIME_START_HOUR;
   let h = parseInt(m[1], 10);
@@ -30,6 +45,28 @@ export function parseTimeToHours(str = "") {
   if (mer === "PM" && h !== 12) h += 12;
   if (mer === "AM" && h === 12) h = 0;
   return h + min / 60;
+}
+
+export function formatIsoTimeLabel(str = "") {
+  if (!str) return str;
+  const date = new Date(str);
+  if (Number.isNaN(date.getTime())) return str;
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+export function formatIsoDateLabel(str = "", locale = "en-US") {
+  const date = new Date(str);
+  if (Number.isNaN(date.getTime())) return str;
+  return date.toLocaleDateString(locale, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export function parseDurationToHours(str = "") {
@@ -60,3 +97,24 @@ export function hoursToTimeString(h) {
   const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
   return `${hour12}:${String(mins).padStart(2,"0")} ${ampm}`;
 }
+export const formatDuration = (startTime, endTime) => {
+  const minutes = differenceInMinutes(
+    new Date(endTime),
+    new Date(startTime)
+  );
+
+  const hours = minutes / 60;
+
+  // exact hour
+  if (minutes % 60 === 0) {
+    return `${hours}h`;
+  }
+
+  // less than 1 hour
+  if (hours < 1) {
+    return `${minutes}m`;
+  }
+
+  // decimal hours
+  return `${hours.toFixed(1)}h`;
+};

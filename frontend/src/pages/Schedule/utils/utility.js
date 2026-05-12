@@ -16,7 +16,7 @@ export const labelsMap = {
     proTipText:     "Schedule your most challenging subjects during your peak productivity hours. Most students perform best in the morning (8–11 AM) or late afternoon (3–5 PM).",
     all:            "All",
     editSession:    "Edit Session",
-    subject:        "Subject",
+    session:        "Session",
     time:           "Time",
     duration:       "Duration",
     cancel:         "Cancel",
@@ -25,6 +25,9 @@ export const labelsMap = {
     overlapError:   "That time slot overlaps another session.",
     today:          "Today",
     sessions:       "sessions",
+    name:           "name",
+    loading:        "loading",
+    deleteSession:  "Delete Session"
   },
   ar: {
     pageTitle:      "جدولي",
@@ -40,7 +43,8 @@ export const labelsMap = {
     proTipText:     "حاول تحط أصعب المواد في ساعات النشاط بتاعتك.",
     all:            "الكل",
     editSession:    "تعديل الجلسة",
-    subject:        "المادة",
+    name:           "اسم",
+    session:        "الجلسة",
     time:           "الوقت",
     duration:       "المدة",
     cancel:         "إلغاء",
@@ -48,6 +52,8 @@ export const labelsMap = {
     overlapError:   "هذا الوقت متداخل مع جلسة تانية.",
     today:          "اليوم",
     sessions:       "جلسات",
+    loading :       "جار التحميل",
+    deleteSession: "حذف الجلسة"
   },
 };
 

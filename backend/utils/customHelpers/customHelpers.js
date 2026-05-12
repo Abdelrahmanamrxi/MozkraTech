@@ -39,3 +39,10 @@ export const checkUserStreak = async (user) => {
   user.lastActivityDate = now;
   await user.save();
 };
+
+
+   export const formatLocalDateTime = (date) => {
+    const pad2 = (value) => String(value).padStart(2, "0")
+       return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`
+        }
+  export  const toLocalTime = (date) => new Date(date.getTime() - offsetMinutes * 60000)

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
-import { calcDuration,to12 } from "@/utils/formatTime";
+import { calcDuration, to12, toLocalDateInputValue, localDateTimeToUtcIso } from "@/utils/formatTime";
 import { motion } from "framer-motion";
 import { X,Edit } from "lucide-react";
 import { generateId } from "@/utils/formatTime";
@@ -8,7 +8,7 @@ const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 
 function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject }) {
-  const today = new Date().toISOString().split("T")[0];
+  const today = toLocalDateInputValue();
   
   // Helper to get day name from date string
   const getDayNameFromDate = (dateString) => {
@@ -29,9 +29,8 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
     const dur = calcDuration(newSession.start, newSession.end);
     
     // Create ISO datetime strings
-    const startDateTime = new Date(`${newSession.date}T${newSession.start}:00Z`).toISOString();
-    const endDateTime = new Date(`${newSession.date}T${newSession.end}:00Z`).toISOString();
-    
+    const startDateTime = localDateTimeToUtcIso(newSession.date, newSession.start);
+    const endDateTime = localDateTimeToUtcIso(newSession.date, newSession.end);
     // Get day name from date
     const dayName = getDayNameFromDate(newSession.date);
     
@@ -86,7 +85,7 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
           <input
             type="date"
             value={newSession.date}
-            min={new Date().toISOString().split("T")[0]}
+            min={toLocalDateInputValue()}
             onChange={(e) => setNewSession(p => ({ ...p, date: e.target.value }))}
             className="w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-[#9B7EDE]/50 focus:outline-none [color-scheme:dark]"
           />
