@@ -3,15 +3,18 @@ import { Bell, UserCircle2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import Notifications from "../../Notifications/Notifications";
+import { Link } from "react-router-dom";
+import { buildAssetUrl } from "../../../../../utils/assetUrl";
 
 export function NotificationsUtilityRow({
   notifOpen,
   setNotifOpen,
   unreadCount,
   notifications,
+  profileImage,
 }) {
-
-  const {t}=useTranslation(['common'])
+  const { t } = useTranslation(["common"]);
+  const profileImageUrl = profileImage ? buildAssetUrl(profileImage) : "";
   return (
     <>
       {/* Utility row: Notifications + Profile */}
@@ -57,7 +60,7 @@ export function NotificationsUtilityRow({
               className="font-blinker text-[0.95rem] font-medium"
               style={{ color: "rgba(255,255,255,0.82)" }}
             >
-              {t('navbar.notifications.title')}
+              {t("navbar.notifications.title")}
             </span>
           </span>
 
@@ -70,21 +73,33 @@ export function NotificationsUtilityRow({
             }}
           />
         </motion.button>
-
-        <motion.button
-          type="button"
-          whileTap={{ scale: 0.97 }}
-          whileHover={{ backgroundColor: "rgba(255,255,255,0.07)" }}
-          transition={{ type: "spring", stiffness: 420, damping: 28 }}
-          className="w-11 h-11 flex items-center justify-center rounded-xl cursor-pointer"
-          aria-label="Profile"
-          style={{
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.10)",
-          }}
-        >
-          <UserCircle2 size={22} style={{ color: "rgba(255,255,255,0.72)" }} />
-        </motion.button>
+        <Link to="/dashboard/myprofile">
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.97 }}
+            whileHover={{ backgroundColor: "rgba(255,255,255,0.07)" }}
+            transition={{ type: "spring", stiffness: 420, damping: 28 }}
+            className="w-11 h-11 flex items-center justify-center rounded-xl cursor-pointer overflow-hidden"
+            aria-label="Profile"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.10)",
+            }}
+          >
+            {profileImageUrl ? (
+              <img
+                src={profileImageUrl}
+                alt="Profile"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <UserCircle2
+                size={22}
+                style={{ color: "rgba(255,255,255,0.72)" }}
+              />
+            )}
+          </motion.button>
+        </Link>
       </div>
 
       {/* Notifications overlay using shared Notifications component */}
@@ -98,11 +113,14 @@ export function NotificationsUtilityRow({
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-50 bg-black/55 flex items-center justify-center px-3"
           >
-            <Notifications setNotifications={setNotifOpen} bellRef={null} mobile />
+            <Notifications
+              setNotifications={setNotifOpen}
+              bellRef={null}
+              mobile
+            />
           </motion.div>
         )}
       </AnimatePresence>
     </>
   );
 }
-

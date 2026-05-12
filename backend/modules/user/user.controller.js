@@ -4,6 +4,39 @@ import HttpException from "../../utils/HttpException.js";
 import friendshipModel from "../../DB/models/friendship.model.js";
 import { notificationModel } from "../../DB/models/notifications.model.js";
 import bcrypt from "bcrypt";
+import fs from "fs";
+import path from "path";
+import { profileImageConfig } from "../../middleware/upload.js";
+
+const getRelativeImagePath = (imageUrl) => {
+  if (!imageUrl) return "";
+  try {
+    const parsed = new URL(imageUrl);
+    return parsed.pathname || "";
+  } catch (error) {
+    return imageUrl;
+  }
+};
+
+const resolveProfileImagePath = (imageUrl) => {
+  const relativePath = getRelativeImagePath(imageUrl);
+  if (!relativePath.startsWith(profileImageConfig.publicPrefix)) return "";
+
+  const safeRelative = relativePath.replace(/^[/\\]+/, "");
+  const absolutePath = path.resolve(process.cwd(), safeRelative);
+  const uploadsRoot = path.resolve(process.cwd(), "uploads", "profile");
+
+  if (!absolutePath.startsWith(uploadsRoot)) return "";
+  return absolutePath;
+};
+
+const removeProfileImageFile = (imageUrl) => {
+  const filePath = resolveProfileImagePath(imageUrl);
+  if (!filePath) return;
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+};
 // ----------------------------------updateProfile-------------------------------------------
 export const updateProfile = asyncHandler(async (req, res, next) => {
   const user = req.user._id;
@@ -12,6 +45,58 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ message: "updateProfile success", updatedUser });
+});
+
+// ----------------------------------updateProfileImage-------------------------------------------
+export const updateProfileImage = asyncHandler(async (req, res, next) => {
+  if (!req.file) {
+    return next(new HttpException("Profile image file is required", 400));
+  }
+
+  const userId = req.user._id;
+  const user = await userModel.findOne({ _id: userId, isDeleted: false });
+
+  if (!user) {
+    return next(new HttpException("User Not Found", 404));
+  }
+
+  const previousImage = user.profileImage;
+  const nextImage = `${profileImageConfig.publicPrefix}/${req.file.filename}`;
+
+  user.profileImage = nextImage;
+  await user.save();
+
+  if (previousImage && previousImage !== nextImage) {
+    removeProfileImageFile(previousImage);
+  }
+
+  return res.status(200).json({
+    message: "Profile image updated successfully",
+    profileImage: nextImage,
+  });
+});
+
+// ----------------------------------removeProfileImage-------------------------------------------
+export const removeProfileImage = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await userModel.findOne({ _id: userId, isDeleted: false });
+
+  if (!user) {
+    return next(new HttpException("User Not Found", 404));
+  }
+
+  const previousImage = user.profileImage;
+  user.profileImage = null;
+  await user.save();
+
+  if (previousImage) {
+    removeProfileImageFile(previousImage);
+  }
+
+  return res.status(200).json({
+    message: "Profile image removed successfully",
+    profileImage: null,
+  });
 });
 
 // ----------------------------------updateStudyPreferences-------------------------------------------

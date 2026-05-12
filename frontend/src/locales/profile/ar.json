@@ -63,7 +63,22 @@
       "phone": "رقم الهاتف",
       "location": "الموقع",
       "summary": "الملخص",
-      "bio": "النبذة"
+      "bio": "النبذة",
+      "profilePhoto": "الصورة الشخصية"
+    },
+    "photo": {
+      "alt": "الصورة الشخصية",
+      "change": "تغيير الصورة",
+      "remove": "إزالة الصورة",
+      "helper": "JPG أو PNG أو WEBP. الحد الأقصى 5 ميغابايت.",
+      "invalidType": "يسمح فقط بصور JPG أو PNG أو WEBP",
+      "tooLarge": "يجب أن تكون الصورة أقل من 5 ميغابايت",
+      "cropTitle": "قص الصورة",
+      "zoom": "تكبير",
+      "cancel": "إلغاء",
+      "use": "استخدام الصورة",
+      "processing": "جارٍ المعالجة...",
+      "processingError": "فشل في معالجة الصورة"
     },
     "buttons": {
       "cancel": "إلغاء",

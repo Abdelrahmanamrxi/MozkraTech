@@ -5,17 +5,17 @@ import {
   Menu,
   X,
   Home,
-  ChartNoAxesCombined, 
+  ChartNoAxesCombined,
   Calendar,
   Users,
   ChevronRight,
 } from "lucide-react";
-import i18n from 'i18next'
+import i18n from "i18next";
 import Logo from "../../../../logo/Logo";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotificationsUtilityRow } from "./NavbarMobileParts";
-import {useTranslation} from "react-i18next"
+import { useTranslation } from "react-i18next";
 import {
   DEMO_NOTIFICATIONS,
   DEMO_UNREAD_COUNT,
@@ -23,12 +23,9 @@ import {
 
 const iconMap = { Home, ChartNoAxesCombined, Calendar, Users };
 
-
-
-
-export default function NavbarMobile() {
+export default function NavbarMobile({ profileImage }) {
   const [open, setOpen] = useState(false);
-  const {t}=useTranslation(['common'])
+  const { t } = useTranslation(["common"]);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const location = useLocation();
@@ -44,13 +41,21 @@ export default function NavbarMobile() {
     setOpen(false);
     setNotifOpen(false);
   }, [location.pathname]);
-  
-const NAV_LINKS = [
-  { label: t("navbar.dashboard"), icon: "Home", href: "/dashboard" },
-  { label:t("navbar.progress"), icon: "ChartNoAxesCombined", href: "/dashboard/progress" },
-  { label:t("navbar.schedule"), icon: "Calendar", href: "/dashboard/schedule" },
-  { label:t("navbar.friends"), icon: "Users", href: "/dashboard/friends" },
-];
+
+  const NAV_LINKS = [
+    { label: t("navbar.dashboard"), icon: "Home", href: "/dashboard" },
+    {
+      label: t("navbar.progress"),
+      icon: "ChartNoAxesCombined",
+      href: "/dashboard/progress",
+    },
+    {
+      label: t("navbar.schedule"),
+      icon: "Calendar",
+      href: "/dashboard/schedule",
+    },
+    { label: t("navbar.friends"), icon: "Users", href: "/dashboard/friends" },
+  ];
 
   return (
     <>
@@ -123,11 +128,18 @@ const NAV_LINKS = [
             style={{
               background:
                 "linear-gradient(160deg, rgba(34,29,54,0.99) 0%, rgba(20,16,40,1) 100%)",
-              borderLeft: i18n.language === "en" ? "1px solid rgba(255,255,255,0.07)" : "none",
-              borderRight: i18n.language === "ar" ? "1px solid rgba(255,255,255,0.07)" : "none",
-              boxShadow: i18n.language === "en" 
-                ? "-12px 0 40px rgba(0,0,0,0.55)" 
-                : "12px 0 40px rgba(0,0,0,0.55)",
+              borderLeft:
+                i18n.language === "en"
+                  ? "1px solid rgba(255,255,255,0.07)"
+                  : "none",
+              borderRight:
+                i18n.language === "ar"
+                  ? "1px solid rgba(255,255,255,0.07)"
+                  : "none",
+              boxShadow:
+                i18n.language === "en"
+                  ? "-12px 0 40px rgba(0,0,0,0.55)"
+                  : "12px 0 40px rgba(0,0,0,0.55)",
               willChange: "transform",
               transform: "translateZ(0)",
             }}
@@ -136,17 +148,19 @@ const NAV_LINKS = [
             <div
               className={`absolute top-0 ${i18n.language === "en" ? "right-0" : "left-0"} w-48 h-48 pointer-events-none`}
               style={{
-                background: i18n.language === "en"
-                  ? "radial-gradient(circle at top right, rgba(144,103,198,0.18) 0%, transparent 60%)"
-                  : "radial-gradient(circle at top left, rgba(144,103,198,0.18) 0%, transparent 60%)",
+                background:
+                  i18n.language === "en"
+                    ? "radial-gradient(circle at top right, rgba(144,103,198,0.18) 0%, transparent 60%)"
+                    : "radial-gradient(circle at top left, rgba(144,103,198,0.18) 0%, transparent 60%)",
               }}
             />
             <div
               className={`absolute bottom-0 ${i18n.language === "en" ? "left-0" : "right-0"} w-48 h-48 pointer-events-none`}
               style={{
-                background: i18n.language === "en"
-                  ? "radial-gradient(circle at bottom left, rgba(144,103,198,0.09) 0%, transparent 60%)"
-                  : "radial-gradient(circle at bottom right, rgba(144,103,198,0.09) 0%, transparent 60%)",
+                background:
+                  i18n.language === "en"
+                    ? "radial-gradient(circle at bottom left, rgba(144,103,198,0.09) 0%, transparent 60%)"
+                    : "radial-gradient(circle at bottom right, rgba(144,103,198,0.09) 0%, transparent 60%)",
               }}
             />
 
@@ -156,7 +170,7 @@ const NAV_LINKS = [
               style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
             >
               <Logo />
-              
+
               {/* Language Switcher & Close Button */}
               <div className="flex items-center gap-2">
                 {/* Language Switcher */}
@@ -164,60 +178,70 @@ const NAV_LINKS = [
                   <motion.button
                     onClick={() => {
                       i18n.changeLanguage("en");
-                      document.documentElement.dir = 'ltr';
+                      document.documentElement.dir = "ltr";
                     }}
                     className={`relative px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200
-                      ${i18n.language === 'en' 
-                        ? 'text-white' 
-                        : 'text-white/50 hover:text-white/80'
+                      ${
+                        i18n.language === "en"
+                          ? "text-white"
+                          : "text-white/50 hover:text-white/80"
                       }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <AnimatePresence>
-                      {i18n.language === 'en' && (
+                      {i18n.language === "en" && (
                         <motion.div
                           layoutId="lang-active-mobile"
                           className="absolute inset-0 rounded-full bg-white/20 border border-white/20 backdrop-blur-sm"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 25,
+                          }}
                         />
                       )}
                     </AnimatePresence>
                     <span className="relative z-10">EN</span>
                   </motion.button>
-                  
+
                   <motion.button
                     onClick={() => {
                       i18n.changeLanguage("ar");
-                      document.documentElement.dir = 'rtl';
+                      document.documentElement.dir = "rtl";
                     }}
                     className={`relative px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200
-                      ${i18n.language === 'ar' 
-                        ? 'text-white' 
-                        : 'text-white/50 hover:text-white/80'
+                      ${
+                        i18n.language === "ar"
+                          ? "text-white"
+                          : "text-white/50 hover:text-white/80"
                       }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <AnimatePresence>
-                      {i18n.language === 'ar' && (
+                      {i18n.language === "ar" && (
                         <motion.div
                           layoutId="lang-active-mobile"
                           className="absolute inset-0 rounded-full bg-white/20 border border-white/20 backdrop-blur-sm"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 25,
+                          }}
                         />
                       )}
                     </AnimatePresence>
                     <span className="relative z-10">AR</span>
                   </motion.button>
                 </div>
-                
+
                 {/* Close Button */}
                 <motion.button
                   onClick={() => setOpen(false)}
@@ -242,7 +266,7 @@ const NAV_LINKS = [
                 className="text-[0.63rem] font-semibold tracking-[0.15em] uppercase mb-3 pl-2"
                 style={{ color: "rgba(141,134,201,0.5)" }}
               >
-                {i18n.language === "en" ? 'Navigation' : 'القائمة'}
+                {i18n.language === "en" ? "Navigation" : "القائمة"}
               </p>
 
               {NAV_LINKS.map(({ label, icon, href }, i) => {
@@ -379,16 +403,17 @@ const NAV_LINKS = [
               className="px-4 pt-4 pb-8 flex flex-col gap-2.5"
               style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
             >
-              {location.pathname !== '/' && (
+              {location.pathname !== "/" && (
                 <NotificationsUtilityRow
                   notifOpen={notifOpen}
                   setNotifOpen={setNotifOpen}
                   unreadCount={DEMO_UNREAD_COUNT}
                   notifications={DEMO_NOTIFICATIONS}
+                  profileImage={profileImage}
                 />
               )}
 
-              {location.pathname === '/' && (
+              {location.pathname === "/" && (
                 <>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
@@ -405,15 +430,17 @@ const NAV_LINKS = [
                         transition: "background 0.15s ease, color 0.15s ease",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgba(255,255,255,0.09)";
+                        e.currentTarget.style.background =
+                          "rgba(255,255,255,0.09)";
                         e.currentTarget.style.color = "white";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                        e.currentTarget.style.background =
+                          "rgba(255,255,255,0.05)";
                         e.currentTarget.style.color = "rgba(255,255,255,0.68)";
                       }}
                     >
-                      {t('navbar.login')}
+                      {t("navbar.login")}
                     </Link>
                   </motion.div>
 
@@ -442,7 +469,9 @@ const NAV_LINKS = [
                             "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 100%)",
                         }}
                       />
-                      <span className="relative z-10">{t('navbar.signup')} →</span>
+                      <span className="relative z-10">
+                        {t("navbar.signup")} →
+                      </span>
                     </Link>
                   </motion.div>
                 </>

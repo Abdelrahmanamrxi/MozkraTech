@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
   updateProfile,
+  updateProfileImage,
+  removeProfileImage,
   updateStudyPreferences,
   changePassword,
   deleteAccount,
@@ -14,6 +16,7 @@ import {
   searchForUsers,
 } from "./user.controller.js";
 import { validation } from "../../middleware/validation.js";
+import { profileImageUpload } from "../../middleware/upload.js";
 import {
   updateProfileSchema,
   updateStudyPreferencesSchema,
@@ -40,6 +43,13 @@ userRouter.patch(
   validation(updateProfileSchema),
   updateProfile,
 );
+userRouter.patch(
+  "/profile-image",
+  authentication,
+  profileImageUpload.single("profileImage"),
+  updateProfileImage,
+);
+userRouter.delete("/profile-image", authentication, removeProfileImage);
 userRouter.patch(
   "/study-preferences",
   authentication,
