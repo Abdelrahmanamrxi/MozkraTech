@@ -292,3 +292,19 @@ select {
   outline: none;
   box-shadow: 0 0 0 3px rgba(155, 126, 222, 0.15);
 }
+/* Hide calendar icon (Chrome, Edge, Safari) */
+.custom-date::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+
+/* Optional: remove inner spin / styling */
+.custom-date::-webkit-inner-spin-button {
+  display: none;
+}
+
+/* Firefox fallback */
+.custom-date {
+  appearance: none;
+  -moz-appearance: textfield;
+}

@@ -38,10 +38,6 @@ const router = createBrowserRouter([
     element: <SignupPage />,
   },
   {
-    path: "/subject-register",
-    element: <SubjectRegister />,
-  },
-  {
     path: "/login",
     element: <LoginPage />,
   },
@@ -89,6 +85,10 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     errorElement: <ErrorFallback />, // ✅ ADD THIS
     children: [
+      {
+        path: "/subject-register",
+        element: <SubjectRegister />,
+      },
       {
         path: "/edit-subjects",
         element: <SubjectRegister isEdit />,

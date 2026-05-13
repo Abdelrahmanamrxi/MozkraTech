@@ -12,6 +12,9 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAccessToken } from "../../slices/authSlice";
+import { getPostAuthRedirectPath } from "../../utils/authRedirect";
 import api from "../../middleware/api";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -303,7 +306,7 @@ const SubjectRegister = ({ isEdit = false }) => {
   const { i18n } = useTranslation();
   const lang = i18n.language === "ar" ? "ar" : "en";
   const navigate = useNavigate();
-
+  const dispatch=useDispatch()
   const labels = {
     en: {
       pageTitle: "Register Your Data",
@@ -361,7 +364,7 @@ const SubjectRegister = ({ isEdit = false }) => {
   const pageSubtitle = isEdit ? t.editPageSubtitle : t.pageSubtitle;
   const isRTL = lang === "ar";
 
-  // ── State ──
+  // ── State ─
   const [subjects, setSubjects] = useState([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
   const [subjectsError, setSubjectsError] = useState("");
@@ -537,7 +540,20 @@ const SubjectRegister = ({ isEdit = false }) => {
         weeklyStudyHours: totalWeeklyHours,
         weeklyGoalHours: normalizedWeeklyGoalHours,
       });
-      navigate("/dashboard", { replace: true });
+      // Refresh access token so client sees updated isSubjectVerified claim
+      try {
+        const { data } = await api.post("/auth/refresh-token");
+        if (data?.accessToken) {
+          dispatch(setAccessToken(data.accessToken));
+          const dest = getPostAuthRedirectPath(data.accessToken);
+          navigate(dest, { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      } catch (err) {
+        // fallback navigation
+        navigate("/dashboard", { replace: true });
+      }
     } catch (err) {
       console.log(err);
       setSaveError("Failed to save data.");

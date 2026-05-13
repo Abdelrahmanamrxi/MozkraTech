@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import Footer from "../../comp/layout/Footer/Footer";
 import { ArrowLeftIcon, Loader2 } from "lucide-react";
 import { setAccessToken } from "../../slices/authSlice";
+import { getPostAuthRedirectPath } from "../../utils/authRedirect";
 
 
 function LoginPage() {
@@ -64,7 +65,7 @@ function LoginPage() {
         }
       );
       dispatch(setAccessToken(response.data.accessToken));
-      navigate("/dashboard");
+      navigate(getPostAuthRedirectPath(response.data.accessToken));
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || "Login Failed";
       setErrors((prev) => ({ ...prev, login: message }));
@@ -93,7 +94,7 @@ function LoginPage() {
         withCredentials:true
       })
       dispatch(setAccessToken(response.data.accessToken))
-      navigate('/dashboard')
+      navigate(getPostAuthRedirectPath(response.data.accessToken))
     }
     catch(err){
           const message = err?.response?.data?.message || err.message || "Login Failed";

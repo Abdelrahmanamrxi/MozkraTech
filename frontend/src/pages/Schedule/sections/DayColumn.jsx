@@ -1,10 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pencil,Trash2,Check  } from "lucide-react";
+import { Pencil,Trash2,Check,CirclePlus  } from "lucide-react";
 import SessionCard from "./SessionCard";
 import SessionDetailsModal from "./SessionDetailsModal";
 import DeleteSessionModal from "./DeleteSessionModal";
+import CreateSessionModal from "./CreateSessionModal";
+
 
 const DayColumn = ({
   day,
@@ -28,8 +30,10 @@ const DayColumn = ({
   const [selectedSession, setSelectedSession] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [deleteModal,setDelete]=useState(false)
+  const [addModal,setAddModal]=useState(false)
+  const [showAddhint,setAddHint]=useState(false)
   const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches;
-  console.log(sessions)
+
   const columnRef = useRef(null);
 
   const getRelativeY = (e) => {
@@ -67,14 +71,14 @@ const DayColumn = ({
     e.dataTransfer.getData("application/json")
   )
 
-  console.log(data)
+
  
     const y = getRelativeY(e);
     const snappedHour = pxToSnappedHour(y);
     setPreviewPx(null);
     setDragOverDay(null);
     onDrop(e, day, targetIndex, snappedHour);
-    console.log(targetIndex)
+  
   };
 
   const isOver = isEditMode && dragOverDay === day;
@@ -94,9 +98,14 @@ const DayColumn = ({
         onDrop={(e) => handleDrop(e)}
         onMouseEnter={() => {
           if (!isEditMode && canHover) setShowEditHint(true);
+          if(isEditMode && canHover) setAddHint(true)
         }}
         onMouseLeave={() => {
-          if (canHover) setShowEditHint(false);
+          if (canHover) {
+            setShowEditHint(false);
+            setAddHint(false)
+          }
+            
         }}
         style={{ height: GRID_HEIGHT }}
         className={`relative rounded-[20px] transition-all duration-150 ${
@@ -110,6 +119,11 @@ const DayColumn = ({
             </div>
           </div>
         )}
+        {isEditMode && showAddhint && <div className="absolute  top-3 sm:top-2 left-2 right-2 z-20 ">
+            <div onClick={()=>{setAddModal(true)}} className="bg-black/50 cursor-pointer flex gap-3 flex-row justify-center items-center text-[10px] sm:text-xs text-white/80 px-2 py-1 rounded-full ">
+              Add Session <CirclePlus size={16}/>
+            </div>
+          </div>}
 
         {HALF_TICKS.map((h) => (
           <div
@@ -234,6 +248,7 @@ const DayColumn = ({
         }}
       /> 
       {deleteModal && selectedSession  && <DeleteSessionModal setDelete={setDelete} session={selectedSession} t={t}/>}
+      {addModal && <CreateSessionModal setAddModal={setAddModal} t={t}/> }
     </div>
   );
 };

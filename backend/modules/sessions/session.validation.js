@@ -41,16 +41,13 @@ export const createSessionSchema=joi.object({
     name:joi.string().required().messages({
       "string.empty":"Please Provide a Session Name."
     }),
-    subjectId:joi.string().required().messages({
-      "string.empty":"Please Provide a SubjectID."
-    }),
      taskId:joi.string().required().messages({
       "string.empty":"Task ID must be provided"
     }),
-    startTime:joi.date().required().messages({
+    startTime:joi.string().required().messages({
       "date.empty":"Start Time must be provided"
     }),
-    endTime:joi.date().required().messages({
+    endTime:joi.string().required().messages({
       "date.empty":"End Time must be Provided"
     })
 
@@ -111,4 +108,10 @@ export const createScheduleSchema=joi.object({
     )
   })
 })
-
+export const deleteSessionSchema=joi.object({
+  params:joi.object({
+    sessionId:joi.string().required().messages({
+      'string.empty':"Please provide the session."
+    })
+  })
+})

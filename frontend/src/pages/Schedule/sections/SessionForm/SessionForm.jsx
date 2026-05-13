@@ -206,7 +206,7 @@ function SessionForm({ setShowAddSessionPopup }) {
         };
       });
       setSessions(transformedSessions);
-      queryClient.invalidateQueries(['schedule'])
+   
     },
     onError:(error)=>{
       const errorMsg = error?.response?.data?.message || error?.message || 'Failed to generate sessions';
@@ -219,6 +219,10 @@ function SessionForm({ setShowAddSessionPopup }) {
     onSuccess:(data)=>{
       console.log(data)
       setMessage(data?.message || 'Schedule created successfully!')
+      queryClient.invalidateQueries({
+      queryKey:['schedule']
+      })
+      setShowAddSessionPopup(false)
     },
     onError:(error)=>{
       const errorMsg = error?.response?.data?.message || error?.message || 'Failed to create schedule';

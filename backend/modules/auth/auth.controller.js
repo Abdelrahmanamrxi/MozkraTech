@@ -25,8 +25,28 @@ export const signUp = asyncHandler(async (req, res, next) => {
 
   // check email
   const emailExist = await userModel.findOne({ email });
-  if (emailExist) {
+  if (emailExist && emailExist.isDeleted===false) {
+
     return next(new HttpException("Email Already Exists", 404));
+  }
+  if (emailExist && emailExist.isDeleted===true) {
+    const hashedPassword = await bcrypt.hash(password, +process.env.SALT_ROUNDS);
+    emailExist.isDeleted = false;
+    emailExist.isVerified = false;
+    emailExist.provider = "system";
+    emailExist.password = hashedPassword;
+    await emailExist.save();
+
+    setImmediate(() => {
+      eventEmitter.emit("sendEmail", { email });
+    });
+
+    return res.status(409).json({
+      message: "Account restored. Please verify your email.",
+      code: "ACCOUNT_RESTORED",
+      restored: true,
+      nextStep: "verify_email",
+    });
   }
 
   // hashing password
@@ -96,9 +116,10 @@ export const login = asyncHandler(async (req, res, next) => {
   });
   if (!user) {
     return next(
-      new HttpException("No User with Such Record Exists or not verified", 401),
+      new HttpException("No User with Such Record Exists", 401),
     );
   }
+ 
 
   //compare password
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -113,6 +134,9 @@ export const login = asyncHandler(async (req, res, next) => {
     payload: {
       email,
       id: user._id,
+      role: user.role,
+      isVerified: user.isVerified,
+      isSubjectVerified: user.isSubjectVerified,
     },
     SIGNATURE: process.env.JWT_SECRET,
     option: { expiresIn: "15m" },
@@ -264,8 +288,46 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
 
   // check email
   const emailExist = await userModel.findOne({ email });
-  if (emailExist) {
+  if (emailExist && emailExist.isDeleted===false) {
     return next(new HttpException("Email Already Exists", 404));
+  }
+  if (emailExist && emailExist.isDeleted===true) {
+    emailExist.isDeleted = false;
+    emailExist.isVerified = true;
+    emailExist.provider = "google";
+    await emailExist.save();
+
+    const accessToken = await generateToken({
+      payload: {
+        email,
+        id: emailExist._id,
+        isVerified: emailExist.isVerified,
+        isSubjectVerified: emailExist.isSubjectVerified,
+      },
+      SIGNATURE: process.env.JWT_SECRET,
+      option: { expiresIn: "15m" },
+    });
+    const refreshToken = await generateToken({
+      payload: {
+        email,
+        id: emailExist._id,
+        isVerified: emailExist.isVerified,
+        isSubjectVerified: emailExist.isSubjectVerified,
+      },
+      SIGNATURE: process.env.JWT_SECRET,
+      option: { expiresIn: "3d" },
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+      sameSite: "strict",
+      httpOnly: true,
+    });
+    return res.status(200).json({
+      message: "Account restored. Signed in with Google.",
+      accessToken,
+      restored: true,
+    });
   }
   const user = await userModel.create({
     fullName: name,
@@ -328,8 +390,11 @@ export const loginWithGoogle = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new HttpException("Email Doesn't Exist"), 400);
   }
+  if(user.isDeleted===true){
+    return next(new HttpException("Account Doesn't Exist"))
+  }
   if (user.provider != "google") {
-    return next(new HttpException("Login with Google Failed", 400));
+    return next(new HttpException("Account Not Found.", 400));
   }
   const accessToken = await generateToken({
     payload: {

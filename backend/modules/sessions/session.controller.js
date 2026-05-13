@@ -13,16 +13,20 @@ import { hasSessionConflict } from '../../utils/sessionHelper/sessionHelper.js'
 export const createSession=asyncHandler(async(req,res,next)=>{
     const userId=req.user._id
 
-    const {name,taskId,subjectId,startTime,endTime}=req.body
+    const {name,taskId,startTime,endTime,date}=req.body
 
+    const fullStartDate = new Date(`${date}T${startTime}:00`)
+    const fullEndDate = new Date(`${date}T${endTime}:00`)
+
+    const task=await taskModel.findOne({_id:taskId}).populate('subjectId')
 
    const session=await sessionModel.create({
         userId,
         name,
         taskId,
-        startTime,
-        endTime,
-        subjectId,
+        startTime:fullStartDate,
+        endTime:fullEndDate,
+        subjectId:task.subjectId._id,
         status:'scheduled'
     })
 
@@ -55,15 +59,15 @@ export const checkAvailableSessions=asyncHandler(async(req,res,next)=>{
 
 
         
-        const today = formatLocalDateTime(toLocalTime(new Date()))
-        const dueDateLocal = formatLocalDateTime(toLocalTime(convertedDate))
+        const today = formatLocalDateTime(toLocalTime(new Date(),offsetMinutes))
+        const dueDateLocal = formatLocalDateTime(toLocalTime(convertedDate,offsetMinutes))
     
     const sessions=await sessionModel.find({userId,endTime:{$lt:convertedDate}})
 
     const existingSessions=sessions.map((session)=>{
         return {
-          startTime: formatLocalDateTime(toLocalTime(new Date(session.startTime))),
-          endTime: formatLocalDateTime(toLocalTime(new Date(session.endTime)))
+          startTime: formatLocalDateTime(toLocalTime(new Date(session.startTime),offsetMinutes)),
+          endTime: formatLocalDateTime(toLocalTime(new Date(session.endTime),offsetMinutes))
         }
     })
 
@@ -311,5 +315,19 @@ export const moveSession = asyncHandler(async (req, res, next) => {
         message: "Session moved successfully",
         session
     })
+})
+
+export const deleteSession=asyncHandler(async(req,res,next)=>{
+    const {sessionId}=req.params
+    
+    const session=await sessionModel.findOneAndDelete({_id:sessionId})
+    if (!session) {
+    return next(
+      new HttpException("Couldn't find session matching your criteria", 404)
+    );
+  }
+
+    res.status(200).json({message:"Session Deleted Successfully"})
+
 })
 

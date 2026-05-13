@@ -78,7 +78,7 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
             type="text"
             value={newSession.name}
             onChange={(e) => setNewSession(p => ({ ...p, name: e.target.value }))}
-            placeholder="Session name (optional)"
+            placeholder="Session name"
             className="w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25 focus:border-[#9B7EDE]/50 focus:outline-none focus:ring-1 focus:ring-[#9B7EDE]/20"
           />
 

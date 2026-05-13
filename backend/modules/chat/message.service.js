@@ -6,6 +6,7 @@ import { connectioUser } from "./chat.socket.service.js";
 import { setUserOnline } from "./chat.socket.service.js";
 import { userStatus } from "./chat.socket.service.js";
 import { notificationModel } from "../../DB/models/notifications.model.js";
+
 export const sendMessage = async (socket) => {
   socket.on("sendMessage", async ({ message, destId }) => {
     if (!destId || !message || !message.trim()) {

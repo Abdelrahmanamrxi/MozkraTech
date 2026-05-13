@@ -9,6 +9,7 @@ import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { getPostAuthRedirectPath } from "../../utils/authRedirect";
 
 function SignupForm({ isRtl, t }) {
  const baseUrl=import.meta.env.VITE_BACKEND_URL
@@ -18,6 +19,7 @@ function SignupForm({ isRtl, t }) {
   const {
     formData,
     errors,
+    notice,
     step,
     otp,
     loading,
@@ -34,6 +36,7 @@ function SignupForm({ isRtl, t }) {
     handleResendOtp,
     setOtp,
     setErrors,
+    setNotice,
     setShowPassword,
     setShowConfirmPassword,
   } = useSignupForm(t);
@@ -66,10 +69,13 @@ const handleGoogleSuccess = async (credentialResponse) => {
       birthDate,
       gender: formData.gender.toLowerCase(),
     },{withCredentials:true});
-
+    
+    if (response.data.message) {
+      setNotice(response.data.message);
+    }
     // Save access token
     dispatch(setAccessToken(response.data.accessToken));
-    navigate('/subject-register')
+    navigate(getPostAuthRedirectPath(response.data.accessToken));
   } catch (err) {
     const message = err?.response?.data?.message || err.message || "Registration failed";
    // console.error("Google signup error:", err);
@@ -366,6 +372,7 @@ useEffect(() => {
         <div className="h-px bg-white/20 flex-1"></div>
       </div>
 
+      {notice ? <p className="flex justify-center items-center text-green-600 mb-4">{notice}</p> : ""}
       {step === 1 ? renderSignupStep() : step === 2 ? renderOtpStep() : renderSuccessStep()}
     </Motion.div>
   );

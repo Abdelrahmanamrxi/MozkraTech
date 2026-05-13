@@ -8,7 +8,7 @@ import SessionForm from "./sections/SessionForm/SessionForm";
 import { useTranslation } from "react-i18next";
 import DayColumn from "./sections/DayColumn";
 import { useQuery } from "@tanstack/react-query";
-import TimeRuler from "./sections/TimeRuler";
+import TimeRuler from "./TimeRuler";
 import EditSessionModal from "./sections/EditSessionModal";
 import DropConfirmationModal from "./sections/DropConfirmationModal";
 import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
@@ -38,6 +38,8 @@ import {
   SNAP_MINUTES,
   HOUR_HEIGHT_PX,
   fmtHourLabel,
+  HOUR_TICKS,
+  GRID_HEIGHT
 } from "./utils/timeUtility";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -99,7 +101,6 @@ const TodayBanner = ({ sessionCount, t, lang, isCurrentWeek }) => {
     </motion.div>
   );
 };
-
 // ─────────────────────────────────────────────────────────────────────────────
 // WEEK NAVIGATION BAR
 // ─────────────────────────────────────────────────────────────────────────────
@@ -173,14 +174,14 @@ const DayHeader = ({ date, dayName, isToday, lang, todayLabel }) => {
   const isWeekend = dayName === "Saturday" || dayName === "Sunday";
 
   return (
-    <div className={`relative flex flex-col items-center gap-1 pb-2.5 pt-2 ${isWeekend ? "opacity-55" : ""}`}>
+    <div className={`relative flex flex-col items-center gap-1 pb-2.5 pt-5 ${isWeekend ? "opacity-55" : ""}`}>
       {isToday && (
-        <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-extrabold uppercase tracking-wider px-2 py-[2px] rounded-full bg-[#C084FC] text-[#1B142D] shadow-md shadow-[#C084FC]/50 ring-1 ring-white/40 pointer-events-none whitespace-nowrap">
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 text-[9px] font-extrabold uppercase tracking-wider px-2.5 py-[3px] rounded-full bg-[#C084FC] text-white shadow-lg shadow-[#C084FC]/60 ring-1 ring-white/30 pointer-events-none whitespace-nowrap">
           {todayLabel}
         </span>
       )}
       <span
-        className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${
+        className={`text-[9px] sm:text-[10px] mt-2 font-bold uppercase tracking-wider ${
           isToday ? "text-[#C084FC]" : "text-white/40"
         }`}
       >
@@ -190,7 +191,6 @@ const DayHeader = ({ date, dayName, isToday, lang, todayLabel }) => {
         className={`
           flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full
           text-xs sm:text-sm font-bold transition-all select-none
-          ${isToday ? "mt-1" : ""}
           ${isToday
             ? "bg-[#9B7EDE] text-white shadow-lg shadow-[#9B7EDE]/55 ring-2 ring-[#C084FC]/35"
             : "text-white/65 hover:bg-white/8"
@@ -202,7 +202,6 @@ const DayHeader = ({ date, dayName, isToday, lang, todayLabel }) => {
     </div>
   );
 };
-
 // ─────────────────────────────────────────────────────────────────────────────
 // WEEK DOT SCRUBBER
 // ─────────────────────────────────────────────────────────────────────────────
@@ -400,8 +399,8 @@ const Schedule = () => {
     const roundDownHalf = (h) => Math.floor(h * 2) / 2;
     const roundUpHalf = (h) => Math.ceil(h * 2) / 2;
 
-    let minHour = Number.isFinite(preferredStartHour) ? preferredStartHour : TIME_START_HOUR;
-    let maxHour = Number.isFinite(preferredEndHour) ? preferredEndHour : TIME_END_HOUR;
+    let minHour = TIME_START_HOUR;
+    let maxHour = TIME_END_HOUR;
 
     minHour = roundDownHalf(minHour);
     maxHour = roundUpHalf(maxHour);
@@ -721,8 +720,8 @@ const Schedule = () => {
             <div className="flex gap-4 sm:gap-2" style={{ minWidth: "960px" }}>
 
               <TimeRuler
-                HOUR_TICKS={hourTicks}
-                GRID_HEIGHT={gridHeight}
+                HOUR_TICKS={HOUR_TICKS}
+                GRID_HEIGHT={GRID_HEIGHT}
                 hourToPx={hourToPxDynamic}
                 fmtHourLabel={fmtHourLabel}
               />

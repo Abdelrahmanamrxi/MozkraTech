@@ -73,6 +73,7 @@ export default function useSignupForm(t) {
   // Form data state.
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
+  const [notice, setNotice] = useState("");
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -103,20 +104,22 @@ export default function useSignupForm(t) {
    * Update form field values and clear field-specific errors.
    */
   const handleChange = (e) => {
-      setErrors((prev) => ({ ...prev, submit: "" }));
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
-      clearFieldError(name);
-    }
+    setErrors((prev) => ({ ...prev, submit: "" }));
+    setNotice("");
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    clearFieldError(name);
+  }
   
 
   /**
    * Update gender selection in the form.
    */
   const handleGenderChange = (selectedGender) => {
-      setFormData((prev) => ({ ...prev, gender: selectedGender }));
-      clearFieldError("gender");
-    }
+    setNotice("");
+    setFormData((prev) => ({ ...prev, gender: selectedGender }));
+    clearFieldError("gender");
+  }
  
   /**
    * Update birth date fields and enforce upper limits.
@@ -124,6 +127,7 @@ export default function useSignupForm(t) {
   const handleBirthDate = (field, value) => {
     const limits = { day: 31, month: 12, year: new Date().getFullYear() };
     if (value > limits[field]) return;
+    setNotice("");
     setFormData((prev) => ({
       ...prev,
       birthDate: { ...prev.birthDate, [field]: value },
@@ -139,6 +143,7 @@ export default function useSignupForm(t) {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
+      setNotice("");
 
       const allEmpty = Object.values(formData).every((val) => {
         if (typeof val === "object" && val !== null) {
@@ -175,8 +180,17 @@ export default function useSignupForm(t) {
         startTimer(60);
         setStep(2);
         setErrors({});
+        setNotice("");
       } catch (err) {
-        const message = err?.response?.data?.message || err.message || "Registration failed";
+        const response = err?.response;
+        if (response?.status === 409 && response?.data?.code === "ACCOUNT_RESTORED") {
+          setNotice(response.data.message || "Account restored. Please verify your email.");
+          startTimer(60);
+          setStep(2);
+          setErrors({});
+          return;
+        }
+        const message = response?.data?.message || err.message || "Registration failed";
         setErrors({ submit: message });
       } finally {
         setLoading(false);
@@ -248,6 +262,7 @@ export default function useSignupForm(t) {
   return {
     formData,
     errors,
+    notice,
     step,
     otp,
     loading,
@@ -265,6 +280,7 @@ export default function useSignupForm(t) {
     setOtp,
     setFormData,
     setErrors,
+    setNotice,
     setStep,
     setShowPassword,
     setShowConfirmPassword,
