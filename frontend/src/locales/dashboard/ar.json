@@ -1,12 +1,12 @@
 {
-"weekly":{
-    "morning":"صباح الخير",
-    "afternoon":"مساء الخير",
-    "schedule":"عرض الجدول الكامل",
-    "report":"التقرير الأسبوعي",
-    "text":"أنت تحرز تقدماً رائعاً! دعنا نستمر في رحلة التعلم الخاصة بك اليوم."
-},
- "summary": {
+  "weekly": {
+    "morning": "صباح الخير",
+    "afternoon": "مساء الخير",
+    "schedule": "عرض الجدول الكامل",
+    "report": "التقرير الأسبوعي",
+    "text": "أنت تحرز تقدماً رائعاً! دعنا نستمر في رحلة التعلم الخاصة بك اليوم."
+  },
+  "summary": {
     "currentStreak": {
       "label": "الانقطاع الحالي",
       "sub": "أيام"
@@ -34,13 +34,15 @@
       "remaining": "متبقي"
     }
   },
-   "learningOverview": {
+  "learningOverview": {
     "aiSuggestion": {
       "label": "اقتراح الذكاء الاصطناعي",
       "button": "ابدأ الجلسة"
     },
     "todaysSchedule": {
       "label": "جدول اليوم هنا",
+      "loading": "جارٍ تحميل جدول اليوم...",
+      "empty": "لا توجد جلسات مجدولة لليوم.",
       "difficulty": {
         "easy": "سهل",
         "medium": "متوسط",
@@ -49,6 +51,8 @@
     },
     "upcomingSchedule": {
       "label": "الجدول القادم",
+      "loading": "جارٍ تحميل الجلسات القادمة...",
+      "empty": "لا توجد جلسات قادمة.",
       "daysLeft": "أيام"
     },
     "friendsProgress": {
