@@ -131,7 +131,7 @@ export const generateAvailableSessions = async (
     studyHours,
     subjectId,
     name,
-    today,
+    currentDateTime,
     freeDays,
     timeRange
   }
@@ -147,21 +147,54 @@ export const generateAvailableSessions = async (
         },
         {
           role: "user",
-          content: `
-Generate an optimized weekly study schedule.
+          content:  `
+Generate an optimized study schedule.
 
-USER_DATA:
+IMPORTANT:
+- totalHours is the ENTIRE schedule total.
+- studyHours is ONLY the MAXIMUM allowed PER DAY.
+- The FINAL TOTAL of ALL session durations combined MUST equal exactly ${totalHours} hours.
+- Never generate more than ${totalHours} total hours.
+- Prefer fewer longer sessions.
+- Minimize number of days.
+
+CURRENT TIME:
+${currentDateTime}
+
+DEADLINE:
+${dueDate}
+
+ALLOWED DAYS:
+${JSON.stringify(freeDays)}
+
+TIME WINDOW:
+${JSON.stringify(timeRange)}
+
+BLOCKED SLOTS:
+${existingSessions
+  .map(
+    (s) =>
+      `- ${s.startTime} → ${s.endTime}`
+  )
+  .join("\n")}
+
+PARAMETERS:
 ${JSON.stringify({
-  existingSessions,
-  dueDate,
   totalHours,
   studyHours,
   subjectId,
-  name,
-  today,
-  freeDays,
-  timeRange
+  name
 })}
+
+VALID EXAMPLE:
+If totalHours = 3 and studyHours = 3:
+VALID:
+- one 3-hour session
+- three 1-hour sessions
+
+INVALID:
+- 3h Monday + 3h Tuesday = 6h
+
 `
         }
       ],

@@ -41,8 +41,14 @@ export const checkUserStreak = async (user) => {
 };
 
 
-   export const formatLocalDateTime = (date,offsetMinutes) => {
-    const pad2 = (value) => String(value).padStart(2, "0")
-       return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`
-        }
+  export const formatLocalDateTime = (date) => {
+  const pad2 = (value) => String(value).padStart(2, "0")
+  return `${date.getUTCFullYear()}-${pad2(date.getUTCMonth() + 1)}-${pad2(date.getUTCDate())}T${pad2(date.getUTCHours())}:${pad2(date.getUTCMinutes())}:${pad2(date.getUTCSeconds())}`
+}
   export  const toLocalTime = (date,offsetMinutes) => new Date(date.getTime() - offsetMinutes * 60000)
+  
+
+  export const toLocalTimeForAI = (date, offsetMinutes) => 
+  new Date(date.getTime() + offsetMinutes * 60000)
+
+

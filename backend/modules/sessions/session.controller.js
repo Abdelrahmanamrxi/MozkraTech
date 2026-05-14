@@ -7,8 +7,9 @@ import { generateAISessionResponse,generateAvailableSessions } from "../../servi
 import userModel from '../../DB/models/user.model.js'
 import {startOfWeek,endOfWeek} from 'date-fns'
 import HttpException from '../../utils/HttpException.js'
-import { formatLocalDateTime,toLocalTime } from '../../utils/customHelpers/customHelpers.js'
+import { formatLocalDateTime,toLocalTime,toLocalTimeForAI } from '../../utils/customHelpers/customHelpers.js'
 import { hasSessionConflict } from '../../utils/sessionHelper/sessionHelper.js'
+
 
 export const createSession=asyncHandler(async(req,res,next)=>{
     const userId=req.user._id
@@ -47,48 +48,54 @@ export const generateSessions = asyncHandler(async (req, res, next) => {
 
 export const checkAvailableSessions=asyncHandler(async(req,res,next)=>{
     const{dueDate,totalHours,studyHours,subjectId,tzOffsetMinutes}=req.query
-    console.log(req.user)
+    const parsedTotalHours = Number(totalHours)
+    const parsedStudyHours = Number(studyHours)
     const userId=req.user._id
 
     const subject=await subjectModel.findOne({userId,_id:subjectId})
     if(!subject){
         return next(new HttpException("SubjectID must be provided"),400)
     }
-        const convertedDate=new Date(dueDate)
-        const offsetMinutes = Number(tzOffsetMinutes || 0)
 
+    const convertedDate=new Date(dueDate)
 
-        
-        const today = formatLocalDateTime(toLocalTime(new Date(),offsetMinutes))
-        const dueDateLocal = formatLocalDateTime(toLocalTime(convertedDate,offsetMinutes))
     
-    const sessions=await sessionModel.find({userId,endTime:{$lt:convertedDate}})
+    const offsetMinutes = -(Number(tzOffsetMinutes || 0)) // negate whatever comes in
+    const currentDateTime = formatLocalDateTime(toLocalTimeForAI(new Date(), offsetMinutes))
+
+    const dueDateLocal = formatLocalDateTime(toLocalTimeForAI(convertedDate,offsetMinutes))
+  
+    const sessions = await sessionModel.find({
+    userId,
+    startTime: { $gte: new Date() },
+    endTime: { $lte: convertedDate }})
 
     const existingSessions=sessions.map((session)=>{
         return {
-          startTime: formatLocalDateTime(toLocalTime(new Date(session.startTime),offsetMinutes)),
-          endTime: formatLocalDateTime(toLocalTime(new Date(session.endTime),offsetMinutes))
+          startTime: formatLocalDateTime(toLocalTimeForAI(new Date(session.startTime),offsetMinutes)),
+          endTime: formatLocalDateTime(toLocalTimeForAI(new Date(session.endTime),offsetMinutes))
         }
     })
-
+  
     const name=subject.name
     const user=await userModel.findOne({_id:userId})
-    console.log(existingSessions)
+      console.log(user.preferredTimeRange)
+   
     const recommendedSessions = await generateAvailableSessions({
         existingSessions,
         dueDate:dueDateLocal,
-        totalHours,
-        studyHours,
+        totalHours:parsedTotalHours,
+        studyHours:parsedStudyHours,
         subjectId,
         name,
-        today,
+        currentDateTime,
         freeDays:user.freeDays,
         timeRange:user.preferredTimeRange
     }
 );
 console.log(recommendedSessions)
     
-    res.status(200).json({message:"Generated Sessions Succesfully",recommendedSessions})
+ res.status(200).json({message:"Generated Sessions Succesfully",recommendedSessions})
 
 })
 

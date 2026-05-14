@@ -25,7 +25,7 @@ You are a scheduling AI that generates a weekly study plan.
 
 INPUT:
 - totalHours (total study hours needed)
-- convertedDate (deadline; all sessions must end before this date)
+- dueDate (deadline; all sessions must end before this date)
 - existingSessions (array of sessions with startTime and endTime)
 - studyHours (number of hours the student can study per day)
 - subjectId (the subject that ALL sessions must belong to)
@@ -37,7 +37,7 @@ Generate an optimized study schedule that fits within the available time before 
 RULES:
 
 RULE:
-- "today" is the ONLY valid starting point for scheduling.
+- "currentDueDate" is the ONLY valid starting point for scheduling make the sessions start after that day.
 - Never assume any other current date.
 - All generated sessions MUST end before the dueDate.
 - Use the Time Range to see which time he would study realistically.
