@@ -1,11 +1,11 @@
 {
-"weekly":{
-     "morning": "Good morning",
+  "weekly": {
+    "morning": "Good morning",
     "afternoon": "Good afternoon",
-    "schedule":"View Full Schedule",
-    "report":"Weekly Report",
-    "text":"You're making great progress! Let's continue your learning journey today."
-},
+    "schedule": "View Full Schedule",
+    "report": "Weekly Report",
+    "text": "You're making great progress! Let's continue your learning journey today."
+  },
   "summary": {
     "currentStreak": {
       "label": "Current Streak",
@@ -34,13 +34,15 @@
       "remaining": "Remaining"
     }
   },
-   "learningOverview": {
+  "learningOverview": {
     "aiSuggestion": {
       "label": "AI Suggestion",
       "button": "Start Session"
     },
     "todaysSchedule": {
       "label": "Today's Schedule Here",
+      "loading": "Loading today's schedule...",
+      "empty": "No sessions scheduled for today.",
       "difficulty": {
         "easy": "Easy",
         "medium": "Medium",
@@ -49,6 +51,8 @@
     },
     "upcomingSchedule": {
       "label": "Upcoming Schedule",
+      "loading": "Loading upcoming sessions...",
+      "empty": "No upcoming sessions.",
       "daysLeft": "days"
     },
     "friendsProgress": {
@@ -56,7 +60,4 @@
       "message": "You're ahead of 2 friends this week! 🎉"
     }
   }
-
-
-
 }

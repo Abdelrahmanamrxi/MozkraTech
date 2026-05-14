@@ -25,7 +25,7 @@ function Profile() {
       location: dbUser.location ?? "",
       bio: dbUser.bio ?? "",
       summary: dbUser.summary ?? "",
-      profileImage: dbUser.profileImage ?? prev.profileImage,
+      profileImage: dbUser.profileImage,
       level: dbUser.level ?? prev.level,
       memberSince: createdAt
         ? createdAt.toLocaleDateString(undefined, {
