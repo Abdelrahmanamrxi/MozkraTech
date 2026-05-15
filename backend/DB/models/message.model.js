@@ -27,6 +27,25 @@ const messageSchema =  new mongoose.Schema(
       default:false,
       required:true
     },
+    deletedFor: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    isDeletedForAll: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     messageType: {
       type: String,
       enum: ["text", "image", "file", "code", "suggestion"],

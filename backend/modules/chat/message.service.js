@@ -66,10 +66,12 @@ export const sendMessage = async (socket) => {
     console.log(userStatus.get(destId.toString(),receiverStatus))
     socket.emit("successMessage", {
       conversationId: conversation._id,
+      _id: newMessage._id,
       message: newMessage.content,
       sentAt: newMessage.createdAt,
       senderId: userId.toString(),
       receiverId: destId.toString(),
+      isDeletedForAll: newMessage.isDeletedForAll,
       status: receiverStatus || { status: "offline", lastActivityDate: null },
     });
 
@@ -79,12 +81,119 @@ export const sendMessage = async (socket) => {
     if (receiverSocketId) {
       socket.to(receiverSocketId).emit("receiveMessage", {
         conversationId: conversation._id,
+        _id: newMessage._id,
         message: newMessage.content,
         sentAt: newMessage.createdAt,
         senderId: userId.toString(),
         receiverId: destId.toString(),
+        isDeletedForAll: newMessage.isDeletedForAll,
       });
     }
+  });
+};
+
+export const deleteMessage = async (socket) => {
+  socket.on("deleteMessage", async ({ messageId, deleteFor, conversationId }) => {
+    if (!messageId || !deleteFor) {
+      return socket.emit("sendError", {
+        message: "messageId and deleteFor are required",
+      });
+    }
+
+    const data = await authSocket({ socket });
+    if (data.statusCode !== 200) {
+      return socket.emit("authError", data);
+    }
+
+    const userId = data.user._id.toString();
+    const message = await messageModel.findById(messageId);
+    if (!message) {
+      return socket.emit("sendError", {
+        message: "Message not found",
+      });
+    }
+
+    if (conversationId && message.conversationId?.toString() !== conversationId.toString()) {
+      return socket.emit("sendError", {
+        message: "Conversation mismatch",
+      });
+    }
+
+    const conversation = await conversationModel.findOne({
+      _id: message.conversationId,
+      "participants.user": userId,
+    });
+
+    if (!conversation) {
+      return socket.emit("sendError", {
+        message: "Conversation not found",
+      });
+    }
+
+    if (deleteFor === "all") {
+      if (message.senderId?.toString() !== userId) {
+        return socket.emit("sendError", {
+          message: "Not allowed to delete this message for everyone",
+        });
+      }
+
+      const deleteTimestamp = message.deletedAt || Date.now();
+      if (!message.isDeletedForAll || !message.deletedAt || !message.deletedBy) {
+        await messageModel.updateOne(
+          { _id: message._id },
+          {
+            $set: {
+              isDeletedForAll: true,
+              deletedAt: deleteTimestamp,
+              deletedBy: userId,
+            },
+          },
+        );
+      }
+
+      const payload = {
+        messageId: message._id.toString(),
+        conversationId: message.conversationId.toString(),
+        deleteFor: "all",
+        deletedBy: userId,
+        deletedAt: message.deletedAt || deleteTimestamp,
+      };
+
+      socket.emit("messageDeleted", payload);
+
+      const otherParticipant = conversation.participants.find(
+        (participant) => participant.user.toString() !== userId,
+      );
+
+      const otherParticipantSocketId = otherParticipant
+        ? connectioUser.get(otherParticipant.user.toString())
+        : null;
+
+      if (otherParticipantSocketId) {
+        socket.to(otherParticipantSocketId).emit("messageDeleted", payload);
+      }
+
+      return;
+    }
+
+    if (deleteFor === "me") {
+      await messageModel.updateOne(
+        { _id: message._id },
+        { $addToSet: { deletedFor: userId } },
+      );
+
+      socket.emit("messageDeleted", {
+        messageId: message._id.toString(),
+        conversationId: message.conversationId.toString(),
+        deleteFor: "me",
+        deletedBy: userId,
+      });
+      return;
+    }
+
+    return socket.emit("sendError", {
+      message: "Invalid deleteFor option",
+    });
   });
 };
 

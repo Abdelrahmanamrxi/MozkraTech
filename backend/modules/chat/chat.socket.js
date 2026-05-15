@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { logOut, registerAccount } from "./chat.socket.service.js";
-import { markAsRead, sendMessage } from "./message.service.js";
+import { deleteMessage, markAsRead, sendMessage } from "./message.service.js";
 
 
 export const runIo = (httpServer) => {
@@ -18,6 +18,7 @@ export const runIo = (httpServer) => {
     
     await registerAccount(socket);
     await sendMessage(socket);
+    await deleteMessage(socket);
     await markAsRead(socket);
     await logOut(socket);
   });

@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { ChevronLeft, ChevronRight, EmojiIcon, SendIcon } from "../../../../comp/ui/Icons";
+import { ChevronLeft, ChevronRight, DotsIcon, EmojiIcon, SendIcon } from "../../../../comp/ui/Icons";
 import { formatRelativeTime } from "@/utils/formatTime.js";
 
 
@@ -74,8 +75,14 @@ function MessagesContent({
   historyError,
   isLoading,
   error,
+  onDeleteMessage,
   t,
 }) {
+  const [openMenuId, setOpenMenuId] = useState(null);
+
+  useEffect(() => {
+    setOpenMenuId(null);
+  }, [selected?._id, selected?.conversationId]);
 
   if (!selected) {
     return (
@@ -152,50 +159,123 @@ function MessagesContent({
       )}
 
       <AnimatePresence initial={false}>
-        {selectedMessages.map((msg, index) => (
-          <Motion.div
-            key={msg.id ?? msg._id ?? index}
-            initial={{ opacity: 0, y: 10, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 340, damping: 24 }}
-            className={`group flex items-end gap-2 ${msg.from === "me" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`flex flex-col gap-1 max-w-[75%] ${msg.from === "me" ? "items-end" : "items-start"}`}
+        {selectedMessages.map((msg, index) => {
+          const messageId = msg._id?.toString() ?? msg.id ?? index;
+          const hasMessageId = !!msg._id;
+          const isDeletedForAll = !!msg.isDeletedForAll;
+          const canDeleteForMe = !!onDeleteMessage && hasMessageId && !isDeletedForAll;
+          const canDeleteForAll =
+            !!onDeleteMessage && hasMessageId && msg.from === "me" && !isDeletedForAll;
+          const menuOpen = openMenuId === messageId;
+
+          return (
+            <Motion.div
+              key={msg.id ?? msg._id ?? index}
+              initial={{ opacity: 0, y: 10, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: "spring", stiffness: 340, damping: 24 }}
+              className={`group flex items-end gap-2 ${msg.from === "me" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm transition-colors duration-150
-                ${
-                  msg.from === "me"
-                    ? "bg-linear-to-r from-[#c4b5fd] to-[#a78bfa] text-slate-950 rounded-br-sm"
-                    : "bg-[#27233a] text-white rounded-bl-sm"
-                }`}
-                title={
-                  msg.sentAt
-                    ? new Date(msg.sentAt).toLocaleString()
-                    : msg.createdAt
-                      ? new Date(msg.createdAt).toLocaleString()
-                      : ""
-                }
+                className={`flex flex-col gap-1 max-w-[75%] ${msg.from === "me" ? "items-end" : "items-start"} relative`}
               >
-                {msg.message}
-              </div>
-              <div className="flex items-center justify-between gap-2 text-[10px] text-purple-300/40">
-                <span>{formatRelativeTime(msg.sentAt || msg.createdAt || msg.time, t)}</span>
-                {msg.from === "me" && (
-                  <span className={msg.isRead ? "text-emerald-300" : "text-orange-300"}>
-                    {msg.isRead ? t("messages.seen") : t("messages.sent")}
+                {(canDeleteForMe || canDeleteForAll) && (
+                  <div className={`absolute top-1 ${msg.from === "me" ? "-left-8" : "-right-8"}`}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenMenuId((prev) => (prev === messageId ? null : messageId))
+                      }
+                      className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-full bg-[#2b2540]/80 border border-[#9B7EDE]/20 flex items-center justify-center"
+                    >
+                      <DotsIcon />
+                    </button>
+                    <AnimatePresence>
+                      {menuOpen && (
+                        <Motion.div
+                          initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                          className={`absolute z-20 mt-2 min-w-35 rounded-xl border border-[#9B7EDE]/20 bg-[#1f1a3c] shadow-xl ${
+                            msg.from === "me" ? "right-0" : "left-0"
+                          }`}
+                        >
+                          <div className="flex flex-col py-1">
+                            {canDeleteForMe && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onDeleteMessage?.({
+                                    messageId: msg._id,
+                                    conversationId: msg.conversationId,
+                                    deleteFor: "me",
+                                  });
+                                  setOpenMenuId(null);
+                                }}
+                                className="px-3 py-2 text-left text-xs text-purple-200 hover:bg-[#2b2540] transition-colors"
+                              >
+                                {t("messages.deleteForMe")}
+                              </button>
+                            )}
+                            {canDeleteForAll && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onDeleteMessage?.({
+                                    messageId: msg._id,
+                                    conversationId: msg.conversationId,
+                                    deleteFor: "all",
+                                  });
+                                  setOpenMenuId(null);
+                                }}
+                                className="px-3 py-2 text-left text-xs text-red-200 hover:bg-[#2b2540] transition-colors"
+                              >
+                                {t("messages.deleteForAll")}
+                              </button>
+                            )}
+                          </div>
+                        </Motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+                <div
+                  className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm transition-colors duration-150
+                  ${
+                    msg.from === "me"
+                      ? "bg-linear-to-r from-[#c4b5fd] to-[#a78bfa] text-slate-950 rounded-br-sm"
+                      : "bg-[#27233a] text-white rounded-bl-sm"
+                  }`}
+                  title={
+                    msg.sentAt
+                      ? new Date(msg.sentAt).toLocaleString()
+                      : msg.createdAt
+                        ? new Date(msg.createdAt).toLocaleString()
+                        : ""
+                  }
+                >
+                  <span className={isDeletedForAll ? "italic text-white/60" : ""}>
+                    {isDeletedForAll ? t("messages.deletedMessage") : msg.message}
                   </span>
+                </div>
+                <div className="flex items-center justify-between gap-2 text-[10px] text-purple-300/40">
+                  <span>{formatRelativeTime(msg.sentAt || msg.createdAt || msg.time, t)}</span>
+                  {msg.from === "me" && (
+                    <span className={msg.isRead ? "text-emerald-300" : "text-orange-300"}>
+                      {msg.isRead ? t("messages.seen") : t("messages.sent")}
+                    </span>
+                  )}
+                </div>
+                {msg.from === "them" && (
+                  <div className="self-start w-8 h-8 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center mt-1">
+                    <span className="text-white font-semibold text-[10px]">{selected.fullName?.[0] ?? "?"}</span>
+                  </div>
                 )}
               </div>
-              {msg.from === "them" && (
-                <div className="self-start w-8 h-8 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center mt-1">
-                  <span className="text-white font-semibold text-[10px]">{selected.fullName?.[0] ?? "?"}</span>
-                </div>
-              )}
-            </div>
-          </Motion.div>
-        ))}
+            </Motion.div>
+          );
+        })}
       </AnimatePresence>
       <div ref={messagesEndRef} />
     </div>
@@ -258,6 +338,7 @@ function ChatPanel({
   onInputChange,
   onKeyDown,
   onSend,
+  onDeleteMessage,
   canSend,
   friendActivityLabel,
   t,
@@ -297,6 +378,7 @@ function ChatPanel({
         onLoadOlder={onLoadOlder}
         selectedMessages={selectedMessages}
         messagesEndRef={messagesEndRef}
+        onDeleteMessage={onDeleteMessage}
         t={t}
       />
 

@@ -72,14 +72,20 @@ function normalizeChat(messages, selected) {
     .map((message) => {
       const senderId = message.senderId?._id?.toString() ?? message.senderId?.toString();
       const isFromThem = selected._id?.toString() === senderId;
+      const messageText = message.message ?? message.content ?? "";
+      const isDeletedForAll = !!message.isDeletedForAll;
 
       return {
         ...message,
+        message: isDeletedForAll ? "" : messageText,
         conversationId: selected.conversationId,
         friendId: selected._id,
         senderId,
         sentAt: message.createdAt,
         from: isFromThem ? "them" : "me",
+        isDeletedForAll,
+        deletedAt: message.deletedAt ?? null,
+        deletedBy: message.deletedBy ?? null,
         
       };
     })
@@ -236,6 +242,7 @@ function useFriendsMessages(selected) {
       const senderId = payload.senderId?._id?.toString() ?? payload.senderId?.toString();
       const receiverId = payload.receiverId?.toString();
       const friendId = senderId;
+      const isDeletedForAll = !!payload.isDeletedForAll;
 
       setMessages((prev) => {
         // Check if message already exists by _id or fallback key
@@ -253,11 +260,15 @@ function useFriendsMessages(selected) {
           {
             ...payload,
             conversationId: payload.conversationId,
+            message: isDeletedForAll ? "" : payload.message,
             from: "them",
             friendId,
             senderId,
             receiverId,
             sentAt: messageTime,
+            isDeletedForAll,
+            deletedAt: payload.deletedAt ?? null,
+            deletedBy: payload.deletedBy ?? null,
           },
         ];
       });
@@ -272,6 +283,7 @@ function useFriendsMessages(selected) {
       const friendId = receiverId;
       const isCurrentConversation =
         payload.conversationId?.toString() === selected?.conversationId?.toString();
+      const isDeletedForAll = !!payload.isDeletedForAll;
 
       const normalizedStatus = normalizeStatus(payload.status)
       // console.log(normalizedStatus)
@@ -295,14 +307,44 @@ function useFriendsMessages(selected) {
           {
             ...payload,
             conversationId: payload.conversationId,
+            message: isDeletedForAll ? "" : payload.message,
             from: "me",
             friendId,
             senderId,
             receiverId,
             sentAt: messageTime,
-            userStatus: payload.status
+            userStatus: payload.status,
+            isDeletedForAll,
+            deletedAt: payload.deletedAt ?? null,
+            deletedBy: payload.deletedBy ?? null,
           },
         ];
+      });
+    });
+
+    socket.on("messageDeleted", ({ messageId, conversationId, deleteFor, deletedBy, deletedAt }) => {
+      if (!messageId) return;
+
+      setMessages((prev) => {
+        if (deleteFor === "me") {
+          return prev.filter((msg) => msg._id?.toString() !== messageId.toString());
+        }
+
+        if (deleteFor === "all") {
+          return prev.map((msg) =>
+            msg._id?.toString() === messageId.toString()
+              ? {
+                  ...msg,
+                  message: "",
+                  isDeletedForAll: true,
+                  deletedBy: deletedBy ?? msg.deletedBy,
+                  deletedAt: deletedAt ?? msg.deletedAt ?? Date.now(),
+                }
+              : msg,
+          );
+        }
+
+        return prev;
       });
     });
 
@@ -377,6 +419,15 @@ function useFriendsMessages(selected) {
     socket.emit("sendMessage", { destId, message });
   }, []);
 
+  const deleteMessage = useCallback(({ messageId, conversationId, deleteFor }) => {
+    const socket = socketRef.current;
+    if (!socket) {
+      setStatus('sendError')
+      return;
+    }
+    socket.emit("deleteMessage", { messageId, conversationId, deleteFor });
+  }, []);
+
   /**
    * Mark the current conversation as read locally and notify the backend.
    * This helps keep unread counts in sync across devices.
@@ -428,6 +479,7 @@ function useFriendsMessages(selected) {
     userStatus,
     messages,
     sendMessage,
+    deleteMessage,
     markAsRead,
     loadOlderMessages,
     hasMoreHistory,

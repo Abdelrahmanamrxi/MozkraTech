@@ -30,6 +30,9 @@
     "unableToLoadFriends": "تعذر تحميل الأصدقاء.",
     "noMessagesYet": "لا توجد رسائل بعد",
     "youLabel": "أنت",
+    "deleteForMe": "حذف لدي",
+    "deleteForAll": "حذف للجميع",
+    "deletedMessage": "تم حذف الرسالة",
     "status": {
       "online": "متصل",
       "offline": "غير متصل"

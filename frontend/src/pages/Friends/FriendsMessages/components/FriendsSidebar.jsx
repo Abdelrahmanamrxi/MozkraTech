@@ -31,6 +31,10 @@ function FriendsSidebar({
   
   
   function getLastMessagePreview(item) {
+    if (item.lastMessage?.isDeletedForAll) {
+      return t("messages.deletedMessage");
+    }
+
     const content = item.lastMessage?.content;
     if (!content) return t("messages.noMessagesYet");
 

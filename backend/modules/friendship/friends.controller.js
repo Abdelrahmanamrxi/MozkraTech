@@ -79,12 +79,15 @@ export const getFriends = asyncHandler(async (req, res, next) => {
     {
       $lookup: {
         from: "messages",
-        let: { convId: "$conversationId" },
+        let: { convId: "$conversationId", viewerId: userId },
         pipeline: [
           {
             $match: {
               $expr: {
-                $eq: ["$conversationId", "$$convId"]
+                $and: [
+                  { $eq: ["$conversationId", "$$convId"] },
+                  { $not: { $in: ["$$viewerId", { $ifNull: ["$deletedFor", []] }] } }
+                ]
               }
             }
           },
@@ -99,10 +102,15 @@ export const getFriends = asyncHandler(async (req, res, next) => {
           {
             $project: {
               _id: 1,
-              content: 1,
+              content: {
+                $cond: ["$isDeletedForAll", "", "$content"]
+              },
               senderId: 1,
               isRead: 1,
-              createdAt: 1
+              createdAt: 1,
+              isDeletedForAll: 1,
+              deletedAt: 1,
+              deletedBy: 1
             }
           }
         ],

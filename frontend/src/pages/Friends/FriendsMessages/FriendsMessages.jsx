@@ -83,6 +83,7 @@ export default function FriendsMessages() {
     userStatus,
     messages,
     sendMessage,
+    deleteMessage,
     markAsRead,
     loadOlderMessages,
     hasMoreHistory,
@@ -170,13 +171,20 @@ export default function FriendsMessages() {
               : item.friend.lastActivityDate,
         };
 
+        const isDeletedForAll =
+          localLatest?.message?.isDeletedForAll || item.lastMessage?.isDeletedForAll;
+        const resolvedContent = isDeletedForAll
+          ? ""
+          : localLatest?.message?.content || localLatest?.message?.message || item.lastMessage?.content;
+
         const updatedLastMessage = localLatest
           ? {
               ...item.lastMessage,
               ...localLatest.message,
-              content: localLatest.message.content || localLatest.message.message || item.lastMessage?.content,
+              content: resolvedContent,
               sentAt: localLatest.message.sentAt || localLatest.message.createdAt,
               createdAt: localLatest.message.createdAt,
+              isDeletedForAll,
             }
           : item.lastMessage;
 
@@ -452,6 +460,7 @@ export default function FriendsMessages() {
             onInputChange={setInput}
             onKeyDown={handleKey}
             onSend={handleSend}
+            onDeleteMessage={deleteMessage}
             canSend={canSend}
             t={t}
           />

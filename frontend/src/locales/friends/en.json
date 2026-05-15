@@ -30,6 +30,9 @@
     "unableToLoadFriends": "Unable to load friends.",
     "noMessagesYet": "No messages yet",
     "youLabel": "You",
+    "deleteForMe": "Delete for me",
+    "deleteForAll": "Delete for everyone",
+    "deletedMessage": "Message deleted",
     "status": {
       "online": "Online",
       "offline": "Offline"
