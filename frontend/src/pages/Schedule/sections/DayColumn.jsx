@@ -30,8 +30,7 @@ const DayColumn = ({
   const [selectedSession, setSelectedSession] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [deleteModal,setDelete]=useState(false)
-  const [addModal,setAddModal]=useState(false)
-  const [showAddhint,setAddHint]=useState(false)
+ 
   const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches;
 
   const columnRef = useRef(null);
@@ -98,12 +97,12 @@ const DayColumn = ({
         onDrop={(e) => handleDrop(e)}
         onMouseEnter={() => {
           if (!isEditMode && canHover) setShowEditHint(true);
-          if(isEditMode && canHover) setAddHint(true)
+       
         }}
         onMouseLeave={() => {
           if (canHover) {
             setShowEditHint(false);
-            setAddHint(false)
+          
           }
             
         }}
@@ -119,11 +118,7 @@ const DayColumn = ({
             </div>
           </div>
         )}
-        {isEditMode && showAddhint && <div className="absolute  top-3 sm:top-2 left-2 right-2 z-20 ">
-            <div onClick={()=>{setAddModal(true)}} className="bg-black/50 cursor-pointer flex gap-3 flex-row justify-center items-center text-[10px] sm:text-xs text-white/80 px-2 py-1 rounded-full ">
-              Add Session <CirclePlus size={16}/>
-            </div>
-          </div>}
+       
 
         {HALF_TICKS.map((h) => (
           <div
@@ -248,7 +243,7 @@ const DayColumn = ({
         }}
       /> 
       {deleteModal && selectedSession  && <DeleteSessionModal setDelete={setDelete} session={selectedSession} t={t}/>}
-      {addModal && <CreateSessionModal setAddModal={setAddModal} t={t}/> }
+   
     </div>
   );
 };

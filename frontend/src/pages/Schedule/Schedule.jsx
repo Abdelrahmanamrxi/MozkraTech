@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { FilterIcon, TipBackgroundIcon } from "@/comp/ui/Icons";
-import { PlusIcon, Bot, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { PlusIcon, Bot, CalendarDays, ChevronLeft, ChevronRight,CirclePlus } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import ScheduleSummary from "./sections/ScheduleSummary";
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -13,6 +13,7 @@ import EditSessionModal from "./sections/EditSessionModal";
 import DropConfirmationModal from "./sections/DropConfirmationModal";
 import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
 import api from "../../middleware/api";
+import CreateSessionModal from "./sections/CreateSessionModal";
 import {
   labelsMap,
   DAY_NAMES,
@@ -71,14 +72,16 @@ async function buildInitialData(date, filter = "All") {
 const TodayBanner = ({ sessionCount, t, lang, isCurrentWeek }) => {
   const locale  = lang === "ar" ? "ar-EG" : "en-US";
   const dateStr = fmtFullDate(TODAY, locale);
+ 
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="flex justify-center mb-5"
+      className="flex justify-center mb-5 relative"
     >
+         
       <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#9B7EDE]/12 border border-[#9B7EDE]/25 backdrop-blur-sm flex-wrap justify-center">
         <span className="relative flex h-2 w-2 flex-shrink-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9B7EDE] opacity-60" />
@@ -105,12 +108,13 @@ const TodayBanner = ({ sessionCount, t, lang, isCurrentWeek }) => {
 // WEEK NAVIGATION BAR
 // ─────────────────────────────────────────────────────────────────────────────
 const WeekNav = ({ weekStart, onPrev, onNext, onToday, canPrev, canNext, isCurrentWeek, t, lang }) => {
+  
   const locale    = lang === "ar" ? "ar-EG" : "en-US";
   const weekDates = getWeekDates(weekStart);
   const startLabel = weekDates[0].toLocaleDateString(locale, { month: "short", day: "numeric" });
   const endLabel   = weekDates[6].toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" });
   const label      = `${startLabel} – ${endLabel}`;
-
+  
   return (
     <div className="flex items-center gap-2 flex-wrap">
       <motion.button
@@ -261,17 +265,17 @@ const LoadingSkeleton = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 const Schedule = () => {
   // FIX 1: Initialize as {} not [] — scheduleData is always a date-keyed object
-  const [scheduleData,        setScheduleData]        = useState({});
-  const [dragOverDay,         setDragOverDay]         = useState(null);
-  const [editingSession,      setEditingSession]      = useState(null);
-  const [showFilterPopup,     setShowFilterPopup]     = useState(false);
+  const [scheduleData,setScheduleData]= useState({});
+  const [dragOverDay,setDragOverDay]= useState(null);
+  const [editingSession,setEditingSession]= useState(null);
+  const [showFilterPopup,setShowFilterPopup]= useState(false);
   const [showAddSessionPopup, setShowAddSessionPopup] = useState(false);
-  const [filterSubject,       setFilterSubject]       = useState("All");
-  const [isEditMode,          setIsEditMode]          = useState(false);
-  const [pendingDrop,         setPendingDrop]         = useState(null);
-  const [metrics,             setMetrics]             = useState(null);
-  const [rawApiData,          setRawApiData]          = useState(null);
-
+  const [filterSubject,setFilterSubject]= useState("All");
+  const [isEditMode,setIsEditMode]= useState(false);
+  const [pendingDrop,setPendingDrop]= useState(null);
+  const [metrics,setMetrics]= useState(null);
+  const [rawApiData,setRawApiData] = useState(null);
+  const[addModal,setAddModal]=useState(false)
   const [weekStart, setWeekStart] = useState(() => getWeekStart(TODAY));
 
   const { data: subjectsData } = useQuery({
@@ -692,8 +696,16 @@ const Schedule = () => {
         <div className="bg-[#3D3555]/60 relative p-4 sm:p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-10">
 
           {/* Header: title + week nav */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+          <div className="flex  flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+            <div className="flex flex-row items-center gap-3">
+        
             <p className="text-xl sm:text-2xl font-semibold">{t.weeklySchedule}</p>
+               { <div className=" ">
+                  <LiquidGlassButton onClick={()=>{setAddModal(true)}} icon={CirclePlus}  className="bg-primary/30 cursor-pointer flex gap-3 flex-row justify-center items-center text-lg sm:text-xs text-white px-3 py-1 rounded-full ">
+                    Add Session
+                  </LiquidGlassButton>
+                </div>}
+            </div>
             <WeekNav
               weekStart={weekStart}
               onPrev={goToPrevWeek}
@@ -797,6 +809,7 @@ const Schedule = () => {
           />
         </div>
       )}
+      {addModal && <CreateSessionModal setAddModal={setAddModal} t={t}/>}
 
       {/* ── Pro tip ── */}
       <div className="border-t flex flex-col lg:flex-row font-Inter text-white items-start lg:items-center gap-4 rounded-[24px] p-5 sm:p-6 border-[#9B7EDE]/30 mt-8 mb-16 bg-gradient-to-br from-[#9B7EDE]/10 to-transparent">

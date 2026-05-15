@@ -41,8 +41,11 @@ const sessionSchema = new mongoose.Schema({
         enum:["scheduled","completed","missed","cancelled"],
         default:"scheduled"
     },
-
-    completedAt:Date
+    completedAt:Date,
+    reminderSent:{
+        type:Boolean,
+        default:false
+    }
 },{
     timestamps:true
 })

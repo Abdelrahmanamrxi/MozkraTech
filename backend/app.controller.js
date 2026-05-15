@@ -6,6 +6,8 @@ import notificationRouter from "./modules/notifications/notifications.routes.js"
 import friendsRouter from "./modules/friendship/friends.routes.js";
 import notFound from "./middleware/notFound.js";
 import cors from "cors";
+import { updateMissedSessions } from "./cron/session.cron.js";
+import { remindUserSession } from "./cron/reminder.cron.js";
 import morgan from "morgan";
 import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
@@ -53,6 +55,8 @@ const bootstrap = async (app, express) => {
   app.use("/api/v1/notifications", notificationRouter);
   app.use("/api/v1/sessions", sessionRouter);
   app.use("/api/v1/tasks", taskRouter);
+  updateMissedSessions()
+  remindUserSession()
 
   // 6. Error handling (last)
   app.use(errorHandler);
