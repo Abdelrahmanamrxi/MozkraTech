@@ -46,6 +46,10 @@ const taskSchema=new mongoose.Schema({
     studyHours:{
         type:Number,
         default:1
+    },
+    reminderSent:{
+        type:Boolean,
+        default:false
     }
 
 },{timestamps:true})

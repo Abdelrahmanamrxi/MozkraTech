@@ -252,6 +252,12 @@ const userSchema = new mongoose.Schema(
         ref: "Subject",
       },
     ],
+    achievements:[
+      {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Achievement'
+      }
+    ]
   },
   {
     timestamps: true,
