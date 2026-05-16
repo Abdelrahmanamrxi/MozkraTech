@@ -1,6 +1,6 @@
 import Router from 'express'
-import { generateSessions,createSession } from './session.controller.js'
-import { generateAISchema,createSessionSchema,checkAvailableSessionsSchema,createScheduleSchema,deleteSessionSchema } from './session.validation.js'
+import { generateSessions,createSession, updateSession } from './session.controller.js'
+import { generateAISchema,createSessionSchema,checkAvailableSessionsSchema,createScheduleSchema,deleteSessionSchema, updateSessionSchema } from './session.validation.js'
 import { authentication } from '../../middleware/auth.js'
 import { validation } from '../../middleware/validation.js'
 import { checkAvailableSessions,createSchedule,getSchedule,editSession,moveSession,deleteSession } from './session.controller.js'
@@ -13,6 +13,7 @@ sessionRouter.post('/schedule',authentication,validation(createScheduleSchema),c
 sessionRouter.post('/move',authentication,moveSession)
 sessionRouter.get('/',authentication,getSchedule)
 sessionRouter.patch('/',authentication,editSession)
-sessionRouter.delete('/:sessionId',authentication,validation(deleteSessionSchema),deleteSession)
+sessionRouter.delete('/:sessionId', authentication, validation(deleteSessionSchema), deleteSession)
+sessionRouter.post('/update-session', authentication, validation(updateSessionSchema), updateSession);
 
 export default sessionRouter

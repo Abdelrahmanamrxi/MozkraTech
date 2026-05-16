@@ -21,17 +21,18 @@ export const createSession=asyncHandler(async(req,res,next)=>{
 
     const task=await taskModel.findOne({_id:taskId}).populate('subjectId')
 
-   const session=await sessionModel.create({
+    const session=await sessionModel.create({
         userId,
         name,
         taskId,
         startTime:fullStartDate,
         endTime:fullEndDate,
         subjectId:task.subjectId._id,
-        status:'scheduled'
+        status: 'scheduled', 
+        duration:(fullEndDate.getTime()-fullStartDate.getTime())/(1000*60)
     })
 
-    res.status(200).json({mesage:"Session Created",session})
+    res.status(200).json({message:"Session Created",session})
 })
 
 
@@ -118,7 +119,8 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
     status: "scheduled",
     id: undefined,
     start: undefined,
-    end: undefined
+    end: undefined, 
+    duration: (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60)
     }));
 
     // Retrieve Old Sessions To Check For no overlaps
@@ -137,7 +139,7 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
    const user=await userModel.findOne({_id:userId})
    user.addXP(50)
 
-    res.status(200).json({message:"Schedule Created Succesfully"})
+    res.status(200).json({message:"Schedule Created Successfully"})
 })
 
 export const getSchedule=asyncHandler(async(req,res,next)=>{
@@ -203,7 +205,7 @@ export const getSchedule=asyncHandler(async(req,res,next)=>{
         .filter(Boolean)
 
     res.status(200).json({
-        message:"Sessions Generated Succesfully",
+        message:"Sessions Generated Successfully",
         sessions,
         weekStart,
         weekEnd,
@@ -248,8 +250,8 @@ export const editSession = asyncHandler(async (req, res, next) => {
             await task.save()
         }
         if(status==="cancelled"){
-             await session.deleteOne()
-             return res.status(200).json({message: "Session cancelled and deleted"})
+            await session.deleteOne()
+            return res.status(200).json({message: "Session cancelled and deleted"})
         }
         session.status = status
     }
@@ -327,7 +329,7 @@ export const moveSession = asyncHandler(async (req, res, next) => {
 export const deleteSession=asyncHandler(async(req,res,next)=>{
     const {sessionId}=req.params
     
-    const session=await sessionModel.findOneAndDelete({_id:sessionId})
+    const session = await sessionModel.findOneAndDelete({_id:sessionId})
     if (!session) {
     return next(
       new HttpException("Couldn't find session matching your criteria", 404)
@@ -338,3 +340,23 @@ export const deleteSession=asyncHandler(async(req,res,next)=>{
 
 })
 
+
+export const updateSession = asyncHandler(async (req, res, next) => { 
+    const { sessionId, actualDuration } = req.body;
+
+    const session = await sessionModel.findById(sessionId);
+    if (!session) return next(new HttpException("Session not found", 404));
+    
+    if (actualDuration >= session.duration) {
+        session.duration = 0;
+        session.status = "completed";
+        await session.save();
+        return res.status(200).json({ message: "Session marked as completed" });
+    }
+    else { 
+        session.duration = session.duration - actualDuration;
+        await session.save();
+        return res.status(200).json({ message: "Session duration updated" });
+    }
+
+})

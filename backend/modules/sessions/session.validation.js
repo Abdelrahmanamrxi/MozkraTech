@@ -115,3 +115,10 @@ export const deleteSessionSchema=joi.object({
     })
   })
 })
+
+export const updateSessionSchema = joi.object({
+  body: joi.object({
+    sessionId: joi.string().required(),
+    actualDuration: joi.number().min(1).required()
+  })
+})
