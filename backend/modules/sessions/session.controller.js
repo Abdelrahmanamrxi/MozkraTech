@@ -347,7 +347,10 @@ export const updateSession = asyncHandler(async (req, res, next) => {
     const session = await sessionModel.findById(sessionId);
     if (!session) return next(new HttpException("Session not found", 404));
     
-    if (actualDuration >= session.duration) {
+    if (session.status == "completed") {
+        return res.status(200).json({ message: "Session is already completed" });
+    }
+    else if (actualDuration >= session.duration) {
         session.duration = 0;
         session.status = "completed";
         await session.save();
