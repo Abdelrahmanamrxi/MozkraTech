@@ -1,7 +1,15 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Shield, Download, Trash2, AlertTriangle, X } from "lucide-react";
+import {
+  Lock,
+  Shield,
+  Download,
+  Trash2,
+  AlertTriangle,
+  X,
+  LogOut,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -223,6 +231,12 @@ const accountButtons = [
     action: "changePassword",
   },
   {
+    icon: LogOut,
+    labelKey: "accountSettings.buttons.logout",
+    danger: false,
+    action: "logout",
+  },
+  {
     icon: Trash2,
     labelKey: "accountSettings.buttons.deleteAccount",
     danger: true,
@@ -233,6 +247,7 @@ const accountButtons = [
 function AccountSettings({ mockProfileData }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { t } = useTranslation("profile");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -251,6 +266,21 @@ function AccountSettings({ mockProfileData }) {
     navigate("/login", { replace: true });
   };
 
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch (err) {
+      console.error("Logout failed", err);
+    } finally {
+      dispatch(removeAccessToken());
+      navigate("/login", { replace: true });
+    }
+  };
+
+  const handleConfirmLogout = async () => {
+    await handleLogout();
+    setShowLogoutModal(false);
+  };
   return (
     <>
       <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-[24px] p-6 font-Inter">
@@ -267,6 +297,7 @@ function AccountSettings({ mockProfileData }) {
                 if (action === "deleteAccount") setShowDeleteModal(true);
                 if (action === "changePassword")
                   setShowChangePasswordModal(true);
+                if (action === "logout") setShowLogoutModal(true);
               }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-[12px] text-sm font-medium transition-all cursor-pointer text-left ${
                 danger
@@ -293,6 +324,56 @@ function AccountSettings({ mockProfileData }) {
             onClose={() => setShowDeleteModal(false)}
             onConfirm={handleDeleteAccount}
           />
+        )}
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowLogoutModal(false)}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-primary-dark/60 font-Inter backdrop-blur-2xl border border-white/20 rounded-[24px] p-6 max-w-md w-full shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-white">
+                  {t("accountSettings.logoutModal.title")}
+                </h3>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowLogoutModal(false)}
+                  className="p-2 hover:bg-white/10 cursor-pointer rounded-lg transition-all"
+                >
+                  <X className="w-5 h-5 text-[#B8A7E5]" />
+                </motion.button>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 px-4 py-2.5 bg-white/10 border border-white/20 text-[#B8A7E5] rounded-lg hover:bg-white/20 transition-all font-medium cursor-pointer"
+                >
+                  {t("accountSettings.logoutModal.cancel")}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleConfirmLogout}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-lg hover:shadow-lg transition-all font-medium cursor-pointer"
+                >
+                  {t("accountSettings.logoutModal.confirm")}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
