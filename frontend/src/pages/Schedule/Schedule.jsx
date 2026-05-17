@@ -514,14 +514,16 @@ const Schedule = () => {
         <div className="bg-[#3D3555]/60 relative p-4 sm:p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-10">
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-            <div className="flex flex-row items-center gap-3">
-              <p className="text-xl sm:text-2xl font-semibold">{t.weeklySchedule}</p>
+            <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-3">
+              <p className="text-2xl text-center lg:text-start sm:text-3xl font-semibold">{t.weeklySchedule}</p>
               <div>
-                <LiquidGlassButton onClick={() => setAddModal(true)} icon={CirclePlus} className="bg-primary/30 cursor-pointer flex gap-3 flex-row justify-center items-center text-lg sm:text-xs text-white px-3 py-1 rounded-full">
+                <LiquidGlassButton onClick={() => setAddModal(true)} icon={CirclePlus} className="bg-primary/30 mb-4 lg:mb-0 cursor-pointer flex gap-3 flex-row justify-center items-center text-sm lg:text-base sm:text-xs text-white px-2 lg:px-3 py-1 rounded-full">
                   Add Session
                 </LiquidGlassButton>
               </div>
             </div>
+         
+
             <WeekNav
               weekStart={weekStart}
               onPrev={goToPrevWeek}
@@ -534,15 +536,18 @@ const Schedule = () => {
               lang={lang}
             />
           </div>
+          <div className="mt-7">
+            
 
           <TodayBanner
             sessionCount={todaySessionCount}
             t={t}
             lang={lang}
             isCurrentWeek={isCurrentWeek}
-          />
-
-          <div className="overflow-x-auto -mx-4 sm:-mx-1 px-4 sm:px-1 pb-3">
+            />
+            </div>
+        
+          <div className="overflow-x-auto no-scrollbar  -mx-4 sm:-mx-1 px-4 sm:px-1 pb-3">
             <div className="flex gap-4 sm:gap-2" style={{ minWidth: "960px" }}>
 
               {/* FIX: pass dynamic hourTicks + gridHeight, not the static imports */}
