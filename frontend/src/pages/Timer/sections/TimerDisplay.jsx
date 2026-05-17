@@ -6,10 +6,10 @@ function formatTime(time) {
 
 export default function TimerDisplay({ time, mode }) {
   return (
-    <div className="mb-6">
-      <h1 className="text-6xl font-bold text-white">{formatTime(time)}</h1>
-      <p className="text-violet-300 mt-2">
-        {mode === "focus" ? "Time To Focus" : "Time To Relax"}
+    <div className="mb-8">
+      <h1 className="text-7xl sm:text-8xl font-light tracking-tight text-white mb-4 font-mono">{formatTime(time)}</h1>
+      <p className={`text-sm font-light tracking-wide uppercase ${mode === "focus" ? "text-emerald-300/80" : "text-blue-300/80"}`}>
+        {mode === "focus" ? "Stay Focused" : "Time to Relax"}
       </p>
     </div>
   );

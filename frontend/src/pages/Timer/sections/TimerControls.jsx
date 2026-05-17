@@ -1,19 +1,18 @@
 export default function TimerControls({
   isRunning,
-  setIsRunning,
-  setTime,
-  duration,
+  onPlayPause,
+  onReset,
 }) {
   return (
-    <div className="flex justify-center items-center gap-6 mt-4">
+    <div className="flex justify-center items-center gap-4 sm:gap-6 mt-6">
       {/* Play / Pause */}
       <button
-        onClick={() => setIsRunning((prev) => !prev)}
-        className="w-14 h-14 flex items-center justify-center rounded-full bg-primary text-white shadow-lg hover:scale-105 transition"
+        onClick={onPlayPause}
+        className="w-16 h-16 sm:w-18 sm:h-18 flex items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-purple-900/30 hover:shadow-xl hover:shadow-purple-900/50 hover:scale-110 active:scale-95 transition-all duration-200"
       >
         {isRunning ? (
           <svg
-            className="w-6 h-6"
+            className="w-7 h-7"
             viewBox="0 0 24 24"
             fill="none"
             stroke="white"
@@ -25,7 +24,7 @@ export default function TimerControls({
           </svg>
         ) : (
           <svg
-            className="w-6 h-6"
+            className="w-7 h-7"
             viewBox="0 0 32 32"
             fill="none"
             stroke="white"
@@ -40,14 +39,11 @@ export default function TimerControls({
 
       {/* Reset */}
       <button
-        onClick={() => {
-          setIsRunning(false);
-          setTime(duration);
-        }}
-        className="w-14 h-14 flex items-center justify-center rounded-full bg-[#52466B] text-white shadow-lg hover:scale-105 transition"
+        onClick={onReset}
+        className="w-16 h-16 sm:w-18 sm:h-18 flex items-center justify-center rounded-full bg-[#52466B] text-white shadow-lg shadow-black/30 hover:shadow-lg hover:shadow-purple-700/40 hover:scale-110 active:scale-95 border border-white/10 hover:border-white/20 transition-all duration-200"
       >
         <svg
-          className="w-6 h-6"
+          className="w-7 h-7"
           viewBox="0 0 32 32"
           fill="none"
           stroke="white"

@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+//* eslint-disable no-unused-vars */
 import { motion } from "framer-motion";
 import { formatDuration, formatIsoTimeLabel } from "../utils/timeUtility";
 import { Info } from "lucide-react";
@@ -82,7 +82,7 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMod
       className={`bg-primary/75 h-full ${
         isCompact ? "p-2 sm:p-3" : "p-3 sm:p-4"
       } rounded-[16px] text-white ${
-        isEditMode  ? "cursor-grab active:cursor-grabbing" : "cursor-default"
+        isEditMode ? "cursor-grab active:cursor-grabbing" : "cursor-default"
       } shadow-lg transition-all hover:shadow-xl flex flex-col ${
         isTall ? "justify-between" : "gap-2"
       } relative group overflow-hidden border border-white/10 hover:border-[#9B7EDE]/30`}
@@ -96,16 +96,32 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMod
           {formatIsoTimeLabel(session.startTime)}
         </p>
         
-        <p className={`${subjectClass} font-semibold truncate  lg:whitespace-normal lg:overflow-visible lg:text-clip  `}>{session.name}</p>
+        <p className={`${subjectClass} font-semibold truncate lg:whitespace-normal lg:overflow-visible lg:text-clip`}>
+          {session.name}
+        </p>
         
         <div className={`flex flex-col ${isTall ? "mt-auto" : "gap-1"}`}>
-          <p className={`${durationClass} opacity-80 leading-tight`}>
-            {formatDuration(session.startTime, session.endTime)}
-          </p>
+          {/* Hide duration on compact cards */}
+          {!isCompact && (
+            <p className={`${durationClass} opacity-80 leading-tight`}>
+              {formatDuration(session.startTime, session.endTime)}
+            </p>
+          )}
+
+          {/* Time left — only show if timer has started and session not completed */}
+          {session.duration > 0 && session.status !== "completed" && session.totalDuration !== session.duration && (
+            <p className={`${timeClass} opacity-60 mb-1 leading-tight tabular-nums`}>
+              ⏱ {Math.round(session.duration)}m left
+            </p>
+          )}
           
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`text-[9px] px-2 py-1 rounded-full font-medium ${statusBg}`}>
-              {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+            <span className={`${isCompact ? "text-[8px] px-1.5 py-0.5" : "text-[9px] px-2 py-1"} rounded-full font-medium ${statusBg}`}>
+              {/* First letter only on compact, full word otherwise */}
+              {isCompact
+                ? session.status.charAt(0).toUpperCase()
+                : session.status.charAt(0).toUpperCase() + session.status.slice(1)
+              }
             </span>
           </div>
         </div>

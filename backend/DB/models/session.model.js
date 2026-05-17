@@ -26,6 +26,10 @@ const sessionSchema = new mongoose.Schema({
     duration:{
         type:Number
     },
+    totalDuration:{
+        type:Number,
+        required:true
+    },
     startTime:{
         type:Date,
         required:true
@@ -55,6 +59,14 @@ sessionSchema.index({userId:1,taskId:1})
 sessionSchema.pre('save',async function(next){
     if(!this.isModified("startTime") && !this.isModified("endTime"))
     return 
+
+    const start = new Date(this.startTime);
+    const end = new Date(this.endTime);
+    const durationInMinutes = (end - start) / (1000 * 60);
+    console.log(start,end)
+
+    if (durationInMinutes < 30) {
+    throw new HttpException("Session duration must be at least 30 minutes", 400);}
 
     if(this.startTime>this.endTime)
     throw new HttpException("End Time must be after Start Time",400)

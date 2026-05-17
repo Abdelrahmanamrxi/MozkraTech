@@ -1,8 +1,8 @@
 import {differenceInMinutes} from "date-fns"
 // GRID CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
-export const TIME_START_HOUR = 8;
-export const TIME_END_HOUR   = 24;
+export const TIME_START_HOUR = 0;
+export const TIME_END_HOUR   = 23;
 export const HOUR_HEIGHT_PX  = 80;
 export const SNAP_MINUTES    = 30;
 

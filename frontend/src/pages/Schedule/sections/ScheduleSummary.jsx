@@ -7,28 +7,30 @@ import { useTranslation } from 'react-i18next'
 function ScheduleSummary({ metrics, scheduleData, weekStart }) {
   const { i18n } = useTranslation();
   const lang = i18n.language === 'ar' ? 'ar' : 'en';
-  const labels = {
-    en: {
-      week: 'This Week',
-      studyHours: 'Study Hours',
-      avgDaily: 'Average Daily',
-      studyTime: 'Study Time',
-      subjects: 'Subjects',
-      activeCourses: 'Active Courses',
-      upcoming: 'Upcoming',
-      deadlines: 'Deadlines',
-    },
-    ar: {
-      week: 'الأسبوع ده',
-      studyHours: 'ساعات مذاكرة',
-      avgDaily: 'المعدل اليومي',
-      studyTime: 'وقت مذاكرة',
-      subjects: 'المواد',
-      activeCourses: 'الكورسات الشغّالة',
-      upcoming: 'الجاي',
-      deadlines: 'المواعيد النهائية',
-    },
-  };
+ const labels = {
+  en: {
+    week: 'This Week',
+    studyHours: 'Study Hours',
+    studyHoursLeft: 'Study Hours Left',
+    avgDaily: 'Average Daily',
+    studyTime: 'Study Time',
+    subjects: 'Subjects',
+    activeCourses: 'Active Courses',
+    upcoming: 'Upcoming',
+    deadlines: 'Deadlines',
+  },
+  ar: {
+    week: 'الأسبوع ده',
+    studyHours: 'ساعات المذاكرة',
+    studyHoursLeft: 'ساعات المذاكرة المتبقية',
+    avgDaily: 'المعدل اليومي',
+    studyTime: 'وقت المذاكرة',
+    subjects: 'المواد',
+    activeCourses: 'الكورسات الشغّالة',
+    upcoming: 'الجاي',
+    deadlines: 'المواعيد النهائية',
+  },
+}
 
   // Get today's date and count sessions for today
   const today = useMemo(() => {
@@ -38,7 +40,7 @@ function ScheduleSummary({ metrics, scheduleData, weekStart }) {
     return sessionsToday.length;
   }, [scheduleData]);
 
-  const totalHours = metrics?.totalHoursThisWeek || 0;
+  const spentHoursThisWeek = metrics?.spentHoursThisWeek || 0;
   const avgDaily = metrics?.avgDailyHours || 0;
   const subjectsCount = metrics?.uniqueSubjects || 0;
   const upcomingDeadlines = metrics?.todaySessionCount || today;
@@ -49,14 +51,14 @@ function ScheduleSummary({ metrics, scheduleData, weekStart }) {
     const m = Math.round((hours - h) * 60);
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   };
-
+  console.log(metrics)
   return (
       <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-row mt-6 lg:gap-3">
           <div className="flex bg-[#9B7EDE]/20 flex-col items-start border-t border-[#9B7EDE]/30 rounded-[24px] font-Inter lg:w-1/4 p-6">
             <ScheduleIcon />
             <p className="text-sm text-[#B8A7E5] mt-3">{labels[lang].week}</p>
-            <p className="font-bold text-white mt-2 text-2xl">{totalHours.toFixed(1)}</p>
-            <p className="text-[#B8A7E5]">{labels[lang].studyHours}</p>
+            <p className="font-bold text-white mt-2 text-2xl">{formatHours(spentHoursThisWeek)}</p>
+            <p className="text-[#B8A7E5]">{labels[lang].studyHoursLeft}</p>
           </div>
           <div className="flex bg-[#7C5FBD]/20 flex-col items-start border-t border-[#7C5FBD]/30 rounded-[24px] font-Inter lg:w-1/4 p-6">
             <svg width="25" height="25" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">

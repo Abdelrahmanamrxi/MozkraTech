@@ -29,6 +29,7 @@ export const createSession=asyncHandler(async(req,res,next)=>{
         endTime:fullEndDate,
         subjectId:task.subjectId._id,
         status: 'scheduled', 
+        totalDuration:(fullEndDate.getTime()-fullStartDate.getTime())/(1000*60),
         duration:(fullEndDate.getTime()-fullStartDate.getTime())/(1000*60)
     })
 
@@ -120,7 +121,8 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
     id: undefined,
     start: undefined,
     end: undefined, 
-    duration: (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60)
+    duration: (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60),
+    totalDuration:(new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60)
     }));
 
     // Retrieve Old Sessions To Check For no overlaps
@@ -128,7 +130,7 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
         userId,
         status:'scheduled'
     }).select("startTime endTime name")    
-    console.log(existingSessions)
+
     // Checking each session with existing sessions to see if there are overlaps
    for (const session of updatedSessions) {
         hasSessionConflict(existingSessions,session)
@@ -141,26 +143,27 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
 
     res.status(200).json({message:"Schedule Created Successfully"})
 })
+export const getSchedule = asyncHandler(async (req, res, next) => {
+    const userId = req.user._id
+    const { date, filter } = req.query
 
-export const getSchedule=asyncHandler(async(req,res,next)=>{
-    const userId=req.user._id
-    const {date,filter}=req.query
-    let query={userId}
-    const currentDate=new Date(date)
+    let query = { userId }
 
-    const weekStart=startOfWeek(currentDate,{
-        weekStartsOn:1
+    const currentDate = new Date(date)
+
+    const weekStart = startOfWeek(currentDate, {
+        weekStartsOn: 1
     })
-    const weekEnd=endOfWeek(currentDate,{
-        weekStartsOn:1
+
+    const weekEnd = endOfWeek(currentDate, {
+        weekStartsOn: 1
     })
-    
-    query.startTime={
-        $gte:weekStart,
-        $lte:weekEnd
+
+    query.startTime = {
+        $gte: weekStart,
+        $lte: weekEnd
     }
 
-    // Add subject filter if provided
     if (filter && filter !== "All") {
         query.subjectId = filter
     }
@@ -171,52 +174,111 @@ export const getSchedule=asyncHandler(async(req,res,next)=>{
         .populate("subjectId", "name")
         .sort({ startTime: 1 })
 
-    // Calculate metrics
     let totalHoursThisWeek = 0
     let spentHoursThisWeek = 0
     let todaySessionCount = 0
+    let totalMismatchMinutes = 0
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
+
     const tomorrowStart = new Date(today)
     tomorrowStart.setDate(tomorrowStart.getDate() + 1)
 
+    // ---------------- LOOP ----------------
     sessions.forEach(session => {
         const sessionStart = new Date(session.startTime)
-        const sessionEnd = new Date(session.endTime)
-        const durationMs = sessionEnd.getTime() - sessionStart.getTime()
-        const durationHours = durationMs / (1000 * 60 * 60)
-        
-        totalHoursThisWeek += durationHours
-        if (session.status === "completed") {
-            spentHoursThisWeek += durationHours
+
+        const status = session.status?.toLowerCase().trim()
+
+        const plannedHours = session.totalDuration / 60
+        totalHoursThisWeek += plannedHours
+
+        // ✅ spentHoursThisWeek = scheduled only
+        if (status === "scheduled" && session.duration != null) {
+            spentHoursThisWeek += session.duration / 60
         }
 
-        // Count sessions for today
-        if(sessionStart >= today && sessionStart < tomorrowStart){
+        // 📊 avgDaily = ONLY mismatch sessions (per day)
+        if (
+            session.duration !== session.totalDuration
+            || session.status==="completed"
+        ) {
+            totalMismatchMinutes +=
+                (session.totalDuration - session.duration)
+        }
+
+        // today scheduled sessions
+        if (
+            sessionStart >= today &&
+            sessionStart < tomorrowStart &&
+            status === "scheduled"
+        ) {
             todaySessionCount++
         }
     })
 
-    const days = 7 // Full week
-    const avgDailyHours = spentHoursThisWeek / days
+    // ---------------- DAYS (DAILY mismatch) ----------------
+    const daysWithMismatch = new Set(
+        sessions
+            .filter(
+                s =>
+                    s.duration != null &&
+                    s.duration !== s.totalDuration
+            )
+            .map(s =>
+                new Date(s.startTime)
+                    .toISOString()
+                    .split("T")[0]
+            )
+    )
 
+    // ---------------- AVG DAILY ----------------
+    const avgDailyHours =
+        (totalMismatchMinutes / 60) /
+        (daysWithMismatch.size || 1)
+
+    const avgDailyWholeHours = Math.floor(avgDailyHours)
+    const avgDailyMinutes = Math.round(
+        (avgDailyHours - avgDailyWholeHours) * 60
+    )
+
+    // ---------------- SUBJECTS ----------------
     const subjectIds = sessions
-        .map((s) => (s.subjectId && s.subjectId._id ? String(s.subjectId._id) : String(s.subjectId || "")))
+        .map(s =>
+            s.subjectId && s.subjectId._id
+                ? String(s.subjectId._id)
+                : String(s.subjectId || "")
+        )
         .filter(Boolean)
 
+    // ---------------- RESPONSE ----------------
     res.status(200).json({
-        message:"Sessions Generated Successfully",
+        message: "Sessions Generated Successfully",
         sessions,
         weekStart,
         weekEnd,
-        metrics:{
-            totalHoursThisWeek: Math.round(totalHoursThisWeek * 100) / 100,
-            avgDailyHours: Math.round(avgDailyHours * 100) / 100,
+        metrics: {
+            totalHoursThisWeek:
+                Math.round(totalHoursThisWeek * 100) / 100,
+
+            // ✅ scheduled only actual usage
+            spentHoursThisWeek:
+                Math.round(spentHoursThisWeek * 100) / 100,
+
+            // 📊 avg daily mismatch (ONLY days with mismatch sessions)
+            avgDailyHours:
+                Math.round(avgDailyHours * 100) / 100,
+
+            avgDailyFormatted:
+                avgDailyWholeHours > 0
+                    ? `${avgDailyWholeHours}h ${avgDailyMinutes}m`
+                    : `${avgDailyMinutes}m`,
+
             todaySessionCount,
             uniqueSubjects: new Set(subjectIds).size
         }
     })
-    
 })
 export const editSession = asyncHandler(async (req, res, next) => {
     const userId = req.user._id
@@ -243,11 +305,12 @@ export const editSession = asyncHandler(async (req, res, next) => {
 
     if (status !== undefined){
         if(status==="completed"){
+            session.duration=0
             let taskId=session.taskId
             let duration=new Date(session.endTime)-new Date(session.startTime)
             const hours = duration / (1000 * 60 * 60);
             const task=await taskModel.findOneAndUpdate({_id:taskId},{$inc:{hoursSpent:hours}})
-            await task.save()
+         
         }
         if(status==="cancelled"){
             await session.deleteOne()
@@ -268,6 +331,13 @@ export const editSession = asyncHandler(async (req, res, next) => {
     if (date && endTime) {
         const fullEndDate = new Date(`${date}T${endTime}:00`)
         session.endTime = fullEndDate
+    }
+    if(date && (startTime || endTime)){
+        const duration=Math.floor((session.endTime - session.startTime) / (1000 * 60))
+        session.totalDuration=duration
+      if(session.status !== "completed") {
+        session.duration = duration
+    }
     }
 
     await session.save()
@@ -340,26 +410,43 @@ export const deleteSession=asyncHandler(async(req,res,next)=>{
 
 })
 
+export const getSessions=asyncHandler(async(req,res,next)=>{
+    const userId=req.user._id
+    const sessions=await sessionModel.find({
+        status:'scheduled',
+        userId,
+    }).sort({ startTime: 1 })
+    if(!sessions){
+       return next(new HttpException("Please start creating your sessions to start studying with timer mode."))
+    }
+    res.status(200).json({message:"Sessions Retrieved Successfully",sessions})
+})
+
 
 export const updateSession = asyncHandler(async (req, res, next) => { 
     const { sessionId, actualDuration } = req.body;
 
-    const session = await sessionModel.findById(sessionId);
+    const session = await sessionModel.findOne({ _id: sessionId, userId: req.user._id });
     if (!session) return next(new HttpException("Session not found", 404));
     
     if (session.status == "completed") {
-        return res.status(200).json({ message: "Session is already completed" });
+        return res.status(200).json({ message: "Session is already completed", session });
     }
-    else if (actualDuration >= session.duration) {
+    else if (actualDuration >= session.totalDuration) {
         session.duration = 0;
         session.status = "completed";
+        session.completedAt = new Date();
+
         await session.save();
-        return res.status(200).json({ message: "Session marked as completed" });
+        await taskModel.findOneAndUpdate({_id:session.taskId},{$inc:{hoursSpent:session.totalDuration}})
+
+        return res.status(200).json({ message: "Session marked as completed", session });
     }
     else { 
-        session.duration = session.duration - actualDuration;
+        const remainingDuration = session.duration - actualDuration;
+        session.duration = Number(Math.max(0, remainingDuration).toFixed(2));
         await session.save();
-        return res.status(200).json({ message: "Session duration updated" });
+        return res.status(200).json({ message: "Session duration updated", session });
     }
 
 })
