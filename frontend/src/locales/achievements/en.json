@@ -1,0 +1,64 @@
+{
+  "title": "All Achievements",
+  "description": "You've unlocked {{unlocked}} out of {{total}} achievements",
+  "back": "Back",
+  "progress": "Progress to mastery",
+  "locked": "Keep going to unlock this achievement!",
+  "unlockedOn": "Unlocked on",
+  "retry": "Retry",
+  "categories": {
+    "session": "Study Sessions",
+    "friendship": "Friendships",
+    "streak": "Streaks"
+  },
+  "achievements": {
+    "session_1": {
+      "name": "First Step",
+      "description": "Completed your first session"
+    },
+    "session_10": {
+      "name": "On a Roll",
+      "description": "Completed 10 sessions"
+    },
+    "session_50": {
+      "name": "Session Veteran",
+      "description": "Completed 50 sessions"
+    },
+    "session_100": {
+      "name": "Session Legend",
+      "description": "Completed 100 sessions"
+    },
+    "friend_1": {
+      "name": "First Connection",
+      "description": "Made your first friend"
+    },
+    "friend_5": {
+      "name": "Social Butterfly",
+      "description": "Made 5 friends"
+    },
+    "friend_25": {
+      "name": "Popular",
+      "description": "Made 25 friends"
+    },
+    "friend_50": {
+      "name": "Networking Legend",
+      "description": "Made 50 friends"
+    },
+    "streak_3": {
+      "name": "Hat Trick",
+      "description": "Achieved 3 day streak"
+    },
+    "streak_7": {
+      "name": "Week Warrior",
+      "description": "Achieved 7 day streak"
+    },
+    "streak_30": {
+      "name": "Consistent",
+      "description": "Achieved 30 day streak"
+    },
+    "streak_100": {
+      "name": "Unstoppable",
+      "description": "Achieved 100 day streak"
+    }
+  }
+}

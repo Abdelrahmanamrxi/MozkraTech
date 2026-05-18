@@ -227,7 +227,7 @@ function SessionForm({ setShowAddSessionPopup }) {
       const errorMsg =
         error?.response?.data?.message ||
         error?.message ||
-        "Failed to generate sessions";
+        t("errors.generateSessionsFailed");
       setError((prev) => ({ ...prev, server: errorMsg }));
     },
   });
@@ -236,7 +236,7 @@ function SessionForm({ setShowAddSessionPopup }) {
     mutationFn: createSchedule,
     onSuccess: (data) => {
       console.log(data);
-      setMessage(data?.message || "Schedule created successfully!");
+      setMessage(data?.message || t("form.scheduleCreated"));
       queryClient.invalidateQueries({
         queryKey: ["schedule"],
       });
@@ -246,7 +246,7 @@ function SessionForm({ setShowAddSessionPopup }) {
       const errorMsg =
         error?.response?.data?.message ||
         error?.message ||
-        "Failed to create schedule";
+        t("errors.createScheduleFailed");
       setError((prev) => ({ ...prev, server: errorMsg }));
     },
   });
@@ -324,10 +324,10 @@ function SessionForm({ setShowAddSessionPopup }) {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="text-2xl sm:text-3xl font-semibold text-white">
-                    Create Task
+                    {t("form.title")}
                   </h3>
                   <p className="text-xs text-[#B8A7E5] mt-1.5">
-                    Sessions are generated automatically based on your inputs.
+                    {t("form.subtitle")}
                   </p>
                 </div>
                 <motion.button
@@ -343,14 +343,14 @@ function SessionForm({ setShowAddSessionPopup }) {
               {/* FORM */}
               <div className="rounded-[20px] border border-white/10 bg-white/5 p-4 sm:p-5 space-y-4">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#B8A7E5]">
-                  Task Input
+                  {t("form.taskInput")}
                 </p>
                 <div className="flex flex-col">
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
-                    placeholder="Task Name"
+                    placeholder={t("placeholders.taskName")}
                     className={inputCls}
                   />
                   {Error.name && (
@@ -363,15 +363,15 @@ function SessionForm({ setShowAddSessionPopup }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <label className="text-xs uppercase tracking-[0.2em] text-[#B8A7E5]">
-                      Subject
+                      {t("labels.subject")}
                     </label>
                     {isLoading ? (
                       <p className="text-xs text-[#B8A7E5]">
-                        Loading subjects...
+                        {t("loading.subjects")}
                       </p>
                     ) : error ? (
                       <p className="text-xs text-red-300">
-                        Failed to load subjects
+                        {t("errors.loadSubjectsFailed")}
                       </p>
                     ) : null}
                     <select
@@ -383,12 +383,12 @@ function SessionForm({ setShowAddSessionPopup }) {
                       }
                     >
                       <option disabled={true} value="">
-                        Choose subject
+                        {t("placeholders.chooseSubject")}
                       </option>
                       {isLoading ? (
-                        <option>Loading subjects...</option>
+                        <option>{t("loading.subjects")}</option>
                       ) : error ? (
-                        <option>Error loading subjects</option>
+                        <option>{t("errors.loadSubjectsFailed")}</option>
                       ) : (
                         subjects.map((subject) => (
                           <option key={subject._id} value={subject._id}>
@@ -406,7 +406,7 @@ function SessionForm({ setShowAddSessionPopup }) {
 
                   <div className="flex flex-col gap-2">
                     <label className="text-xs uppercase tracking-[0.2em] text-[#B8A7E5]">
-                      Due Date
+                      {t("form.dueDate")}
                     </label>
                     <input
                       type="datetime-local"
@@ -426,9 +426,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <label className="text-xs uppercase tracking-[0.2em] text-[#B8A7E5]">
-                      Total Hours{" "}
-                      {selectedSubject &&
-                        `(Max: ${selectedSubject.hoursPerWeek}h/week)`}
+                      {t("form.totalHours")} {selectedSubject && `(${t("form.totalHoursMax", { max: selectedSubject.hoursPerWeek })})`}
                     </label>
                     <input
                       type="number"
@@ -439,7 +437,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                       onChange={(e) =>
                         updateField("totalHours", e.target.value)
                       }
-                      placeholder="Total Hours"
+                      placeholder={t("placeholders.totalHours")}
                       className={inputCls}
                     />
                     {Error.totalHours && (
@@ -450,7 +448,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                   </div>
                   <div className="flex flex-col gap-2">
                     <label className="text-xs uppercase tracking-[0.2em] text-[#B8A7E5]">
-                      Priority
+                      {t("form.priority")}
                     </label>
                     <select
                       value={form.priority}
@@ -458,11 +456,11 @@ function SessionForm({ setShowAddSessionPopup }) {
                       className={`${inputCls} sf-select`}
                     >
                       <option value="" disabled>
-                        Select priority
+                        {t("priority.select")}
                       </option>
-                      {["Low", "Medium", "High"].map((l) => (
-                        <option key={l} value={l.toLocaleLowerCase()}>
-                          {l}
+                      {["low", "medium", "high"].map((value) => (
+                        <option key={value} value={value}>
+                          {t(`priority.${value}`)}
                         </option>
                       ))}
                     </select>
@@ -481,7 +479,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                     step="0.5"
                     value={form.studyHours}
                     onChange={(e) => updateField("studyHours", e.target.value)}
-                    placeholder="Your Maximum Study Hours in a day."
+                    placeholder={t("placeholders.maxStudyHours")}
                     className={inputCls}
                   />
                   {Error.studyHours && (
@@ -519,7 +517,7 @@ function SessionForm({ setShowAddSessionPopup }) {
               <div className="rounded-[20px] border border-white/10 bg-white/5 p-4 sm:p-5">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-[11px] uppercase tracking-[0.2em] text-[#B8A7E5]">
-                    Generated Sessions ({sessions.length})
+                    {t("form.generatedSessions", { count: sessions.length })}
                   </p>
                   <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full" />
@@ -529,7 +527,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                       onClick={() => setShowAddModal(true)}
                       className="flex items-center gap-1 px-2 py-1 rounded-[8px] bg-[#9B7EDE]/20 text-[#B8A7E5] text-xs hover:bg-[#9B7EDE]/30 transition"
                     >
-                      <Plus className="w-3 h-3" /> Add Session
+                      <Plus className="w-3 h-3" /> {t("buttons.addSession")}
                     </motion.button>
                   </div>
                 </div>
@@ -547,14 +545,14 @@ function SessionForm({ setShowAddSessionPopup }) {
                       <Loader className="w-8 h-8 text-[#9B7EDE]" />
                     </motion.div>
                     <p className="text-sm text-[#B8A7E5]">
-                      Generating sessions...
+                      {t("form.generatingSessions")}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {sessions.length === 0 ? (
                       <p className="text-center text-white/40 text-sm py-6">
-                        No sessions added. Click "Add Session" to create one.
+                        {t("form.noSessionsAdded")}
                       </p>
                     ) : (
                       sessions.map((session) => (
@@ -578,7 +576,7 @@ function SessionForm({ setShowAddSessionPopup }) {
               {/* BREAKDOWN */}
               <div>
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#B8A7E5]">
-                  Breakdown
+                  {t("form.breakdown")}
                 </p>
                 <p className="mt-2 text-sm text-[#B8A7E5]">{breakdownText}</p>
               </div>
@@ -606,7 +604,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                       Creating...
                     </span>
                   ) : (
-                    "Create Task & Schedule"
+                    t("buttons.createTaskSchedule")
                   )}
                 </motion.button>
                 <motion.button
@@ -617,7 +615,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                   whileTap={{ scale: 0.97 }}
                   className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 bg-white/5 text-sm text-[#B8A7E5] hover:bg-white/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Generate Sessions
+                  {t("buttons.generateSessions")}
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.97 }}
@@ -625,7 +623,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                   disabled={scheduleMutation.isPending || mutation.isPending}
                   className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 text-sm text-white/60 hover:text-white/90 transition disabled:opacity-50"
                 >
-                  Cancel
+                  {t("buttons.cancel")}
                 </motion.button>
               </div>
             </>
@@ -648,7 +646,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                 onClick={() => setShowAddSessionPopup(false)}
                 className="px-6 py-2 rounded-[12px] bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition"
               >
-                Close
+                {t("buttons.close")}
               </motion.button>
             </div>
           )}

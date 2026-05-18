@@ -63,7 +63,7 @@ function DeleteSessionModal({ session, setDelete }) {
         {/* Header */}
         <div className="mb-5">
           <h2 className="text-red-500 font-semibold text-lg">
-            {t("labels.deleteSession")}
+            {t("deleteSessionModal.label")}
           </h2>
           <p className="text-white/60 text-xs mt-1">
             {t("deleteSessionModal.warning")}

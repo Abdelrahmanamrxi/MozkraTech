@@ -7,7 +7,7 @@ export const updateProfileSchema = joi.object({
       .string()
       .min(3)
       .pattern(/^[A-Za-z\s]+$/),
-    location: joi.string(),
+    location: joi.string().allow(""),
     gender: joi.string().valid("male", "female", "other"),
     bio: joi.string().allow(""),
     summary: joi.string().allow(""),

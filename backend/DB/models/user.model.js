@@ -38,21 +38,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: "",
-      validate: {
-        validator: function (v) {
-          // If value is provided and not empty, it must be at least 30 chars
-          if (v && v.length > 0) {
-            return v.length >= 30;
-          }
-          return true; // Empty strings are allowed
-        },
-        message: "Summary must be at least 30 characters long if provided",
-      },
+      
     },
     bio: {
       type: String,
       trim: true,
-      minLength: 100,
+      
     },
     plan: {
       name: {

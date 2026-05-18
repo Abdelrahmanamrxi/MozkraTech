@@ -12,6 +12,7 @@ import api from "../../middleware/api";
 
 function Profile() {
   const [user, setUser] = useState({});
+  const [metrics, setMetrics] = useState({});
 
   const applyUserFromApi = (dbUser) => {
     if (!dbUser) return;
@@ -38,8 +39,9 @@ function Profile() {
 
   const refreshUser = async () => {
     try {
-      const { data } = await api.post("/user/get-profile");
+      const { data } = await api.get("/user/get-profile");
       applyUserFromApi(data?.user);
+      setMetrics(data.metrics);
     } catch (err) {
       console.log(err);
     }
@@ -56,7 +58,7 @@ function Profile() {
         onUserChange={setUser}
         onUserRefresh={refreshUser}
       />
-      <StatsRow mockProfileData={mockProfileData} />
+      <StatsRow streak={user.currentStreak} metrics={metrics} />
 
       <div className="flex flex-col lg:flex-row gap-8 mt-10 items-start">
         {/* Left column */}
@@ -68,7 +70,7 @@ function Profile() {
         <div className="flex flex-col gap-6 lg:w-[400px] w-full">
           <Preferences mockProfileData={mockProfileData} />
           <AccountSettings mockProfileData={mockProfileData} />
-          <AchievementsCard mockProfileData={mockProfileData} />
+          <AchievementsCard achievements={metrics.achievementCount} />
         </div>
       </div>
     </div>

@@ -237,7 +237,7 @@ const EditSessionModal = ({
           {/* Time Selection */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] uppercase text-white/30 mb-1">Start</p>
+              <p className="text-[10px] uppercase text-white/30 mb-1">{t("labels.start")}</p>
               <input
                 type="time"
                 value={form.startTime}
@@ -246,7 +246,7 @@ const EditSessionModal = ({
               />
             </div>
             <div>
-              <p className="text-[10px] uppercase text-white/30 mb-1">End</p>
+              <p className="text-[10px] uppercase text-white/30 mb-1">{t("labels.end")}</p>
               <input
                 type="time"
                 value={form.endTime}

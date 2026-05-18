@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X,Loader2 } from "lucide-react";
 import api from "../../../middleware/api";
 import { useQuery,useMutation,useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -23,8 +24,9 @@ async function createSession(newSession){
   return response.data
 }
 
-function CreateSessionModal({ setAddModal,t }) {
-  const queryClient=useQueryClient()
+function CreateSessionModal({ setAddModal }) {
+  const { t } = useTranslation("schedule");
+  const queryClient = useQueryClient();
  
   const today = toLocalDateInputValue();
   const[err,setError]=useState("")
@@ -53,7 +55,7 @@ function CreateSessionModal({ setAddModal,t }) {
       setAddModal(false)
     },
     onError:(err)=>{
-         const errorMsg = err?.response?.data?.message || err?.message || 'Failed to Create Session';
+         const errorMsg = err?.response?.data?.message || err?.message || t('errors.createSessionFailed');
          setError(errorMsg);
        }
   })
@@ -87,7 +89,7 @@ function CreateSessionModal({ setAddModal,t }) {
 
   const selectedTaskName =
     tasks.find((t) => t._id === newSession.taskId)?.name ||
-    "Select Task";
+    t("createSessionModal.selectTask");
 
   return (
     <motion.div
@@ -105,7 +107,7 @@ function CreateSessionModal({ setAddModal,t }) {
       >
         {/* HEADER */}
         <div className="flex justify-between items-center mb-4">
-          <h4 className="text-white font-semibold">Add New Session</h4>
+          <h4 className="text-white font-semibold">{t("createSessionModal.title")}</h4>
          
           <button
             onClick={() => setAddModal(false)}
@@ -120,12 +122,12 @@ function CreateSessionModal({ setAddModal,t }) {
         {/* LOADING */}
         {isLoading ? (
           <p className="text-white/50 text-sm text-center py-8">
-            Loading tasks...
+            {t("loading.tasks")}
           </p>
         ) : tasks.length > 0 ? (
           <div className="space-y-3">
             {/* SESSION NAME */}
-                        <label htmlFor="NAME" className='text-[11px] text-[#B8A7E5] uppercase mb-1 block'>Name</label>
+                        <label htmlFor="NAME" className='text-[11px] text-[#B8A7E5] uppercase mb-1 block'>{t("createSessionModal.nameLabel")}</label>
             <input
               type="text"
               value={newSession.name}
@@ -135,14 +137,14 @@ function CreateSessionModal({ setAddModal,t }) {
                   name: e.target.value,
                 }))
               }
-              placeholder="Session name "
+              placeholder={t("placeholders.sessionName")}
               className="w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25"
             />
 
             {/* TASK SELECT */}
             <div className="relative">
               <span className="text-[11px] text-[#B8A7E5] uppercase mb-1 block">
-                Task
+                {t("createSessionModal.taskLabel")}
               </span>
 
               <button
@@ -150,7 +152,7 @@ function CreateSessionModal({ setAddModal,t }) {
                 onClick={() => setTask(!taskSelection)}
                 className="w-full flex items-center justify-between bg-white/5 border border-white/10 rounded-[10px] px-3 py-2 text-sm text-white hover:bg-white/10 transition-all"
               >
-                <span>{selectedTaskName}</span>
+                <span>{selectedTaskName || t("createSessionModal.selectTask")}</span>
 
                 <span
                   className={`text-[10px] transition-transform ${
@@ -207,7 +209,7 @@ function CreateSessionModal({ setAddModal,t }) {
             </div>
 
             {/* DATE */}
-            <label htmlFor="taskDate" className='text-[11px] text-[#B8A7E5] uppercase mb-1 block'>Date</label>
+            <label htmlFor="taskDate" className='text-[11px] text-[#B8A7E5] uppercase mb-1 block'>{t("createSessionModal.dateLabel")}</label>
             <input
               type="date"
               value={newSession.date}
@@ -225,7 +227,7 @@ function CreateSessionModal({ setAddModal,t }) {
             {/* TIME */}
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col" >
-            <label htmlFor="from" className='text-[11px]  text-[#B8A7E5] uppercase mb-1 block'>From</label>
+            <label htmlFor="from" className='text-[11px]  text-[#B8A7E5] uppercase mb-1 block'>{t("createSessionModal.fromLabel")}</label>
               <input
               
               type="time"
@@ -242,7 +244,7 @@ function CreateSessionModal({ setAddModal,t }) {
 
 </div>
             <div className="flex flex-col">
-            <label htmlFor="to" className='text-[11px] text-[#B8A7E5] uppercase mb-1 block'>To</label>
+            <label htmlFor="to" className='text-[11px] text-[#B8A7E5] uppercase mb-1 block'>{t("createSessionModal.toLabel")}</label>
               <input
                 type="time"
                 name="to"
@@ -260,8 +262,7 @@ function CreateSessionModal({ setAddModal,t }) {
 
             {/* DURATION */}
             <p className="text-[11px] text-white/30">
-              Duration:{" "}
-              <span className="text-[#B8A7E5]">
+              {t("createSessionModal.durationLabel")}: <span className="text-[#B8A7E5]">
                 {calcDuration(newSession.startTime, newSession.endTime)}
               </span>
             </p>
@@ -273,21 +274,21 @@ function CreateSessionModal({ setAddModal,t }) {
                 className="flex-1 py-2 rounded-[10px] cursor-pointer bg-[#9B7EDE] text-center text-white text-sm font-semibold"
               >
                 {createSessionMutation.isPending?(<p className="flex justify-center items-center flex-row gap-3 text-center">
-                  Loading  <Loader2 className="animate-spin"/>
-                </p>):"Add Session"}
+                  {t("loading.general")}  <Loader2 className="animate-spin"/>
+                </p>):t("createSessionModal.addButton")}
               </button>
 
               <button
                 onClick={() => setAddModal(false)}
                 className="flex-1 py-2 rounded-[10px] border border-white/10 text-white/60 text-sm"
               >
-                Cancel
+                {t("createSessionModal.cancelButton")}
               </button>
             </div>
           </div>
         ) : (
           <p className="flex justify-center items-center text-center rounded-[24px] p-8 bg-red-500/10 border border-red-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.15)] text-red-200">
-            Please add a task to start creating your sessions.
+            {t("createSessionModal.noTasksMessage")}
           </p>
         )}
       </motion.div>

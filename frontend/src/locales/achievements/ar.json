@@ -1,0 +1,64 @@
+{
+  "title": "كل الإنجازات",
+  "description": "لقد فتحت {{unlocked}} من أصل {{total}} إنجازات",
+  "back": "رجوع",
+  "progress": "تقدمك نحو الإتقان",
+  "locked": "استمر للتقدم وفتح هذا الإنجاز!",
+  "unlockedOn": "تم الفتح في",
+  "retry": "إعادة محاولة",
+  "categories": {
+    "session": "جلسات الدراسة",
+    "friendship": "الصداقات",
+    "streak": "السلاسل"
+  },
+  "achievements": {
+    "session_1": {
+      "name": "الخطوة الأولى",
+      "description": "أكملت جلستك الأولى"
+    },
+    "session_10": {
+      "name": "في الطريق الصحيح",
+      "description": "أكملت 10 جلسات"
+    },
+    "session_50": {
+      "name": "محارب الجلسات",
+      "description": "أكملت 50 جلسة"
+    },
+    "session_100": {
+      "name": "أسطورة الجلسات",
+      "description": "أكملت 100 جلسة"
+    },
+    "friend_1": {
+      "name": "الاتصال الأول",
+      "description": "أضفت صديقك الأول"
+    },
+    "friend_5": {
+      "name": "فراشة اجتماعية",
+      "description": "أضفت 5 أصدقاء"
+    },
+    "friend_25": {
+      "name": "شهير",
+      "description": "أضفت 25 صديقاً"
+    },
+    "friend_50": {
+      "name": "أسطورة التواصل",
+      "description": "أضفت 50 صديقاً"
+    },
+    "streak_3": {
+      "name": "الهدف الثلاثي",
+      "description": "حققت سلسلة 3 أيام"
+    },
+    "streak_7": {
+      "name": "محارب الأسبوع",
+      "description": "حققت سلسلة 7 أيام"
+    },
+    "streak_30": {
+      "name": "متسق",
+      "description": "حققت سلسلة 30 يوماً"
+    },
+    "streak_100": {
+      "name": "لا يوقفك شيء",
+      "description": "حققت سلسلة 100 يوم"
+    }
+  }
+}

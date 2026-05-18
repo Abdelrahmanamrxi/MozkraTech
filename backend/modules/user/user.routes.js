@@ -104,6 +104,6 @@ userRouter.patch(
   validation(addFriendSchema),
   deleteFriend,
 );
-userRouter.post("/get-profile", authentication, getProfile);
+userRouter.get("/get-profile", authentication, getProfile);
 
 export default userRouter;

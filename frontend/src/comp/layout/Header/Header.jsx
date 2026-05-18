@@ -16,7 +16,7 @@ function Header() {
     const fetchProfileImage = async () => {
       if (!accessToken || !isDashboardRoute) return;
       try {
-        const { data } = await api.post("/user/get-profile");
+        const { data } = await api.get("/user/get-profile");
         if (!active) return;
         setProfileImage(data?.user?.profileImage ?? "");
       } catch (error) {

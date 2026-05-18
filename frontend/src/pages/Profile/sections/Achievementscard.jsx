@@ -2,11 +2,13 @@
 import { motion } from "framer-motion";
 import { Trophy, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
-function AchievementsCard({ mockProfileData }) {
-  const { achievements } = mockProfileData;
-  const { total, unlocked } = achievements;
-  const percentage = Math.round((unlocked / total) * 100);
+function AchievementsCard({ achievements }) {
+  console.log(achievements);
+  const navigate = useNavigate();
+  const total = 12;
+  const percentage = Math.round((achievements / total) * 100);
   const { t } = useTranslation("profile");
 
   return (
@@ -21,7 +23,7 @@ function AchievementsCard({ mockProfileData }) {
       </div>
 
       <p className="text-xs text-[#B8A7E5] leading-relaxed">
-        {t("achievements.description", { unlocked, total })}
+        {t("achievements.description", { unlocked: achievements, total })}
       </p>
 
       <div className="mt-4 bg-white/10 rounded-full h-2 overflow-hidden">
@@ -33,12 +35,13 @@ function AchievementsCard({ mockProfileData }) {
         />
       </div>
       <p className="text-[10px] text-[#B8A7E5]/50 mt-1 text-right">
-        {unlocked}/{total}
+        {achievements}/{total}
       </p>
 
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.95 }}
+        onClick={() => navigate("/dashboard/achievements")}
         className="mt-3 flex items-center gap-1 text-xs text-[#B8A7E5] hover:text-white transition-colors cursor-pointer"
       >
         {t("achievements.viewAll")} <ChevronRight size={12} />

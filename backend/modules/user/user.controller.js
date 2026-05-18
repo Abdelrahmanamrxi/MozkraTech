@@ -7,6 +7,9 @@ import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
 import { profileImageConfig } from "../../middleware/upload.js";
+import subjectModel from "../../DB/models/subject.model.js";
+import taskModel from "../../DB/models/task.model.js";
+import achievementModel from "../../DB/models/achievement.model.js";
 
 const getRelativeImagePath = (imageUrl) => {
   if (!imageUrl) return "";
@@ -518,11 +521,27 @@ export const getProfile = asyncHandler(async (req, res, next) => {
     isDeleted: false,
     isVerified: true,
   });
+
   if (!user) {
     return next(new HttpException("User Not Found", 404));
   }
+
+  const [tasks, subjectCount, achievementCount] = await Promise.all([
+    taskModel.find({ userId: user._id }),
+    subjectModel.countDocuments({ userId: user._id }),
+    achievementModel.countDocuments({ userId: user._id }),
+  ]);
+
+  const studyHours = tasks.reduce((sum, t) => sum + t.hoursSpent, 0);
+
   return res.status(200).json({
-    message: "getUsers success",
-    user: user,
+    message: "getProfile success",
+    user,
+    metrics: {
+      subjectCount,
+      achievementCount,
+      studyHours,
+      streak: user.streak,
+    },
   });
 });

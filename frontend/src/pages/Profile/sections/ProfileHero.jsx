@@ -381,7 +381,8 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
       }));
     }
   };
-
+  console.log(user.bio)
+  
   return (
     <>
       <div className="bg-gradient-to-br from-[#9B7EDE]/60 to-[#7C5FBD]/40 border-t border-[#9B7EDE]/40 rounded-[24px] p-6 lg:p-8 font-Inter">
@@ -402,9 +403,14 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
               <h1 className="text-2xl lg:text-3xl font-bold text-white">
                 {user.name}
               </h1>
-              <p className="text-sm text-[#D4C5F5] mt-0.5">
+
+              {user.summary && (
+                <p className="text-[#B8A7E5] text-[12px]">{user.summary}</p>
+              )}
+              <p className="text-sm text-[#D4C5F5] font-bold mt-0.5">
                 {displayTitle} • {t("hero.level", { level: user.level })}
               </p>
+              <p className="mt-4 text-[15px] text-[#B8A7E5]">{user.bio}</p>
               <div className="flex flex-wrap gap-2 mt-3">
                 {(user.badges || []).map((badgeKey) => (
                   <span

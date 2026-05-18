@@ -95,7 +95,8 @@
     "taskName": "اسم المهمة",
     "sessionName": "اسم الجلسة",
     "totalHours": "إجمالي الساعات",
-    "maxStudyHours": "أقصى عدد ساعات مذاكرة في اليوم."
+    "maxStudyHours": "أقصى عدد ساعات مذاكرة في اليوم.",
+    "chooseSubject": "اختار مادة"
   },
   "loading": {
     "general": "جار التحميل...",
@@ -135,6 +136,8 @@
     "error": "حصل خطأ في نقل الجلسة. حاول تاني."
   },
   "deleteSessionModal": {
+    
+    "label": "متأكد إنك عايز تحذف الجلسة دي؟",
     "warning": "مش هينفع ترجع الخطوة دي."
   },
   "addSessionModal": {
@@ -168,13 +171,13 @@
     "close": "إغلاق"
   },
   "status": {
-    "scheduled": "مجدولة",
+    "scheduled": "مخطط",
     "completed": "مكتملة",
     "missed": "فائتة",
     "cancelled": "ملغاة"
   },
   "statusShort": {
-    "scheduled": "ج",
+    "scheduled": "ق",
     "completed": "ت",
     "missed": "ف",
     "cancelled": "ل"

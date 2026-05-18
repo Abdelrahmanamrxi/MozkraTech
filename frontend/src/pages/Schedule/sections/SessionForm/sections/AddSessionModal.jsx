@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { calcDuration, to12, toLocalDateInputValue, localDateTimeToUtcIso } from "@/utils/formatTime";
 import { motion } from "framer-motion";
 import { X,Edit } from "lucide-react";
@@ -7,7 +8,8 @@ import { generateId } from "@/utils/formatTime";
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 
-function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject }) {
+function AddSessionModal({ isOpen, onClose, onAdd, defaultDay, selectedSubject }) {
+  const { t } = useTranslation("schedule");
   const today = toLocalDateInputValue();
   
   // Helper to get day name from date string
@@ -67,7 +69,7 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
         className="bg-[#1B142D] border border-white/10 rounded-[20px] p-5 w-full max-w-md"
       >
         <div className="flex justify-between items-center mb-4">
-          <h4 className="text-white font-semibold">Add New Session</h4>
+          <h4 className="text-white font-semibold">{t("addSessionModal.title")}</h4>
           <button onClick={onClose} className="text-white/50 hover:text-white/80">
             <X className="w-4 h-4" />
           </button>
@@ -78,7 +80,7 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
             type="text"
             value={newSession.name}
             onChange={(e) => setNewSession(p => ({ ...p, name: e.target.value }))}
-            placeholder="Session name"
+            placeholder={t("placeholders.sessionName")}
             className="w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25 focus:border-[#9B7EDE]/50 focus:outline-none focus:ring-1 focus:ring-[#9B7EDE]/20"
           />
 
@@ -92,7 +94,7 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] uppercase text-white/30 mb-1">Start</p>
+              <p className="text-[10px] uppercase text-white/30 mb-1">{t("labels.start")}</p>
               <input
                 type="time"
                 value={newSession.start}
@@ -101,7 +103,7 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
               />
             </div>
             <div>
-              <p className="text-[10px] uppercase text-white/30 mb-1">End</p>
+              <p className="text-[10px] uppercase text-white/30 mb-1">{t("labels.end")}</p>
               <input
                 type="time"
                 value={newSession.end}
@@ -112,7 +114,7 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
           </div>
 
           <p className="text-[11px] text-white/30">
-            Duration: <span className="text-[#B8A7E5]">{calcDuration(newSession.start, newSession.end)}</span>
+            {t("addSessionModal.durationLabel")}: <span className="text-[#B8A7E5]">{calcDuration(newSession.start, newSession.end)}</span>
           </p>
 
           <div className="flex gap-2 pt-2">
@@ -120,13 +122,13 @@ function AddSessionModal({ isOpen, onClose, onAdd, defaultDay,selectedSubject })
               onClick={handleAdd}
               className="flex-1 py-2 rounded-[10px] bg-[#9B7EDE] text-white text-sm font-semibold"
             >
-              Add Session
+              {t("addSessionModal.addButton")}
             </button>
             <button
               onClick={onClose}
               className="flex-1 py-2 rounded-[10px] border border-white/10 text-white/60 text-sm"
             >
-              Cancel
+              {t("addSessionModal.cancelButton")}
             </button>
           </div>
         </div>

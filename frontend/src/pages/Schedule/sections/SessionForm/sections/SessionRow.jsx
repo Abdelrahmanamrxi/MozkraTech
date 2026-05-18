@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { to24, to12, calcDuration, isoToLocalDateInputValue, isoToLocalTimeInputValue, localDateTimeToUtcIso, toLocalDateInputValue } from "@/utils/formatTime";
 import { Pencil,Trash2,Clock,Edit,Check } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
@@ -29,6 +30,7 @@ function getDayNameFromDateString(dateString) {
 }
 
 function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
+  const { t } = useTranslation("schedule");
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
     name: session.name,
@@ -131,14 +133,14 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
                   type="text"
                   value={draft.name}
                   onChange={(e) => setDraft((p) => ({ ...p, name: e.target.value }))}
-                  placeholder="Session name "
+                  placeholder={t("placeholders.sessionName")}
                   className="w-full mt-3 rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25 focus:border-[#9B7EDE]/50 focus:outline-none focus:ring-1 focus:ring-[#9B7EDE]/20 transition"
                 />
               </div>
 
               {/* Date picker */}
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-widest text-white/30">Date</p>
+                <p className="text-[10px] uppercase tracking-widest text-white/30">{t("labels.date")}</p>
                 <input
                   type="date"
                   value={draft.date}
@@ -155,7 +157,7 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
                   { label: "End",   key: "end"   },
                 ].map(({ label, key }) => (
                   <div key={key} className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-widest text-white/30">{label}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-white/30">{t(`labels.${label.toLowerCase()}`)}</p>
                     <div className="relative">
                       <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9B7EDE]/60 pointer-events-none" />
                       <input
@@ -171,8 +173,7 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
 
               {/* Preview */}
               <p className="text-[11px] text-white/30">
-                Duration preview:{" "}
-                <span className="text-[#B8A7E5]">{calcDuration(draft.start, draft.end)}</span>
+                {t("sessionRow.durationPreview")}: <span className="text-[#B8A7E5]">{calcDuration(draft.start, draft.end)}</span>
               </p>
 
               {/* Actions */}
@@ -182,13 +183,13 @@ function SessionRow({ session, subjectColor, onUpdate, onDelete }) {
                   onClick={save}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#9B7EDE] text-white text-xs font-semibold"
                 >
-                  <Check className="w-3 h-3" /> Save
+                  <Check className="w-3 h-3" /> {t("sessionRow.save")}
                 </motion.button>
                 <button
                   onClick={cancel}
                   className="px-3 py-1.5 rounded-[8px] border border-white/10 text-xs text-white/50 hover:text-white/80 transition"
                 >
-                  Cancel
+                  {t("sessionRow.cancel")}
                 </button>
               </div>
             </div>

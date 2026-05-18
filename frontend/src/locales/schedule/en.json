@@ -95,7 +95,8 @@
     "taskName": "Task Name",
     "sessionName": "Session name",
     "totalHours": "Total Hours",
-    "maxStudyHours": "Your Maximum Study Hours in a day."
+    "maxStudyHours": "Your Maximum Study Hours in a day.",
+    "chooseSubject": "Choose subject"
   },
   "loading": {
     "general": "Loading...",
@@ -135,6 +136,7 @@
     "error": "Failed to move session. Please try again."
   },
   "deleteSessionModal": {
+    "label": "Are you sure you want to delete this session?",
     "warning": "This action cannot be undone."
   },
   "addSessionModal": {
