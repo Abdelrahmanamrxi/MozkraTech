@@ -3,13 +3,14 @@ import taskModel from '../../DB/models/task.model.js'
 import sessionModel from '../../DB/models/session.model.js'
 import {asyncHandler} from "../../utils/asyncHandler/index.js"
 import subjectModel from '../../DB/models/subject.model.js'
+import achievementModel from '../../DB/models/achievement.model.js'
 import { generateAISessionResponse,generateAvailableSessions } from "../../services/aiResponse.js"
 import userModel from '../../DB/models/user.model.js'
 import {startOfWeek,endOfWeek} from 'date-fns'
 import HttpException from '../../utils/HttpException.js'
 import { formatLocalDateTime,toLocalTime,toLocalTimeForAI } from '../../utils/customHelpers/customHelpers.js'
 import { hasSessionConflict } from '../../utils/sessionHelper/sessionHelper.js'
-
+import { CheckSessionAchievements } from '../achievement/achievement.helper.js'
 
 export const createSession=asyncHandler(async(req,res,next)=>{
     const userId=req.user._id
@@ -309,8 +310,15 @@ export const editSession = asyncHandler(async (req, res, next) => {
             let taskId=session.taskId
             let duration=new Date(session.endTime)-new Date(session.startTime)
             const hours = duration / (1000 * 60 * 60);
+
             const task=await taskModel.findOneAndUpdate({_id:taskId},{$inc:{hoursSpent:hours}})
-         
+            
+            session.status=status
+
+            await session.save()
+            await CheckSessionAchievements(userId);
+
+            return res.status(200).json({message:"Session Completed Successfully",session})
         }
         if(status==="cancelled"){
             await session.deleteOne()
@@ -439,6 +447,7 @@ export const updateSession = asyncHandler(async (req, res, next) => {
 
         await session.save();
         await taskModel.findOneAndUpdate({_id:session.taskId},{$inc:{hoursSpent:session.totalDuration}})
+        await CheckSessionAchievements(session.userId);
 
         return res.status(200).json({ message: "Session marked as completed", session });
     }

@@ -47,14 +47,13 @@ export function parseTimeToHours(str = "") {
   return h + min / 60;
 }
 
-export function formatIsoTimeLabel(str = "") {
+export function formatIsoTimeLabel(str = "", locale = "en-US") {
   if (!str) return str;
   const date = new Date(str);
   if (Number.isNaN(date.getTime())) return str;
-  return date.toLocaleTimeString("en-US", {
+  return date.toLocaleTimeString(locale, {
     hour: "numeric",
     minute: "2-digit",
-    hour12: true,
   });
 }
 
@@ -84,20 +83,32 @@ export function pxToSnappedHour(px) {
   return Math.max(TIME_START_HOUR, Math.min(TIME_END_HOUR - step, snapped));
 }
 
-export function fmtHourLabel(h) {
-  const h12  = h % 12 === 0 ? 12 : h % 12;
-  const ampm = h < 12 ? "AM" : "PM";
-  return `${h12}:00 ${ampm}`;
+export function fmtHourLabel(h, locale = "en-US") {
+  const date = new Date();
+  date.setHours(h, 0, 0, 0);
+  return date.toLocaleTimeString(locale, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
-export function hoursToTimeString(h) {
+export function hoursToTimeString(h, locale = "en-US") {
   const hour24 = Math.floor(h);
-  const mins   = Math.round((h - hour24) * 60);
-  const ampm   = hour24 < 12 ? "AM" : "PM";
-  const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
-  return `${hour12}:${String(mins).padStart(2,"0")} ${ampm}`;
+  const mins = Math.round((h - hour24) * 60);
+  const date = new Date();
+  date.setHours(hour24, mins, 0, 0);
+  return date.toLocaleTimeString(locale, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
-export const formatDuration = (startTime, endTime) => {
+
+export const formatDuration = (startTime, endTime, options = {}) => {
+  const {
+    hourLabel = "h",
+    minuteLabel = "m",
+    formatNumber = (value) => value,
+  } = options;
   const minutes = differenceInMinutes(
     new Date(endTime),
     new Date(startTime)
@@ -107,14 +118,14 @@ export const formatDuration = (startTime, endTime) => {
 
   // exact hour
   if (minutes % 60 === 0) {
-    return `${hours}h`;
+    return `${formatNumber(hours)}${hourLabel}`;
   }
 
   // less than 1 hour
   if (hours < 1) {
-    return `${minutes}m`;
+    return `${formatNumber(minutes)}${minuteLabel}`;
   }
 
   // decimal hours
-  return `${hours.toFixed(1)}h`;
+  return `${formatNumber(Number(hours.toFixed(1)))}${hourLabel}`;
 };

@@ -17,7 +17,7 @@ const achievementSchema=new mongoose.Schema({
     },
     type:{
         type:String,
-        enum:['streak','friendship','session'],
+        enum:['streak','friendship','session','task'],
         required:true
     },
     badge:{
@@ -25,8 +25,12 @@ const achievementSchema=new mongoose.Schema({
         enum:['common','rare','epic','legendary'],
         required:true,
     },
+    icon:{
+        type:String,
+        required:true
+    }
 
-},{timeStamps:true})
+},{timestamps:true})
 
 const achievementModel=mongoose.model('Achievement',achievementSchema)
 export default achievementModel

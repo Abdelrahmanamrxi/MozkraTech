@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pencil,Trash2,Check,CirclePlus  } from "lucide-react";
+import { Pencil, Trash2, Check, CirclePlus } from "lucide-react";
 import SessionCard from "./SessionCard";
 import SessionDetailsModal from "./SessionDetailsModal";
 import DeleteSessionModal from "./DeleteSessionModal";
 import CreateSessionModal from "./CreateSessionModal";
-
+import { useTranslation } from "react-i18next";
 
 const DayColumn = ({
   day,
@@ -16,7 +16,6 @@ const DayColumn = ({
   onDrop,
   onEditSession,
   isEditMode,
-  t,
   parseTimeToHours,
   parseDurationToHours,
   hourToPx,
@@ -25,13 +24,16 @@ const DayColumn = ({
   HALF_TICKS,
   HOUR_HEIGHT_PX,
 }) => {
+  const { t } = useTranslation("schedule");
   const [previewPx, setPreviewPx] = useState(null);
   const [showEditHint, setShowEditHint] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [deleteModal,setDelete]=useState(false)
- 
-  const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches;
+  const [deleteModal, setDelete] = useState(false);
+
+  const canHover =
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: hover)").matches;
 
   const columnRef = useRef(null);
 
@@ -55,7 +57,7 @@ const DayColumn = ({
 
   const handleDragLeave = (e) => {
     if (!isEditMode) return;
-    
+
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setDragOverDay(null);
       setPreviewPx(null);
@@ -66,18 +68,13 @@ const DayColumn = ({
     if (!isEditMode) return;
     e.preventDefault();
 
-  const data = JSON.parse(
-    e.dataTransfer.getData("application/json")
-  )
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
 
-
- 
     const y = getRelativeY(e);
     const snappedHour = pxToSnappedHour(y);
     setPreviewPx(null);
     setDragOverDay(null);
     onDrop(e, day, targetIndex, snappedHour);
-  
   };
 
   const isOver = isEditMode && dragOverDay === day;
@@ -97,35 +94,35 @@ const DayColumn = ({
         onDrop={(e) => handleDrop(e)}
         onMouseEnter={() => {
           if (!isEditMode && canHover) setShowEditHint(true);
-       
         }}
         onMouseLeave={() => {
           if (canHover) {
             setShowEditHint(false);
-          
           }
-            
         }}
         style={{ height: GRID_HEIGHT }}
         className={`relative rounded-[20px] transition-all duration-150 ${
-          isOver ? "bg-white/[0.07] ring-2 ring-[#9B7EDE]/60" : "bg-[#2a2242]/40"
+          isOver
+            ? "bg-white/[0.07] ring-2 ring-[#9B7EDE]/60"
+            : "bg-[#2a2242]/40"
         }`}
       >
         {!isEditMode && showEditHint && (
           <div className="absolute top-3 sm:top-2 left-2 right-2 z-20 pointer-events-none">
             <div className="bg-black/50 text-[10px] sm:text-xs text-white/80 px-2 py-1 rounded-full text-center">
-              {t.editHint}
+              {t("page.editHint")}
             </div>
           </div>
         )}
-       
 
         {HALF_TICKS.map((h) => (
           <div
             key={h}
             style={{ top: hourToPx(h) }}
             className={`absolute left-0 right-0 pointer-events-none border-t ${
-              Number.isInteger(h) ? "border-white/[0.10]" : "border-white/[0.04]"
+              Number.isInteger(h)
+                ? "border-white/[0.10]"
+                : "border-white/[0.04]"
             }`}
           />
         ))}
@@ -139,17 +136,19 @@ const DayColumn = ({
 
         <AnimatePresence>
           {sessions.map((session, idx) => {
-           
             const startH = parseTimeToHours(session.startTime);
-            const durationMinutes = (new Date(session.endTime) - new Date(session.startTime)) / (1000 * 60);
-            const durationH = Number.isFinite(durationMinutes) && durationMinutes > 0
-              ? durationMinutes / 60
-              : (typeof session.duration === "number"
-                ? session.duration
-                : parseDurationToHours(session.duration));
+            const durationMinutes =
+              (new Date(session.endTime) - new Date(session.startTime)) /
+              (1000 * 60);
+            const durationH =
+              Number.isFinite(durationMinutes) && durationMinutes > 0
+                ? durationMinutes / 60
+                : typeof session.duration === "number"
+                  ? session.duration
+                  : parseDurationToHours(session.duration);
             const topPx = hourToPx(startH);
             const heightPx = durationH * HOUR_HEIGHT_PX;
-           
+
             return (
               <motion.div
                 key={session.id}
@@ -181,7 +180,7 @@ const DayColumn = ({
                   onDragStart={(e, d, i) => {
                     e.dataTransfer.setData(
                       "application/json",
-                      JSON.stringify({ fromDay: d, sourceIndex: i })
+                      JSON.stringify({ fromDay: d, sourceIndex: i }),
                     );
                     e.dataTransfer.effectAllowed = "move";
                   }}
@@ -189,7 +188,7 @@ const DayColumn = ({
                   onShowDetails={handleShowDetails}
                 />
 
-                {isEditMode && session.status!=="completed"  && (
+                {isEditMode && session.status !== "completed" && (
                   <button
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
@@ -198,25 +197,21 @@ const DayColumn = ({
                     }}
                     className="absolute top-1.5 right-1.5 z-30 w-6 h-6 rounded-full bg-black/30 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     style={{ opacity: undefined }}
-                    aria-label="Edit session"
+                    aria-label={t("aria.editSession")}
                   >
-                     <Pencil size={11} />
+                    <Pencil size={11} />
                   </button>
                 )}
-                
+
                 {isEditMode && (
                   <button
-                    onClick={
-                      ()=>{
-                        setSelectedSession(session),
-                        setDelete(true)
-                      }
-                        
-                    }
+                    onClick={() => {
+                      (setSelectedSession(session), setDelete(true));
+                    }}
                     onMouseDown={(e) => e.stopPropagation()}
                     className="absolute top-1.5 left-1.5 text-white z-30 w-6 h-6 rounded-full bg-black/30 hover:bg-black/60 flex items-center justify-center  hover:text-red-600 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     style={{ opacity: undefined }}
-                    aria-label="Edit session"
+                    aria-label={t("aria.deleteSession")}
                   >
                     <Trash2 size={11} />
                   </button>
@@ -228,7 +223,9 @@ const DayColumn = ({
 
         {sessions.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <p className="text-[#B8A7E5]/25 text-[10px] text-center">{t.noSessions}</p>
+            <p className="text-[#B8A7E5]/25 text-[10px] text-center">
+              {t("labels.noSessions")}
+            </p>
           </div>
         )}
       </div>
@@ -241,9 +238,14 @@ const DayColumn = ({
           setShowDetailsModal(false);
           setSelectedSession(null);
         }}
-      /> 
-      {deleteModal && selectedSession  && <DeleteSessionModal setDelete={setDelete} session={selectedSession} t={t}/>}
-   
+      />
+      {deleteModal && selectedSession && (
+        <DeleteSessionModal
+          setDelete={setDelete}
+          session={selectedSession}
+          t={t}
+        />
+      )}
     </div>
   );
 };

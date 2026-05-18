@@ -98,7 +98,7 @@ function Leaderboard() {
         stiffness: 280,
         damping: 24,
       }}
-      className="w-full mt-3 rounded-2xl p-5 sm:p-7 border-t-1 border-[#9B7EDE]/30"
+      className="w-full mt-11 rounded-2xl p-5 sm:p-7 border-t-1 border-[#9B7EDE]/30"
       style={{
         background:
           "linear-gradient(135deg, rgba(155, 126, 222, 0.2) 0%, rgba(124, 95, 189, 0.2) 100%)",

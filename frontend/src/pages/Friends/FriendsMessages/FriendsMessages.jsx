@@ -15,7 +15,7 @@ import ChatPanel from "./components/ChatPanel";
  */
 async function getFriends(search) {
   const response = await api.get(`/friends?search=${search}`);
-  console.log(response)
+  console.log(response);
   return response.data;
 }
 
@@ -52,7 +52,9 @@ export default function FriendsMessages() {
   const [search, setSearch] = useState("");
   const [input, setInput] = useState("");
   const [selected, setSelected] = useState(null);
-  const [locallyReadConversationIds, setLocallyReadConversationIds] = useState(() => new Set());
+  const [locallyReadConversationIds, setLocallyReadConversationIds] = useState(
+    () => new Set(),
+  );
 
   // DOM refs and scroll tracking
   const messagesEndRef = useRef(null);
@@ -71,7 +73,6 @@ export default function FriendsMessages() {
     queryFn: () => getFriends(debouncedQuery),
     retry: false,
   });
-  
 
   /**
    * Manage real-time chat state for the currently selected friend.
@@ -90,13 +91,14 @@ export default function FriendsMessages() {
     isLoadingOlder,
     isLoading: chatIsLoading,
     error: chatError,
-    olderLoadError
+    olderLoadError,
   } = useFriendsMessages(selected);
   // Normalize friend list data and avoid recomputing on every render.
   const friendItems = useMemo(() => data?.friends ?? [], [data?.friends]);
 
   const rememberConversationAsRead = (conversationId) => {
-    const normalizedConversationId = conversationId?.toString?.() ?? conversationId;
+    const normalizedConversationId =
+      conversationId?.toString?.() ?? conversationId;
     if (!normalizedConversationId) return;
 
     setLocallyReadConversationIds((prev) => {
@@ -120,7 +122,8 @@ export default function FriendsMessages() {
       const next = new Set(prev);
 
       friendItems.forEach((item) => {
-        const normalizedConversationId = item.conversationId?.toString?.() ?? item.conversationId;
+        const normalizedConversationId =
+          item.conversationId?.toString?.() ?? item.conversationId;
         if (!normalizedConversationId) return;
 
         if ((item.unReadCount ?? 0) > 0 && next.has(normalizedConversationId)) {
@@ -132,7 +135,7 @@ export default function FriendsMessages() {
       return changed ? next : prev;
     });
   }, [friendItems]);
-  
+
   const latestMessageByFriend = useMemo(() => {
     return messages.reduce((acc, msg) => {
       const friendId = msg.friendId?.toString();
@@ -155,13 +158,19 @@ export default function FriendsMessages() {
 
         const localLatest = latestMessageByFriend[friendId];
         const serverMessageTime = item.lastMessage
-          ? new Date(item.lastMessage.sentAt || item.lastMessage.createdAt || 0).getTime()
+          ? new Date(
+              item.lastMessage.sentAt || item.lastMessage.createdAt || 0,
+            ).getTime()
           : 0;
         const friendActivityTime = item.friend?.lastActivityDate
           ? new Date(item.friend.lastActivityDate).getTime()
           : 0;
         const localTime = localLatest?.time ?? 0;
-        const mostRecentTime = Math.max(localTime, serverMessageTime, friendActivityTime);
+        const mostRecentTime = Math.max(
+          localTime,
+          serverMessageTime,
+          friendActivityTime,
+        );
 
         const updatedFriend = {
           ...item.friend,
@@ -172,17 +181,21 @@ export default function FriendsMessages() {
         };
 
         const isDeletedForAll =
-          localLatest?.message?.isDeletedForAll || item.lastMessage?.isDeletedForAll;
+          localLatest?.message?.isDeletedForAll ||
+          item.lastMessage?.isDeletedForAll;
         const resolvedContent = isDeletedForAll
           ? ""
-          : localLatest?.message?.content || localLatest?.message?.message || item.lastMessage?.content;
+          : localLatest?.message?.content ||
+            localLatest?.message?.message ||
+            item.lastMessage?.content;
 
         const updatedLastMessage = localLatest
           ? {
               ...item.lastMessage,
               ...localLatest.message,
               content: resolvedContent,
-              sentAt: localLatest.message.sentAt || localLatest.message.createdAt,
+              sentAt:
+                localLatest.message.sentAt || localLatest.message.createdAt,
               createdAt: localLatest.message.createdAt,
               isDeletedForAll,
             }
@@ -220,7 +233,8 @@ export default function FriendsMessages() {
     const friendId = latest.friendId?.toString();
 
     if (latest.from === "them" && friendId === selected._id?.toString()) {
-      const timestamp = latest.sentAt || latest.createdAt || new Date().toISOString();
+      const timestamp =
+        latest.sentAt || latest.createdAt || new Date().toISOString();
       return { ...selected, updatedAt: timestamp };
     }
 
@@ -240,13 +254,18 @@ export default function FriendsMessages() {
       const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
       if (!friendId) return acc;
 
-      const conversationId = item.conversationId?.toString?.() ?? item.conversationId;
+      const conversationId =
+        item.conversationId?.toString?.() ?? item.conversationId;
       const isActiveConversation =
-        !!selectedConversationId && !!conversationId && selectedConversationId === conversationId;
-      const isLocallyRead = !!conversationId && locallyReadConversationIds.has(conversationId);
+        !!selectedConversationId &&
+        !!conversationId &&
+        selectedConversationId === conversationId;
+      const isLocallyRead =
+        !!conversationId && locallyReadConversationIds.has(conversationId);
 
       // Keep UI consistent: once a conversation is open, treat its unread as cleared.
-      acc[friendId] = isActiveConversation || isLocallyRead ? 0 : (item.unReadCount ?? 0);
+      acc[friendId] =
+        isActiveConversation || isLocallyRead ? 0 : (item.unReadCount ?? 0);
       return acc;
     }, {});
 
@@ -266,7 +285,12 @@ export default function FriendsMessages() {
     }, {});
 
     return { ...serverUnread, ...liveUnread };
-  }, [friendItems, messages, selected?.conversationId, locallyReadConversationIds]);
+  }, [
+    friendItems,
+    messages,
+    selected?.conversationId,
+    locallyReadConversationIds,
+  ]);
 
   /**
    * Filter and order the chat history for the currently selected friend.
@@ -284,7 +308,8 @@ export default function FriendsMessages() {
       });
   }, [messages, selected?._id]);
 
-  const canSend = socketConnectionStatus === "connected" && !!input.trim() && !!selected?._id;
+  const canSend =
+    socketConnectionStatus === "connected" && !!input.trim() && !!selected?._id;
 
   /**
    * Scroll the chat viewport to the most recent message.
@@ -293,7 +318,7 @@ export default function FriendsMessages() {
   const scrollToBottom = (behavior = "smooth") => {
     const container = messagesContainerRef.current;
     if (!container) return;
-    
+
     if (behavior === "smooth") {
       container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
     } else {
@@ -341,7 +366,12 @@ export default function FriendsMessages() {
     // Keep track of whether the user is near the bottom of the chat.
     shouldStickToBottomRef.current = distanceFromBottom < 120;
 
-    if (!selected?.conversationId || container.scrollTop > 80 || !hasMoreHistory || isLoadingOlder) {
+    if (
+      !selected?.conversationId ||
+      container.scrollTop > 80 ||
+      !hasMoreHistory ||
+      isLoadingOlder
+    ) {
       return;
     }
 
@@ -357,7 +387,8 @@ export default function FriendsMessages() {
       }
 
       // Preserve the user's position after loading earlier messages.
-      const newHeightDelta = updatedContainer.scrollHeight - previousScrollHeight;
+      const newHeightDelta =
+        updatedContainer.scrollHeight - previousScrollHeight;
       updatedContainer.scrollTop = previousScrollTop + newHeightDelta;
     });
   };
@@ -368,7 +399,8 @@ export default function FriendsMessages() {
       return;
     }
 
-    const selectedConversationId = selected.conversationId?.toString?.() ?? selected.conversationId;
+    const selectedConversationId =
+      selected.conversationId?.toString?.() ?? selected.conversationId;
     const hasUnreadInActiveConversation = messages.some((message) => {
       const messageConversationId =
         message.conversationId?.toString?.() ?? message.conversationId;
@@ -393,7 +425,11 @@ export default function FriendsMessages() {
       return;
     }
 
-    if (chatIsLoading || !selectedMessages.length || initialScrollDoneRef.current) {
+    if (
+      chatIsLoading ||
+      !selectedMessages.length ||
+      initialScrollDoneRef.current
+    ) {
       return;
     }
 
@@ -404,7 +440,11 @@ export default function FriendsMessages() {
   }, [selected?.conversationId, chatIsLoading, selectedMessages.length]);
 
   useEffect(() => {
-    if (!selected?.conversationId || !selectedMessages.length || isLoadingOlder) {
+    if (
+      !selected?.conversationId ||
+      !selectedMessages.length ||
+      isLoadingOlder
+    ) {
       return;
     }
 
@@ -415,13 +455,17 @@ export default function FriendsMessages() {
     }
   }, [selectedMessages.length, selected?.conversationId, isLoadingOlder]);
 
-
-
-  console.log()
+  console.log();
   return (
-    <div className="mt-2 font-Inter">
-      <div className="flex items-center justify-center p-2 sm:p-4">
-        <div className="w-full h-[75vh] min-h-125 flex gap-3 relative">
+    <div className=" font-Inter">
+      <div className="p-9 sm:p-11">
+        <p className="text-white font-semibold text-3xl sm:text-4xl font-Inter">
+          {t("messageHeader")}
+        </p>
+        <p className="text-[#B8A7E5] text-[13px] mt-2">{t("messageSub")}</p>
+      </div>
+      <div className="flex items-center justify-center  p-4 sm:p-11">
+        <div className=" w-full  h-[75vh] min-h-125 flex gap-3 relative">
           <FriendsSidebar
             sidebarOpen={sidebarOpen}
             t={t}

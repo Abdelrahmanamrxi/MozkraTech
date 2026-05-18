@@ -16,6 +16,7 @@ import limiter from "./middleware/rateLimiter.js";
 import chatRouter from "./modules/chat/chat.route.js";
 import sessionRouter from "./modules/sessions/session.route.js";
 import taskRouter from "./modules/task/task.routes.js";
+import achievementRouter from "./modules/achievement/achievement.route.js";
 import path from "path";
 
 const bootstrap = async (app, express) => {
@@ -56,6 +57,9 @@ const bootstrap = async (app, express) => {
   app.use("/api/v1/notifications", notificationRouter);
   app.use("/api/v1/sessions", sessionRouter);
   app.use("/api/v1/tasks", taskRouter);
+  app.use('/api/v1/achievements',achievementRouter)
+
+  // 5- CRON Tasks
   updateMissedSessions()
   deleteDueTasks()
   remindUserSession()

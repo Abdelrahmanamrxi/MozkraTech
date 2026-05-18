@@ -5,19 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import api from "../../../middleware/api";
 import { useMutation } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
-const validators={
-  date:(v)=>{
-    if(!v) return "Date is required"
-    const selectedDay=new Date(v)
-    const today=new Date()
-    console.log(selectedDay,today)
-    today.setHours(0,0,0,0)
-    if(selectedDay<today) return "Date must be placed after today."
-    return false
-    
-  }
-  
-}
+import { useTranslation } from "react-i18next";
 
 const EditSessionModal = ({
   session,
@@ -25,19 +13,30 @@ const EditSessionModal = ({
   onConfirm,
   onCancel,
   setEditingSession,
-  t,
   sessionColors,
   wouldOverlap,
 }) => {
+  const { t } = useTranslation("schedule");
+  const validators = {
+    date: (v) => {
+      if (!v) return t("errors.dateRequired");
+      const selectedDay = new Date(v);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDay < today) return t("errors.dateAfterToday");
+      return false;
+    },
+  };
   const getTodayString = () => new Date().toISOString().split("T")[0];
-  
 
   // Local state for the custom status dropdown toggle
   const [isStatusOpen, setIsStatusOpen] = useState(false);
-  const [error,setError]=useState({})
+  const [error, setError] = useState({});
   const [form, setForm] = useState(() => {
     // Create local Date objects from the ISO strings to handle timezone shift
-    const startObj = session.startTime ? new Date(session.startTime) : new Date();
+    const startObj = session.startTime
+      ? new Date(session.startTime)
+      : new Date();
     const endObj = session.endTime ? new Date(session.endTime) : new Date();
 
     const toHHmm = (date) =>
@@ -57,8 +56,8 @@ const EditSessionModal = ({
       status: session.status || "scheduled", // Ensure status is initialized
     };
   });
-  console.log(form)
-  const queryClient=useQueryClient()
+  console.log(form);
+  const queryClient = useQueryClient();
 
   const [overlapError, setOverlapError] = useState(false);
 
@@ -67,55 +66,53 @@ const EditSessionModal = ({
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  
-
-
-  function validateErrors(form){
-    let errors={}
-    for(const key in validators){
-     const error=validators[key](form[key])
-     if(error)
-     errors[key]=error
+  function validateErrors(form) {
+    let errors = {};
+    for (const key in validators) {
+      const error = validators[key](form[key]);
+      if (error) errors[key] = error;
     }
-    return errors
+    return errors;
   }
 
-  async function editSession(){
-    
-    setError({})
-    const errors=validateErrors(form)
-    setError(errors)
-    console.log(errors)
-    if(Object.keys(errors).length>0)
-     throw new Error("Date must be placed after today.");
+  async function editSession() {
+    setError({});
+    const errors = validateErrors(form);
+    setError(errors);
+    console.log(errors);
+    if (Object.keys(errors).length > 0)
+      throw new Error(t("errors.dateAfterToday"));
 
-    const response=await api.patch('/sessions',{form})
-    return response.data
+    const response = await api.patch("/sessions", { form });
+    return response.data;
   }
 
   const statusOptions = [
-    { value: "scheduled", label: "Scheduled", dot: "bg-blue-400" },
-    { value: "completed", label: "Completed", dot: "bg-green-400" },
-    { value: "missed", label: "Missed", dot: "bg-red-400" },
-    { value: "cancelled", label: "Cancelled", dot: "bg-gray-400" },
+    { value: "scheduled", label: t("status.scheduled"), dot: "bg-blue-400" },
+    { value: "completed", label: t("status.completed"), dot: "bg-green-400" },
+    { value: "missed", label: t("status.missed"), dot: "bg-red-400" },
+    { value: "cancelled", label: t("status.cancelled"), dot: "bg-gray-400" },
   ];
 
   const currentStatus = statusOptions.find((s) => s.value === form.status);
   const hideIconClass = "[&::-webkit-calendar-picker-indicator]:hidden";
-  const editMutation=useMutation({
-    mutationFn:editSession,
-    onSuccess:()=>{
+  const editMutation = useMutation({
+    mutationFn: editSession,
+    onSuccess: () => {
       queryClient.invalidateQueries({
-      queryKey: ['schedule']
-      })
-      setEditingSession(null)
+        queryKey: ["schedule"],
+      });
+      setEditingSession(null);
     },
-    onError:(err)=>{
-       console.log(err)
-       const errorMsg = err?.response?.data?.message || err?.message || 'Failed to Edit Session';
-       setError(prev => ({ ...prev, server: errorMsg }));
-    }
-  })
+    onError: (err) => {
+      console.log(err);
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        t("errors.editSessionFailed");
+      setError((prev) => ({ ...prev, server: errorMsg }));
+    },
+  });
 
   return (
     <motion.div
@@ -132,13 +129,19 @@ const EditSessionModal = ({
         onClick={(e) => e.stopPropagation()}
         className="bg-[#2F2844] border border-white/10 rounded-[20px] p-6 w-full max-w-sm shadow-2xl"
       >
-        <p className="text-white font-semibold text-lg mb-5">{t.editSession}</p>
-        {error.server && <p className="text-sm text-center font-Inter text-red-600">{error.server}</p>}
+        <p className="text-white font-semibold text-lg mb-5">
+          {t("labels.session")}
+        </p>
+        {error.server && (
+          <p className="text-sm text-center font-Inter text-red-600">
+            {error.server}
+          </p>
+        )}
         <div className="flex flex-col gap-4">
           {/* Name Input */}
           <label className="flex flex-col gap-1">
             <span className="text-[11px] text-[#B8A7E5] uppercase tracking-wide">
-              {t.name}
+              {t("labels.name")}
             </span>
             <input
               value={form.name}
@@ -150,7 +153,7 @@ const EditSessionModal = ({
           {/* Status Custom Dropdown */}
           <div className="relative">
             <span className="text-[11px] text-[#B8A7E5] uppercase tracking-wide mb-1 block">
-              Status
+              {t("labels.status")}
             </span>
             <button
               type="button"
@@ -161,7 +164,9 @@ const EditSessionModal = ({
                 <div className={`w-2 h-2 rounded-full ${currentStatus?.dot}`} />
                 {currentStatus?.label}
               </div>
-              <span className={`text-[10px] transition-transform ${isStatusOpen ? "rotate-180" : ""}`}>
+              <span
+                className={`text-[10px] transition-transform ${isStatusOpen ? "rotate-180" : ""}`}
+              >
                 ▼
               </span>
             </button>
@@ -170,7 +175,10 @@ const EditSessionModal = ({
               {isStatusOpen && (
                 <>
                   {/* Local overlay to close dropdown when clicking outside */}
-                  <div className="fixed inset-0 z-10" onClick={() => setIsStatusOpen(false)} />
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsStatusOpen(false)}
+                  />
                   <motion.ul
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 5 }}
@@ -209,7 +217,7 @@ const EditSessionModal = ({
           {/* Date Picker */}
           <label className="flex flex-col gap-1">
             <span className="text-[11px] text-[#B8A7E5] uppercase tracking-wide">
-              Date
+              {t("labels.date")}
             </span>
             <input
               type="date"
@@ -219,7 +227,11 @@ const EditSessionModal = ({
               onChange={(e) => update("date", e.target.value)}
               className={`w-full rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-[#9B7EDE]/50 focus:outline-none [color-scheme:dark] ${hideIconClass}`}
             />
-            {error.date && <p className="text-xs font-Inter text-red-600 mt-2">{error.date}</p>}
+            {error.date && (
+              <p className="text-xs font-Inter text-red-600 mt-2">
+                {error.date}
+              </p>
+            )}
           </label>
 
           {/* Time Selection */}
@@ -244,9 +256,6 @@ const EditSessionModal = ({
             </div>
           </div>
 
-
-       
-
           <AnimatePresence>
             {overlapError && (
               <motion.p
@@ -255,7 +264,7 @@ const EditSessionModal = ({
                 exit={{ opacity: 0 }}
                 className="text-red-400 text-xs mt-1"
               >
-                {t.overlapError || "This session overlaps with another one."}
+                {t("errors.overlap")}
               </motion.p>
             )}
           </AnimatePresence>
@@ -267,7 +276,7 @@ const EditSessionModal = ({
             onClick={onCancel}
             className="flex-1 py-2 rounded-[10px] text-sm text-[#B8A7E5] bg-white/5 hover:bg-white/10 transition-colors"
           >
-            {t.cancel}
+            {t("buttons.cancel")}
           </button>
           <button
             onClick={() => editMutation.mutate()}
@@ -277,10 +286,10 @@ const EditSessionModal = ({
             {editMutation.isPending ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader className="w-4 h-4 animate-spin" />
-                {t.loading}
+                {t("loading.general")}
               </span>
             ) : (
-              t.confirm
+              t("buttons.confirm")
             )}
           </button>
         </div>

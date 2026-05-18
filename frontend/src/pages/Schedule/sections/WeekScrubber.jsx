@@ -1,8 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { MIN_WEEK_START,MAX_WEEK_START } from "../utils/utility";
+import { MIN_WEEK_START, MAX_WEEK_START } from "../utils/utility";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const WeekScrubber = ({ currentWeekStart, weekStart, setWeekStart }) => {
+  const { i18n } = useTranslation("schedule");
+  const locale = i18n.language === "ar" ? "ar-EG" : "en-US";
   const offsets = Array.from({ length: 9 }, (_, i) => i - 4);
 
   return (
@@ -16,7 +19,10 @@ const WeekScrubber = ({ currentWeekStart, weekStart, setWeekStart }) => {
 
           const isSelected = ws.getTime() === weekStart.getTime();
           const isThisWeek = offset === 0;
-          const label      = ws.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          const label = ws.toLocaleDateString(locale, {
+            month: "short",
+            day: "numeric",
+          });
 
           return (
             <button
@@ -29,8 +35,8 @@ const WeekScrubber = ({ currentWeekStart, weekStart, setWeekStart }) => {
                     ? "w-5 h-2 bg-[#9B7EDE]"
                     : "w-5 h-2 bg-[#7C5FBD]"
                   : isThisWeek
-                  ? "w-2 h-2 bg-[#9B7EDE]/45 hover:bg-[#9B7EDE]/75 ring-1 ring-[#9B7EDE]/50"
-                  : "w-2 h-2 bg-white/15 hover:bg-white/35"
+                    ? "w-2 h-2 bg-[#9B7EDE]/45 hover:bg-[#9B7EDE]/75 ring-1 ring-[#9B7EDE]/50"
+                    : "w-2 h-2 bg-white/15 hover:bg-white/35"
               }`}
             />
           );
@@ -40,5 +46,4 @@ const WeekScrubber = ({ currentWeekStart, weekStart, setWeekStart }) => {
   );
 };
 
-
-export default WeekScrubber
+export default WeekScrubber;

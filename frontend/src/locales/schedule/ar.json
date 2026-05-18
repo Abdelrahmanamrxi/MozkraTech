@@ -16,5 +16,186 @@
   "thursday": "الخميس",
   "friday": "الجمعة",
   "saturday": "السبت",
-  "sunday": "الأحد"
+  "sunday": "الأحد",
+  "page": {
+    "title": "جدولي",
+    "subtitle": "نظم جلسات مذاكرتك وخطط ليها",
+    "weeklySchedule": "جدول الأسبوع",
+    "loadingSchedule": "جار تحميل الجدول...",
+    "proTipTitle": "نصيحة",
+    "proTipText": "حاول تحط أصعب المواد في ساعات النشاط بتاعتك. أغلب الطلبة بيكونوا أفضل في الصبح (8-11) أو بعد الضهر (3-5).",
+    "editHint": "اضغط على تعديل علشان تبدأ تعدل جلساتك."
+  },
+  "buttons": {
+    "edit": "تعديل",
+    "confirm": "تأكيد",
+    "filter": "فلتر",
+    "addTask": "ضيف مهمة",
+    "addSession": "ضيف جلسة",
+    "createTaskSchedule": "اعمل المهمة والجدول",
+    "generateSessions": "ولد الجلسات",
+    "cancel": "إلغاء",
+    "close": "إغلاق"
+  },
+  "labels": {
+    "all": "الكل",
+    "today": "اليوم",
+    "sessions": "جلسات",
+    "noSessions": "مفيش جلسات",
+    "session": "الجلسة",
+    "name": "الاسم",
+    "time": "الوقت",
+    "duration": "المدة",
+    "subject": "المادة",
+    "task": "المهمة",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "start": "البداية",
+    "end": "النهاية",
+    "startTime": "وقت البداية",
+    "endTime": "وقت النهاية",
+    "from": "من",
+    "to": "إلى"
+  },
+  "summary": {
+    "thisWeek": "الأسبوع ده",
+    "studyHoursLeft": "ساعات المذاكرة المتبقية",
+    "avgDaily": "المعدل اليومي",
+    "studyTime": "وقت المذاكرة",
+    "subjects": "المواد",
+    "activeCourses": "الكورسات الشغالة",
+    "upcoming": "الجاي",
+    "deadlines": "المواعيد النهائية"
+  },
+  "form": {
+    "title": "إنشاء مهمة",
+    "subtitle": "الجلسات بتتولد تلقائيا حسب اختياراتك.",
+    "taskInput": "بيانات المهمة",
+    "taskName": "اسم المهمة",
+    "subject": "المادة",
+    "dueDate": "تاريخ التسليم",
+    "totalHours": "إجمالي الساعات",
+    "totalHoursMax": "الحد الأقصى: {{max}} س/أسبوع",
+    "priority": "الأولوية",
+    "studyHours": "أقصى عدد ساعات مذاكرة في اليوم.",
+    "generatedSessions": "الجلسات المتولدة ({{count}})",
+    "generatingSessions": "جار توليد الجلسات...",
+    "noSessionsAdded": "مفيش جلسات. اضغط \"ضيف جلسة\" عشان تضيف واحدة.",
+    "breakdown": "التقسيم",
+    "breakdownText": "{{hours}} ساعة متقسمة على {{sessions}} جلسة",
+    "scheduleCreated": "تم إنشاء الجدول بنجاح!"
+  },
+  "priority": {
+    "select": "اختار الأولوية",
+    "low": "منخفضة",
+    "medium": "متوسطة",
+    "high": "عالية"
+  },
+  "placeholders": {
+    "taskName": "اسم المهمة",
+    "sessionName": "اسم الجلسة",
+    "totalHours": "إجمالي الساعات",
+    "maxStudyHours": "أقصى عدد ساعات مذاكرة في اليوم."
+  },
+  "loading": {
+    "general": "جار التحميل...",
+    "subjects": "جار تحميل المواد...",
+    "tasks": "جار تحميل المهام...",
+    "creating": "جار الإنشاء..."
+  },
+  "messages": {
+    "addTaskToStart": "من فضلك ضيف مهمة عشان تبدأ تعمل جلساتك."
+  },
+  "errors": {
+    "taskNameRequired": "اسم المهمة مطلوب.",
+    "dueDateRequired": "تاريخ التسليم مطلوب.",
+    "dueDatePast": "تاريخ التسليم لازم يكون بعد النهاردة.",
+    "subjectRequired": "لازم تختار مادة.",
+    "totalHoursRequired": "إجمالي ساعات المهمة مطلوب.",
+    "studyHoursRequired": "من فضلك اكتب أقصى عدد ساعات مذاكرة في اليوم.",
+    "priorityRequired": "من فضلك اختار أولوية المهمة.",
+    "addSessionRequired": "من فضلك ضيف جلسة عشان تعمل جدولك.",
+    "maxHoursPerWeek": "أقصى ساعات للمادة دي {{max}} ساعة في الأسبوع.",
+    "generateSessionsFailed": "حصل خطأ في توليد الجلسات.",
+    "createScheduleFailed": "حصل خطأ في إنشاء الجدول.",
+    "createSessionFailed": "حصل خطأ في إنشاء الجلسة.",
+    "editSessionFailed": "حصل خطأ في تعديل الجلسة.",
+    "deleteSessionFailed": "حصل خطأ في حذف الجلسة.",
+    "moveSessionFailed": "حصل خطأ في نقل الجلسة. حاول تاني.",
+    "dateRequired": "التاريخ مطلوب.",
+    "dateAfterToday": "لازم التاريخ يكون بعد النهاردة.",
+    "overlap": "الوقت ده متداخل مع جلسة تانية.",
+    "loadSubjectsFailed": "حصل خطأ في تحميل المواد."
+  },
+  "dropConfirmation": {
+    "title": "نقل الجلسة",
+    "untitledSession": "جلسة بدون اسم",
+    "notAvailable": "غير متاح",
+    "oneHour": "ساعة واحدة",
+    "error": "حصل خطأ في نقل الجلسة. حاول تاني."
+  },
+  "deleteSessionModal": {
+    "warning": "مش هينفع ترجع الخطوة دي."
+  },
+  "addSessionModal": {
+    "title": "إضافة جلسة جديدة",
+    "durationLabel": "المدة",
+    "addButton": "ضيف جلسة",
+    "cancelButton": "إلغاء"
+  },
+  "createSessionModal": {
+    "title": "إضافة جلسة جديدة",
+    "nameLabel": "الاسم",
+    "taskLabel": "المهمة",
+    "selectTask": "اختار مهمة",
+    "dateLabel": "التاريخ",
+    "fromLabel": "من",
+    "toLabel": "إلى",
+    "durationLabel": "المدة",
+    "addButton": "ضيف جلسة",
+    "cancelButton": "إلغاء",
+    "noTasksMessage": "من فضلك ضيف مهمة عشان تبدأ تعمل جلساتك."
+  },
+  "sessionRow": {
+    "dateLabel": "التاريخ",
+    "startLabel": "البداية",
+    "endLabel": "النهاية",
+    "durationPreview": "معاينة المدة",
+    "save": "حفظ",
+    "cancel": "إلغاء"
+  },
+  "details": {
+    "close": "إغلاق"
+  },
+  "status": {
+    "scheduled": "مجدولة",
+    "completed": "مكتملة",
+    "missed": "فائتة",
+    "cancelled": "ملغاة"
+  },
+  "statusShort": {
+    "scheduled": "ج",
+    "completed": "ت",
+    "missed": "ف",
+    "cancelled": "ل"
+  },
+  "time": {
+    "hourShort": "س",
+    "minuteShort": "د"
+  },
+  "timeLeft": "متبقي {{minutes}}د",
+  "dayShort": {
+    "sun": "الأحد",
+    "mon": "الاثنين",
+    "tue": "الثلاثاء",
+    "wed": "الأربعاء",
+    "thu": "الخميس",
+    "fri": "الجمعة",
+    "sat": "السبت"
+  },
+  "aria": {
+    "editSession": "تعديل الجلسة",
+    "deleteSession": "حذف الجلسة",
+    "viewDetails": "عرض تفاصيل الجلسة"
+  }
 }

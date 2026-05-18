@@ -13,7 +13,7 @@ export const runIo = (httpServer) => {
   });
 
   io.on("connection", async (socket) => {
-    // console.log(socket.id);
+     
     // console.log(socket.handshake.auth);
     
     await registerAccount(socket);
@@ -21,5 +21,6 @@ export const runIo = (httpServer) => {
     await deleteMessage(socket);
     await markAsRead(socket);
     await logOut(socket);
+    
   });
 };

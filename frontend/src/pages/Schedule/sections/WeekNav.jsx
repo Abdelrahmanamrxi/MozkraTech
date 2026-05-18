@@ -1,15 +1,37 @@
- import { getWeekDates } from "../utils/utility";
- // eslint-disable-next-line no-unused-vars
- import { motion,AnimatePresence } from "framer-motion";
- import { ChevronLeft,ChevronRight } from "lucide-react";
- const WeekNav = ({ weekStart, onPrev, onNext, onToday, canPrev, canNext, isCurrentWeek, t, lang }) => {
-  
-  const locale    = lang === "ar" ? "ar-EG" : "en-US";
+import { getWeekDates } from "../utils/utility";
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+const WeekNav = ({
+  weekStart,
+  onPrev,
+  onNext,
+  onToday,
+  canPrev,
+  canNext,
+  isCurrentWeek,
+}) => {
+  const { t, i18n } = useTranslation("schedule");
+  const isRtl = i18n.language === "ar";
+  const locale = isRtl ? "ar-EG" : "en-US";
   const weekDates = getWeekDates(weekStart);
-  const startLabel = weekDates[0].toLocaleDateString(locale, { month: "short", day: "numeric" });
-  const endLabel   = weekDates[6].toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" });
-  const label      = `${startLabel} – ${endLabel}`;
-  
+  const startLabel = weekDates[0].toLocaleDateString(locale, {
+    month: "short",
+    day: "numeric",
+  });
+  const endLabel = weekDates[6].toLocaleDateString(locale, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const label = `${startLabel} – ${endLabel}`;
+  const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
+  const NextIcon = isRtl ? ChevronLeft : ChevronRight;
+  const slideX = isRtl ? 4 : -4;
+  const todayArrow = isRtl ? "↪" : "↩";
+
   return (
     <div className="flex items-center gap-2 flex-wrap">
       <motion.button
@@ -23,7 +45,7 @@
             : "border-white/6 text-white/12 cursor-not-allowed"
         }`}
       >
-        <ChevronLeft size={14} />
+        <PrevIcon size={14} />
       </motion.button>
 
       <span className="text-white/75 text-xs sm:text-sm font-medium select-none min-w-[150px] text-center">
@@ -41,26 +63,26 @@
             : "border-white/6 text-white/12 cursor-not-allowed"
         }`}
       >
-        <ChevronRight size={14} />
+        <NextIcon size={14} />
       </motion.button>
 
       <AnimatePresence>
         {!isCurrentWeek && (
           <motion.button
             key="today-jump"
-            initial={{ opacity: 0, scale: 0.85, x: -4 }}
+            initial={{ opacity: 0, scale: 0.85, x: slideX }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.85, x: -4 }}
+            exit={{ opacity: 0, scale: 0.85, x: slideX }}
             onClick={onToday}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="text-[10px] sm:text-[11px] font-bold px-3 py-1.5 rounded-full bg-[#9B7EDE]/20 border border-[#9B7EDE]/40 text-[#C084FC] hover:bg-[#9B7EDE]/35 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
           >
-            ↩ {t.today}
+            {todayArrow} {t("labels.today")}
           </motion.button>
         )}
       </AnimatePresence>
     </div>
   );
 };
-export default WeekNav
+export default WeekNav;

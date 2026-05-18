@@ -5,6 +5,8 @@ import friendshipModel from "../../DB/models/friendship.model.js"
 import { notificationModel } from "../../DB/models/notifications.model.js"
 import { checkWhetherUsersExist } from "./friends.service.js"
 import conversationModel from "../../DB/models/Conversation.model.js"
+import achievementModel from "../../DB/models/achievement.model.js"
+import { checkFriendshipAchievements } from "../achievement/achievement.helper.js"
 //------------------------------------------getFriends-------------------------------------------
 
 export const getFriends = asyncHandler(async (req, res, next) => {
@@ -286,6 +288,10 @@ export const acceptFriend = asyncHandler(async (req, res, next) => {
   await updated.save();
 
   user.addXP(40)
+  await Promise.all([
+    await checkFriendshipAchievements(userId),
+    await checkFriendshipAchievements(senderId)
+  ])
 
   await notificationModel.findOneAndDelete({
     userId,

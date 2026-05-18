@@ -21,6 +21,7 @@ function Navbar({ profileImage }) {
     { name: t("navbar.progress"), to: "/dashboard/progress" },
     { name: t("navbar.schedule"), to: "/dashboard/schedule" },
     { name: t("navbar.friends"), to: "/dashboard/friends" },
+    { name: t("navbar.Messages"), to: "/dashboard/messages" },
   ];
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [scrolled, setScrolled] = useState(false);

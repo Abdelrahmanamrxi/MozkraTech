@@ -1,17 +1,23 @@
 /* eslint-disable no-unused-vars */
 import { motion } from "framer-motion";
-import { DAY_SHORT_AR,DAY_SHORT } from "../utils/utility";
+import { DAY_SHORT_AR, DAY_SHORT } from "../utils/utility";
+import { useTranslation } from "react-i18next";
 
-const DayHeader = ({ date, dayName, isToday, lang, todayLabel },ref) => {
-  const shortMap  = lang === "ar" ? DAY_SHORT_AR : DAY_SHORT;
-  const dayNum    = date.getDate();
+const DayHeader = ({ date, dayName, isToday }, ref) => {
+  const { t, i18n } = useTranslation("schedule");
+  const lang = i18n.language === "ar" ? "ar" : "en";
+  const shortMap = lang === "ar" ? DAY_SHORT_AR : DAY_SHORT;
+  const dayNum = date.getDate();
   const isWeekend = dayName === "Saturday" || dayName === "Sunday";
 
   return (
-    <div ref={ref} className={`relative flex flex-col items-center gap-1 pb-2.5 pt-5 ${isWeekend ? "opacity-55" : ""}`}>
+    <div
+      ref={ref}
+      className={`relative flex flex-col items-center gap-1 pb-2.5 pt-5 ${isWeekend ? "opacity-55" : ""}`}
+    >
       {isToday && (
         <span className="absolute top-0 left-1/2 -translate-x-1/2 text-[9px] font-extrabold uppercase tracking-wider px-2.5 py-[3px] rounded-full bg-[#C084FC] text-white shadow-lg shadow-[#C084FC]/60 ring-1 ring-white/30 pointer-events-none whitespace-nowrap">
-          {todayLabel}
+          {t("labels.today")}
         </span>
       )}
       <span
@@ -25,9 +31,10 @@ const DayHeader = ({ date, dayName, isToday, lang, todayLabel },ref) => {
         className={`
           flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full
           text-xs sm:text-sm font-bold transition-all select-none
-          ${isToday
-            ? "bg-[#9B7EDE] text-white shadow-lg shadow-[#9B7EDE]/55 ring-2 ring-[#C084FC]/35"
-            : "text-white/65 hover:bg-white/8"
+          ${
+            isToday
+              ? "bg-[#9B7EDE] text-white shadow-lg shadow-[#9B7EDE]/55 ring-2 ring-[#C084FC]/35"
+              : "text-white/65 hover:bg-white/8"
           }
         `}
       >
@@ -36,4 +43,4 @@ const DayHeader = ({ date, dayName, isToday, lang, todayLabel },ref) => {
     </div>
   );
 };
-export default DayHeader
+export default DayHeader;

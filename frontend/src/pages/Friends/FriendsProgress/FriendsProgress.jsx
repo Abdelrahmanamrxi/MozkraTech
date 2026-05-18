@@ -4,7 +4,7 @@ import FriendsComparison from "./FriendsComparison/FriendsComparison";
 
 const FriendsProgress = () => {
   return (
-    <div className="font-Inter min-h-screen mt-2 flex-col flex items-start justify-center">
+    <div className="font-Inter min-h-screen mt-2  flex-col flex items-start justify-center">
       <Leaderboard />
       <FriendsComparison />
     </div>

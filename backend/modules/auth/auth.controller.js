@@ -5,8 +5,9 @@ import { eventEmitter } from "../../utils/sendEmail.events/sendEmail.events.js";
 import { generateToken } from "../../token/gnerateToken.js";
 import jwt from "jsonwebtoken";
 import HttpException from "../../utils/HttpException.js";
-import { checkUserStreak } from "../../utils/customHelpers/customHelpers.js";
+import { checkUserStreak } from "../achievement/achievement.helper.js"
 import { OAuth2Client } from "google-auth-library";
+import { notificationModel } from "../../DB/models/notifications.model.js";
 
 export const signUp = asyncHandler(async (req, res, next) => {
   const {
@@ -66,7 +67,11 @@ export const signUp = asyncHandler(async (req, res, next) => {
     preferredLanguage: "English",
     lastActivityDate: Date.now(),
   });
-
+   await notificationModel.create({
+    eventType:'system_announcement',
+    userId:user._id,
+    message:`Welcome ${user.fullName}, Start studying by creating your first task !`,
+   })
   // send email after response path so this request is not blocked
   setImmediate(() => {
     eventEmitter.emit("sendEmail", { email });
@@ -149,7 +154,7 @@ export const login = asyncHandler(async (req, res, next) => {
       isSubjectVerified: user.isSubjectVerified,
     },
     SIGNATURE: process.env.JWT_SECRET,
-    option: { expiresIn: "3d" },
+    option: { expiresIn: "1d" },
   });
   res.cookie("refreshToken", refreshToken, {
     maxAge: 3 * 24 * 60 * 60 * 1000,
@@ -206,7 +211,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
     SIGNATURE: process.env.JWT_SECRET,
     option: { expiresIn: "15m" },
   });
-
+  await checkUserStreak(user)
   return res.status(200).json({
     message: "Token refreshed successfully",
     accessToken,
@@ -291,11 +296,19 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
   if (emailExist && emailExist.isDeleted===false) {
     return next(new HttpException("Email Already Exists", 404));
   }
+
+  // If user has been deleted and tried to sign up with google
   if (emailExist && emailExist.isDeleted===true) {
     emailExist.isDeleted = false;
     emailExist.isVerified = true;
     emailExist.provider = "google";
     await emailExist.save();
+
+    await notificationModel.create({
+    eventType:'system_announcement',
+    userId:emailExist._id,
+    message:`Welcome Back ${emailExist.fullName}, Your account has been restored successfully!`,
+   })
 
     const accessToken = await generateToken({
       payload: {
@@ -315,7 +328,7 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
         isSubjectVerified: emailExist.isSubjectVerified,
       },
       SIGNATURE: process.env.JWT_SECRET,
-      option: { expiresIn: "3d" },
+      option: { expiresIn: "1d" },
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -329,6 +342,9 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
       restored: true,
     });
   }
+
+
+  
   const user = await userModel.create({
     fullName: name,
     email: email,
@@ -341,6 +357,14 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
     preferredLanguage: "English",
     lastActivityDate: Date.now(),
   });
+
+    await notificationModel.create({
+    eventType:'system_announcement',
+    userId:user._id,
+    message:`Welcome ${user.fullName}, Start studying by creating your first task !`,
+   })
+
+
   const accessToken = await generateToken({
     payload: {
       email,
@@ -359,7 +383,7 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
       isSubjectVerified: user.isSubjectVerified,
     },
     SIGNATURE: process.env.JWT_SECRET,
-    option: { expiresIn: "3d" },
+    option: { expiresIn: "1d" },
   });
 
   res.cookie("refreshToken", refreshToken, {
@@ -414,7 +438,7 @@ export const loginWithGoogle = asyncHandler(async (req, res, next) => {
       isSubjectVerified: user.isSubjectVerified,
     },
     SIGNATURE: process.env.JWT_SECRET,
-    option: { expiresIn: "3d" },
+    option: { expiresIn: "1d" },
   });
   res.cookie("refreshToken", refreshToken, {
     sameSite: "strict",

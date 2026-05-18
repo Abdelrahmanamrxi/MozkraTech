@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { formatDuration, formatIsoTimeLabel } from "../utils/timeUtility";
 import { Info } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const parseDurationToHours = (startTime, endTime) => {
   try {
@@ -16,9 +17,20 @@ const parseDurationToHours = (startTime, endTime) => {
   }
 };
 
-const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMode, onShowDetails }) => {
+const SessionCard = ({
+  session,
+  index,
+  day,
+  onDragStart,
+  onDropOnCard,
+  isEditMode,
+  onShowDetails,
+}) => {
+  const { t, i18n } = useTranslation("schedule");
+  const locale = i18n.language === "ar" ? "ar-EG" : "en-US";
+  const numberFormatter = new Intl.NumberFormat(locale);
   const [showDetailBtn, setShowDetailBtn] = useState(false);
-  
+
   const handleDragStart = (event) => {
     if (!isEditMode) return;
     const target = event.currentTarget;
@@ -52,16 +64,36 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMod
     e.preventDefault();
   };
 
-  const durationHours = parseDurationToHours(session.startTime, session.endTime);
+  const durationHours = parseDurationToHours(
+    session.startTime,
+    session.endTime,
+  );
   const isCompact = durationHours <= 1;
   const isTall = durationHours >= 1.5;
   const timeClass = isCompact ? "text-[10px]" : "text-xs";
   const subjectClass = isCompact ? "text-xs" : "text-sm";
   const durationClass = isCompact ? "text-[10px]" : "text-xs";
-  const statusBg = session.status === "scheduled" ? "bg-yellow-500/20 text-yellow-400" : 
-                   session.status === "missed" ? "bg-red-500/20 text-red-400" : 
-                   session.status === "completed" ? "bg-green-500/20 text-green-400" :
-                   "bg-gray-500/20 text-gray-400";
+  const statusBg =
+    session.status === "scheduled"
+      ? "bg-yellow-500/20 text-yellow-400"
+      : session.status === "missed"
+        ? "bg-red-500/20 text-red-400"
+        : session.status === "completed"
+          ? "bg-green-500/20 text-green-400"
+          : "bg-gray-500/20 text-gray-400";
+  const statusKey = session.status || "scheduled";
+  const statusLabel = isCompact
+    ? t(`statusShort.${statusKey}`)
+    : t(`status.${statusKey}`);
+  const durationLabel = formatDuration(session.startTime, session.endTime, {
+    hourLabel: t("time.hourShort"),
+    minuteLabel: t("time.minuteShort"),
+    formatNumber: (value) => numberFormatter.format(value),
+  });
+  const minutesLeft = Math.round(session.duration);
+  const timeLeftLabel = t("timeLeft", {
+    minutes: numberFormatter.format(minutesLeft),
+  });
 
   return (
     <motion.div
@@ -93,35 +125,39 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMod
       {/* Content container */}
       <div className="relative z-10 flex flex-col h-full">
         <p className={`${timeClass} font-Inter opacity-90 leading-tight`}>
-          {formatIsoTimeLabel(session.startTime)}
+          {formatIsoTimeLabel(session.startTime, locale)}
         </p>
-        
-        <p className={`${subjectClass} font-semibold truncate lg:whitespace-normal lg:overflow-visible lg:text-clip`}>
+
+        <p
+          className={`${subjectClass} font-semibold truncate lg:whitespace-normal lg:overflow-visible lg:text-clip`}
+        >
           {session.name}
         </p>
-        
+
         <div className={`flex flex-col ${isTall ? "mt-auto" : "gap-1"}`}>
           {/* Hide duration on compact cards */}
           {!isCompact && (
             <p className={`${durationClass} opacity-80 leading-tight`}>
-              {formatDuration(session.startTime, session.endTime)}
+              {durationLabel}
             </p>
           )}
 
           {/* Time left — only show if timer has started and session not completed */}
-          {session.duration > 0 && session.status !== "completed" && session.totalDuration !== session.duration && (
-            <p className={`${timeClass} opacity-60 mb-1 leading-tight tabular-nums`}>
-              ⏱ {Math.round(session.duration)}m left
-            </p>
-          )}
-          
+          {session.duration > 0 &&
+            session.status !== "completed" &&
+            session.totalDuration !== session.duration && (
+              <p
+                className={`${timeClass} opacity-60 mb-1 leading-tight tabular-nums`}
+              >
+                ⏱ {timeLeftLabel}
+              </p>
+            )}
+
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`${isCompact ? "text-[8px] px-1.5 py-0.5" : "text-[9px] px-2 py-1"} rounded-full font-medium ${statusBg}`}>
-              {/* First letter only on compact, full word otherwise */}
-              {isCompact
-                ? session.status.charAt(0).toUpperCase()
-                : session.status.charAt(0).toUpperCase() + session.status.slice(1)
-              }
+            <span
+              className={`${isCompact ? "text-[8px] px-1.5 py-0.5" : "text-[9px] px-2 py-1"} rounded-full font-medium ${statusBg}`}
+            >
+              {statusLabel}
             </span>
           </div>
         </div>
@@ -130,13 +166,16 @@ const SessionCard = ({ session, index, day, onDragStart, onDropOnCard, isEditMod
       {/* Info button - appears on hover */}
       <motion.button
         initial={{ opacity: 0, scale: 0 }}
-        animate={showDetailBtn ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+        animate={
+          showDetailBtn ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }
+        }
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
         onClick={(e) => {
           e.stopPropagation();
           if (onShowDetails) onShowDetails(session);
         }}
         className="absolute top-2 right-2 z-20 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#9B7EDE]/40 hover:bg-[#9B7EDE]/70 flex items-center justify-center text-white/80 hover:text-white transition-all shadow-lg"
+        aria-label={t("aria.viewDetails")}
         whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.9 }}
       >

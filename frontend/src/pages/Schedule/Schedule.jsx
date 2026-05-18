@@ -1,9 +1,16 @@
 /* eslint-disable no-unused-vars */
 import { FilterIcon, TipBackgroundIcon } from "@/comp/ui/Icons";
-import { PlusIcon, Bot, CalendarDays, ChevronLeft, ChevronRight,CirclePlus } from "lucide-react";
+import {
+  PlusIcon,
+  Bot,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  CirclePlus,
+} from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import ScheduleSummary from "./sections/ScheduleSummary";
-import { useState, useMemo, useCallback, useEffect,useRef } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import SessionForm from "./sections/SessionForm/SessionForm";
 import { useTranslation } from "react-i18next";
 import DayColumn from "./sections/DayColumn";
@@ -14,15 +21,12 @@ import DropConfirmationModal from "./sections/DropConfirmationModal";
 import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
 import api from "../../middleware/api";
 import CreateSessionModal from "./sections/CreateSessionModal";
-import  TodayBanner  from "./sections/TodayBanner";
+import TodayBanner from "./sections/TodayBanner";
 import WeekNav from "./sections/WeekNav";
 import DayHeader from "./sections/DayHeader";
 import WeekScrubber from "./sections/WeekScrubber";
 import {
-  labelsMap,
   DAY_NAMES,
-  DAY_SHORT,
-  DAY_SHORT_AR,
   TODAY,
   MIN_WEEK_START,
   getWeekStart,
@@ -30,8 +34,6 @@ import {
   getWeekDates,
   dateKey,
   TODAY_KEY,
-  fmtFullDate,
-  fmtMonthYear,
   SESSION_COLORS,
 } from "./utils/utility";
 import {
@@ -39,7 +41,6 @@ import {
   TIME_END_HOUR,
   parseTimeToHours,
   parseDurationToHours,
-  hoursToTimeString,
   SNAP_MINUTES,
   HOUR_HEIGHT_PX,
   fmtHourLabel,
@@ -50,12 +51,12 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 function wouldOverlap(sessions, candidate, excludeId = null) {
   const cStart = parseTimeToHours(candidate.time);
-  const cEnd   = cStart + parseDurationToHours(candidate.duration);
+  const cEnd = cStart + parseDurationToHours(candidate.duration);
   return sessions
     .filter((s) => s.id !== excludeId)
     .some((s) => {
       const sStart = parseTimeToHours(s.time);
-      const sEnd   = sStart + parseDurationToHours(s.duration);
+      const sEnd = sStart + parseDurationToHours(s.duration);
       return cStart < sEnd && cEnd > sStart;
     });
 }
@@ -64,20 +65,22 @@ function wouldOverlap(sessions, candidate, excludeId = null) {
 // DATA FETCHER
 // ─────────────────────────────────────────────────────────────────────────────
 async function buildInitialData(date, filter = "All") {
-  const response = await api.get(`/sessions/schedule?date=${date}&filter=${filter}`);
+  const response = await api.get(
+    `/sessions/schedule?date=${date}&filter=${filter}`,
+  );
   return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LOADING SKELETON  — shown while fetching
 // ─────────────────────────────────────────────────────────────────────────────
-const LoadingSkeleton = () => (
+const LoadingSkeleton = ({ label }) => (
   <div className="mt-10 flex justify-center items-center gap-3 h-40 text-[#B8A7E5] text-sm">
     <span className="relative flex h-2 w-2">
       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9B7EDE] opacity-60" />
       <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C084FC]" />
     </span>
-    Loading schedule…
+    {label}
   </div>
 );
 
@@ -85,17 +88,17 @@ const LoadingSkeleton = () => (
 // SCHEDULE  (root component)
 // ─────────────────────────────────────────────────────────────────────────────
 const Schedule = () => {
-  const [scheduleData,setScheduleData]= useState({});
-  const [dragOverDay,setDragOverDay]= useState(null);
-  const [editingSession,setEditingSession]= useState(null);
-  const [showFilterPopup,setShowFilterPopup]= useState(false);
+  const [scheduleData, setScheduleData] = useState({});
+  const [dragOverDay, setDragOverDay] = useState(null);
+  const [editingSession, setEditingSession] = useState(null);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
   const [showAddSessionPopup, setShowAddSessionPopup] = useState(false);
-  const [filterSubject,setFilterSubject]= useState("All");
-  const [isEditMode,setIsEditMode]= useState(false);
-  const [pendingDrop,setPendingDrop]= useState(null);
-  const [metrics,setMetrics]= useState(null);
-  const [rawApiData,setRawApiData] = useState(null);
-  const [addModal,setAddModal]=useState(false);
+  const [filterSubject, setFilterSubject] = useState("All");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [pendingDrop, setPendingDrop] = useState(null);
+  const [metrics, setMetrics] = useState(null);
+  const [rawApiData, setRawApiData] = useState(null);
+  const [addModal, setAddModal] = useState(false);
   const [weekStart, setWeekStart] = useState(() => getWeekStart(TODAY));
   // FIX: Use 0 as default so the ruler starts flush — measured value replaces it after mount
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -130,21 +133,23 @@ const Schedule = () => {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["schedule", weekStart, filterSubject],
-    queryFn:  async () => {
+    queryFn: async () => {
       const response = await buildInitialData(weekStart, filterSubject);
       setRawApiData(response);
       return response;
     },
-    retry:1,
+    retry: 1,
     select: (data) => {
       const sessions = data.sessions || [];
       return sessions.reduce((acc, session, idx) => {
-        const startIso = typeof session.startTime === "string"
-          ? session.startTime
-          : new Date(session.startTime).toISOString();
-        const endIso = typeof session.endTime === "string"
-          ? session.endTime
-          : new Date(session.endTime).toISOString();
+        const startIso =
+          typeof session.startTime === "string"
+            ? session.startTime
+            : new Date(session.startTime).toISOString();
+        const endIso =
+          typeof session.endTime === "string"
+            ? session.endTime
+            : new Date(session.endTime).toISOString();
 
         const dateMatch = startIso.match(/^(\d{4}-\d{2}-\d{2})/);
         const key = dateMatch
@@ -178,9 +183,8 @@ const Schedule = () => {
     }
   }, [rawApiData]);
 
-  const { i18n } = useTranslation();
-  const lang = i18n.language === "ar" ? "ar" : "en";
-  const t    = labelsMap[lang];
+  const { t, i18n } = useTranslation("schedule");
+  const locale = i18n.language === "ar" ? "ar-EG" : "en-US";
 
   const preferredStartHour = useMemo(() => {
     const start = userProfile?.preferredTimeRange?.start;
@@ -194,28 +198,28 @@ const Schedule = () => {
 
   const filterOptions = useMemo(
     () => [
-      { id: "All", label: t.all },
+      { id: "All", label: t("labels.all") },
       ...subjects.map((subject) => ({
         id: subject._id,
         label: subject.name,
       })),
     ],
-    [subjects, t.all]
+    [subjects, t],
   );
 
   useEffect(() => {
     if (filterSubject === "All") return;
-    const exists = subjects.some((subject) =>
-      String(subject._id) === String(filterSubject)
+    const exists = subjects.some(
+      (subject) => String(subject._id) === String(filterSubject),
     );
     if (!exists) setFilterSubject("All");
   }, [subjects, filterSubject]);
 
-  const weekDates        = useMemo(() => getWeekDates(weekStart), [weekStart]);
+  const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
   const currentWeekStart = useMemo(() => getWeekStart(TODAY), []);
-  const isCurrentWeek    = weekStart.getTime() === currentWeekStart.getTime();
-  const canPrev          = weekStart.getTime() > MIN_WEEK_START.getTime();
-  const canNext          = weekStart.getTime() < MAX_WEEK_START.getTime();
+  const isCurrentWeek = weekStart.getTime() === currentWeekStart.getTime();
+  const canPrev = weekStart.getTime() > MIN_WEEK_START.getTime();
+  const canNext = weekStart.getTime() < MAX_WEEK_START.getTime();
 
   const todaySessionCount = (scheduleData?.[TODAY_KEY] ?? []).length;
 
@@ -226,44 +230,50 @@ const Schedule = () => {
 
   // FIX: compute dynamic grid values — hourTicks and gridHeight replace the
   // static HOUR_TICKS / GRID_HEIGHT imports that were being passed to TimeRuler
-  const { gridStartHour, gridEndHour, gridHeight, halfTicks, hourTicks } = useMemo(() => {
-    const allSessions = Object.values(scheduleData || {}).flat();
-    const roundDownHalf = (h) => Math.floor(h * 2) / 2;
-    const roundUpHalf = (h) => Math.ceil(h * 2) / 2;
+  const { gridStartHour, gridEndHour, gridHeight, halfTicks, hourTicks } =
+    useMemo(() => {
+      const allSessions = Object.values(scheduleData || {}).flat();
+      const roundDownHalf = (h) => Math.floor(h * 2) / 2;
+      const roundUpHalf = (h) => Math.ceil(h * 2) / 2;
 
-    let minHour = TIME_START_HOUR;
-    let maxHour = TIME_END_HOUR;
+      let minHour = TIME_START_HOUR;
+      let maxHour = TIME_END_HOUR;
 
-    minHour = roundDownHalf(minHour);
-    maxHour = roundUpHalf(maxHour);
+      minHour = roundDownHalf(minHour);
+      maxHour = roundUpHalf(maxHour);
 
-    allSessions.forEach((session) => {
-      const startH = parseTimeToHours(session.startTime);
-      const endH = parseTimeToHours(session.endTime);
-      if (Number.isFinite(startH)) minHour = Math.min(minHour, roundDownHalf(startH));
-      if (Number.isFinite(endH)) maxHour = Math.max(maxHour, roundUpHalf(endH));
-    });
+      allSessions.forEach((session) => {
+        const startH = parseTimeToHours(session.startTime);
+        const endH = parseTimeToHours(session.endTime);
+        if (Number.isFinite(startH))
+          minHour = Math.min(minHour, roundDownHalf(startH));
+        if (Number.isFinite(endH))
+          maxHour = Math.max(maxHour, roundUpHalf(endH));
+      });
 
-    minHour = Math.max(0, minHour);
-    maxHour = Math.min(24, Math.max(minHour + 1, maxHour));
+      minHour = Math.max(0, minHour);
+      maxHour = Math.min(24, Math.max(minHour + 1, maxHour));
 
-    const totalHours = maxHour - minHour;
-    const height = totalHours * HOUR_HEIGHT_PX;
-    const half = Array.from({ length: totalHours * 2 + 1 }, (_, i) => minHour + i * 0.5);
-    const hours = half.filter((h) => Number.isInteger(h));
+      const totalHours = maxHour - minHour;
+      const height = totalHours * HOUR_HEIGHT_PX;
+      const half = Array.from(
+        { length: totalHours * 2 + 1 },
+        (_, i) => minHour + i * 0.5,
+      );
+      const hours = half.filter((h) => Number.isInteger(h));
 
-    return {
-      gridStartHour: minHour,
-      gridEndHour: maxHour,
-      gridHeight: height,
-      halfTicks: half,
-      hourTicks: hours,   // dynamic — changes based on actual session times
-    };
-  }, [scheduleData, preferredStartHour, preferredEndHour]);
+      return {
+        gridStartHour: minHour,
+        gridEndHour: maxHour,
+        gridHeight: height,
+        halfTicks: half,
+        hourTicks: hours, // dynamic — changes based on actual session times
+      };
+    }, [scheduleData, preferredStartHour, preferredEndHour]);
 
   const hourToPxDynamic = useCallback(
     (hour) => (hour - gridStartHour) * HOUR_HEIGHT_PX,
-    [gridStartHour]
+    [gridStartHour],
   );
 
   const pxToSnappedHourDynamic = useCallback(
@@ -273,7 +283,7 @@ const Schedule = () => {
       const snapped = Math.round(raw / step) * step;
       return Math.max(gridStartHour, Math.min(gridEndHour - step, snapped));
     },
-    [gridStartHour, gridEndHour]
+    [gridStartHour, gridEndHour],
   );
 
   // ── Week navigation ───────────────────────────────────────────────────────
@@ -282,7 +292,9 @@ const Schedule = () => {
     setWeekStart((prev) => {
       const d = new Date(prev);
       d.setDate(d.getDate() - 7);
-      return d.getTime() < MIN_WEEK_START.getTime() ? new Date(MIN_WEEK_START) : d;
+      return d.getTime() < MIN_WEEK_START.getTime()
+        ? new Date(MIN_WEEK_START)
+        : d;
     });
   }, [canPrev]);
 
@@ -291,7 +303,9 @@ const Schedule = () => {
     setWeekStart((prev) => {
       const d = new Date(prev);
       d.setDate(d.getDate() + 7);
-      return d.getTime() > MAX_WEEK_START.getTime() ? new Date(MAX_WEEK_START) : d;
+      return d.getTime() > MAX_WEEK_START.getTime()
+        ? new Date(MAX_WEEK_START)
+        : d;
     });
   }, [canNext]);
 
@@ -306,7 +320,7 @@ const Schedule = () => {
       try {
         const { fromDay: fromDateKey, sourceIndex } = JSON.parse(raw);
         const sourceList = [...(scheduleData[fromDateKey] || [])];
-        const movedItem  = { ...sourceList[sourceIndex] };
+        const movedItem = { ...sourceList[sourceIndex] };
 
         let newHour = snappedHour ?? parseTimeToHours(movedItem.startTime);
 
@@ -317,7 +331,12 @@ const Schedule = () => {
 
         const dateObj = new Date(toDateKey);
         const newStartDate = new Date(dateObj);
-        newStartDate.setHours(Math.floor(newHour), Math.round((newHour % 1) * 60), 0, 0);
+        newStartDate.setHours(
+          Math.floor(newHour),
+          Math.round((newHour % 1) * 60),
+          0,
+          0,
+        );
 
         const newEndDate = new Date(newStartDate);
         newEndDate.setTime(newStartDate.getTime() + durationMs);
@@ -339,14 +358,15 @@ const Schedule = () => {
         console.error("Drop error:", err);
       }
     },
-    [scheduleData]
+    [scheduleData],
   );
 
   // ── Handle drop confirmation ──────────────────────────────────────────────
   const handleDropConfirmation = useCallback(() => {
     if (!pendingDrop) return;
 
-    const { fromDateKey, toDateKey, sourceIndex, newStartTime, newEndTime } = pendingDrop;
+    const { fromDateKey, toDateKey, sourceIndex, newStartTime, newEndTime } =
+      pendingDrop;
 
     setScheduleData((prev) => {
       const next = { ...prev };
@@ -381,12 +401,12 @@ const Schedule = () => {
       setScheduleData((prev) => ({
         ...prev,
         [dk]: (prev[dk] || []).map((s) =>
-          s.id === updatedSession.id ? updatedSession : s
+          s.id === updatedSession.id ? updatedSession : s,
         ),
       }));
       setEditingSession(null);
     },
-    [editingSession]
+    [editingSession],
   );
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -394,12 +414,13 @@ const Schedule = () => {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <section className="min-h-screen p-4 sm:p-7 lg:p-14 pt-10 lg:pt-20">
-
       {/* ── Page header ── */}
       <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
         <div className="flex flex-col font-Inter gap-2">
-          <p className="text-2xl sm:text-3xl font-semibold text-white">{t.pageTitle}</p>
-          <p className="text-xs text-[#B8A7E5]">{t.pageSubtitle}</p>
+          <p className="text-3xl sm:text-4xl font-semibold text-white">
+            {t("page.title")}
+          </p>
+          <p className="text-xs text-[#B8A7E5]">{t("page.subtitle")}</p>
           <div className="flex flex-row gap-3 items-center mt-3 flex-wrap">
             {!isScheduleEmpty && (
               <motion.button
@@ -413,24 +434,28 @@ const Schedule = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={`rounded-full cursor-pointer font-Inter text-sm px-5 py-2 h-9 transition-colors border border-white/10 ${
-                  isEditMode ? "bg-[#7C5FBD] text-white" : "bg-[#3D3555] text-white"
+                  isEditMode
+                    ? "bg-[#7C5FBD] text-white"
+                    : "bg-[#3D3555] text-white"
                 }`}
               >
-                {isEditMode ? t.confirmSchedule : t.editSchedule}
+                {isEditMode ? t("buttons.confirm") : t("buttons.edit")}
               </motion.button>
             )}
           </div>
         </div>
 
         <div className="flex flex-row gap-3 mt-3 text-white relative flex-wrap">
-          {(!isScheduleEmpty || filterSubject !== "All" || subjects.length > 0) && (
+          {(!isScheduleEmpty ||
+            filterSubject !== "All" ||
+            subjects.length > 0) && (
             <motion.button
               onClick={() => setShowFilterPopup(!showFilterPopup)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-[#3D3555] border-t border-[#9B7EDE]/20 rounded-full flex gap-2 font-Inter text-sm items-center px-4 py-2"
             >
-              <FilterIcon /> {t.filterButton}
+              <FilterIcon /> {t("buttons.filter")}
             </motion.button>
           )}
 
@@ -470,7 +495,7 @@ const Schedule = () => {
             whileTap={{ scale: 0.95 }}
             className="bg-[#9B7EDE] flex gap-2 items-center px-4 py-2 rounded-full text-sm"
           >
-            <PlusIcon size={16} /> {t.addSession}
+            <PlusIcon size={16} /> {t("buttons.addTask")}
           </motion.button>
         </div>
       </div>
@@ -482,7 +507,7 @@ const Schedule = () => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {editingSession && editingSession.session.status!="completed" && (
+        {editingSession && editingSession.session.status != "completed" && (
           <EditSessionModal
             setEditingSession={setEditingSession}
             session={editingSession.session}
@@ -506,23 +531,31 @@ const Schedule = () => {
         )}
       </AnimatePresence>
 
-      <ScheduleSummary metrics={metrics} scheduleData={scheduleData} weekStart={weekStart} />
+      <ScheduleSummary
+        metrics={metrics}
+        scheduleData={scheduleData}
+        weekStart={weekStart}
+      />
 
       {isLoading ? (
-        <LoadingSkeleton />
+        <LoadingSkeleton label={t("page.loadingSchedule")} />
       ) : (
         <div className="bg-[#3D3555]/60 relative p-4 sm:p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-10">
-
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
             <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-3">
-              <p className="text-2xl text-center lg:text-start sm:text-3xl font-semibold">{t.weeklySchedule}</p>
+              <p className="text-2xl text-center lg:text-start sm:text-3xl font-semibold">
+                {t("page.weeklySchedule")}
+              </p>
               <div>
-                <LiquidGlassButton onClick={() => setAddModal(true)} icon={CirclePlus} className="bg-primary/30 mb-4 lg:mb-0 cursor-pointer flex gap-3 flex-row justify-center items-center text-sm lg:text-base sm:text-xs text-white px-2 lg:px-3 py-1 rounded-full">
-                  Add Session
+                <LiquidGlassButton
+                  onClick={() => setAddModal(true)}
+                  icon={CirclePlus}
+                  className="bg-primary/30 mb-4 lg:mb-0 cursor-pointer flex gap-3 flex-row justify-center items-center text-sm lg:text-base sm:text-xs text-white px-2 lg:px-3 py-1 rounded-full"
+                >
+                  {t("buttons.addSession")}
                 </LiquidGlassButton>
               </div>
             </div>
-         
 
             <WeekNav
               weekStart={weekStart}
@@ -532,40 +565,35 @@ const Schedule = () => {
               canPrev={canPrev}
               canNext={canNext}
               isCurrentWeek={isCurrentWeek}
-              t={t}
-              lang={lang}
             />
           </div>
           <div className="mt-7">
-            
-
-          <TodayBanner
-            sessionCount={todaySessionCount}
-            t={t}
-            lang={lang}
-            isCurrentWeek={isCurrentWeek}
+            <TodayBanner
+              sessionCount={todaySessionCount}
+              isCurrentWeek={isCurrentWeek}
             />
-            </div>
-        
+          </div>
+
           <div className="overflow-x-auto no-scrollbar  -mx-4 sm:-mx-1 px-4 sm:px-1 pb-3">
             <div className="flex gap-4 sm:gap-2" style={{ minWidth: "960px" }}>
-
               {/* FIX: pass dynamic hourTicks + gridHeight, not the static imports */}
               <TimeRuler
                 HOUR_TICKS={hourTicks}
                 GRID_HEIGHT={gridHeight}
                 hourToPx={hourToPxDynamic}
-                fmtHourLabel={fmtHourLabel}
+                fmtHourLabel={(hour) => fmtHourLabel(hour, locale)}
                 headerHeight={headerHeight}
               />
 
               <LayoutGroup>
                 <div
                   className="grid gap-4 sm:gap-2 flex-1"
-                  style={{ gridTemplateColumns: "repeat(7, minmax(110px, 1fr))" }}
+                  style={{
+                    gridTemplateColumns: "repeat(7, minmax(110px, 1fr))",
+                  }}
                 >
                   {weekDates.map((date, i) => {
-                    const dk      = dateKey(date);
+                    const dk = dateKey(date);
                     const dayName = DAY_NAMES[i];
                     const isToday = dk === TODAY_KEY;
 
@@ -579,7 +607,9 @@ const Schedule = () => {
                       <div
                         key={dk}
                         className={`relative rounded-[16px] pt-1 transition-all duration-300 ${
-                          isToday ? "ring-2 ring-[#9B7EDE]/50 ring-offset-2 ring-offset-[#3D3555]/60" : ""
+                          isToday
+                            ? "ring-2 ring-[#9B7EDE]/50 ring-offset-2 ring-offset-[#3D3555]/60"
+                            : ""
                         }`}
                       >
                         {/* FIX: wrapper div with callback ref on first column only —
@@ -590,8 +620,6 @@ const Schedule = () => {
                               date={date}
                               dayName={dayName}
                               isToday={isToday}
-                              lang={lang}
-                              todayLabel={t.today}
                             />
                           </div>
                         ) : (
@@ -599,14 +627,11 @@ const Schedule = () => {
                             date={date}
                             dayName={dayName}
                             isToday={isToday}
-                            lang={lang}
-                            todayLabel={t.today}
                           />
                         )}
 
                         <DayColumn
                           day={dk}
-                          t={t}
                           sessions={daySessions}
                           isEditMode={isEditMode}
                           dragOverDay={dragOverDay}
@@ -639,13 +664,17 @@ const Schedule = () => {
           />
         </div>
       )}
-      {addModal && <CreateSessionModal setAddModal={setAddModal} t={t} />}
+      {addModal && <CreateSessionModal setAddModal={setAddModal} />}
 
       <div className="border-t flex flex-col lg:flex-row font-Inter text-white items-start lg:items-center gap-4 rounded-[24px] p-5 sm:p-6 border-[#9B7EDE]/30 mt-8 mb-16 bg-gradient-to-br from-[#9B7EDE]/10 to-transparent">
         <TipBackgroundIcon />
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-base sm:text-lg">{t.proTip}</p>
-          <p className="text-xs leading-relaxed text-[#B8A7E5]">{t.proTipText}</p>
+          <p className="font-semibold text-base sm:text-lg">
+            {t("page.proTipTitle")}
+          </p>
+          <p className="text-xs leading-relaxed text-[#B8A7E5]">
+            {t("page.proTipText")}
+          </p>
         </div>
       </div>
     </section>

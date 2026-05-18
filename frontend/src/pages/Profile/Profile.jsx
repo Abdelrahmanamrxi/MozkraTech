@@ -11,7 +11,7 @@ import mockProfileData from "./Profile.constants";
 import api from "../../middleware/api";
 
 function Profile() {
-  const [user, setUser] = useState(mockProfileData.user);
+  const [user, setUser] = useState({});
 
   const applyUserFromApi = (dbUser) => {
     if (!dbUser) return;

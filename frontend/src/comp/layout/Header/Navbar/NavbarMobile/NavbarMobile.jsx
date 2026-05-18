@@ -9,6 +9,7 @@ import {
   Calendar,
   Users,
   ChevronRight,
+  MessageCircleMore,
 } from "lucide-react";
 import i18n from "i18next";
 import Logo from "../../../../logo/Logo";
@@ -21,7 +22,13 @@ import {
   DEMO_UNREAD_COUNT,
 } from "./NavbarMobile.constants";
 
-const iconMap = { Home, ChartNoAxesCombined, Calendar, Users };
+const iconMap = {
+  Home,
+  ChartNoAxesCombined,
+  Calendar,
+  Users,
+  MessageCircleMore,
+};
 
 export default function NavbarMobile({ profileImage }) {
   const [open, setOpen] = useState(false);
@@ -55,6 +62,11 @@ export default function NavbarMobile({ profileImage }) {
       href: "/dashboard/schedule",
     },
     { label: t("navbar.friends"), icon: "Users", href: "/dashboard/friends" },
+    {
+      label: t("navbar.Messages"),
+      icon: "MessageCircleMore",
+      href: "/dashboard/messages",
+    },
   ];
 
   return (

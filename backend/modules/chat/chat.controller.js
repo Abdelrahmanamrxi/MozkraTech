@@ -6,7 +6,7 @@ export const getChat = asyncHandler(async (req, res) => {
     const { conversationId, cursor } = req.query; // Use Cursor To Load 20 Messages Before That
     const query = { conversationId };
     const userId = req.user?._id;
-
+    console.log(conversationId)
     if (!conversationId) {
         return res.status(200).json({ message: "No chat found", chat: null });
     }
@@ -41,6 +41,6 @@ export const getChat = asyncHandler(async (req, res) => {
         })),
 
     };
-    console.log(formattedChat)
+   
     return res.status(200).json({ message: "Chat retrieved successfully", chat: formattedChat });
 });

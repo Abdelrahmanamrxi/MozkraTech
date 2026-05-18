@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { ChevronLeft, ChevronRight, DotsIcon, EmojiIcon, SendIcon } from "../../../../comp/ui/Icons";
+import {
+  ChevronLeft,
+  ChevronRight,
+  DotsIcon,
+  EmojiIcon,
+  SendIcon,
+} from "../../../../comp/ui/Icons";
 import { formatRelativeTime } from "@/utils/formatTime.js";
-
-
+import { useTranslation } from "react-i18next";
 
 function ChatHeader({
   displaySelected,
@@ -40,7 +45,9 @@ function ChatHeader({
 
         <div className="relative shrink-0">
           <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
-            <span className="text-white font-semibold text-xs">{displaySelected?.fullName?.[0] ?? "?"}</span>
+            <span className="text-white font-semibold text-xs">
+              {displaySelected?.fullName?.[0] ?? "?"}
+            </span>
           </div>
           <span
             className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${isOnline ? "bg-green-500" : "bg-gray-500"}`}
@@ -48,12 +55,18 @@ function ChatHeader({
         </div>
 
         <div>
-          <h2 className="text-white font-semibold text-sm leading-tight">{displaySelected?.fullName}</h2>
+          <h2 className="text-white font-semibold text-sm leading-tight">
+            {displaySelected?.fullName}
+          </h2>
           <div className="flex items-center gap-2">
             <p className="text-xs text-[#B8A7E5]">{activityStatus}</p>
             <span className="text-xs text-[#B8A7E5]/60">•</span>
-            <p className={`text-xs ${socketConnectionStatus === "connected" ? "text-emerald-400" : "text-red-400"}`}>
-              {socketConnectionStatus === "connected" ? t("messages.connected") : t("messages.disconnected")}
+            <p
+              className={`text-xs ${socketConnectionStatus === "connected" ? "text-emerald-400" : "text-red-400"}`}
+            >
+              {socketConnectionStatus === "connected"
+                ? t("messages.connected")
+                : t("messages.disconnected")}
             </p>
           </div>
         </div>
@@ -79,7 +92,7 @@ function MessagesContent({
   t,
 }) {
   const [openMenuId, setOpenMenuId] = useState(null);
-
+  const { i18n } = useTranslation();
   useEffect(() => {
     setOpenMenuId(null);
   }, [selected?._id, selected?.conversationId]);
@@ -107,8 +120,12 @@ function MessagesContent({
     return (
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="flex flex-col items-center gap-3 bg-red-950/30 border border-red-500/30 rounded-lg p-4 max-w-xs">
-          <p className="text-red-300 text-sm font-medium">{t("messages.loadErrorTitle")}</p>
-          <p className="text-red-200/70 text-xs text-center">{t("messages.loadErrorDescription")}</p>
+          <p className="text-red-300 text-sm font-medium">
+            {t("messages.loadErrorTitle")}
+          </p>
+          <p className="text-red-200/70 text-xs text-center">
+            {t("messages.loadErrorDescription")}
+          </p>
         </div>
       </div>
     );
@@ -152,8 +169,12 @@ function MessagesContent({
       {!selectedMessages.length && (
         <div className="flex-1 flex items-center justify-center">
           <div className="max-w-xs text-center space-y-2">
-            <p className="text-sm font-medium text-[#D5C7F6]">{t("messages.noMessagesTitle")}</p>
-            <p className="text-xs text-[#B8A7E5]/80">{t("messages.noMessagesDescription")}</p>
+            <p className="text-sm font-medium text-[#D5C7F6]">
+              {t("messages.noMessagesTitle")}
+            </p>
+            <p className="text-xs text-[#B8A7E5]/80">
+              {t("messages.noMessagesDescription")}
+            </p>
           </div>
         </div>
       )}
@@ -163,9 +184,13 @@ function MessagesContent({
           const messageId = msg._id?.toString() ?? msg.id ?? index;
           const hasMessageId = !!msg._id;
           const isDeletedForAll = !!msg.isDeletedForAll;
-          const canDeleteForMe = !!onDeleteMessage && hasMessageId && !isDeletedForAll;
+          const canDeleteForMe =
+            !!onDeleteMessage && hasMessageId && !isDeletedForAll;
           const canDeleteForAll =
-            !!onDeleteMessage && hasMessageId && msg.from === "me" && !isDeletedForAll;
+            !!onDeleteMessage &&
+            hasMessageId &&
+            msg.from === "me" &&
+            !isDeletedForAll;
           const menuOpen = openMenuId === messageId;
 
           return (
@@ -180,13 +205,25 @@ function MessagesContent({
                 className={`flex flex-col gap-1 max-w-[75%] ${msg.from === "me" ? "items-end" : "items-start"} relative`}
               >
                 {(canDeleteForMe || canDeleteForAll) && (
-                  <div className={`absolute top-1 ${msg.from === "me" ? "-left-8" : "-right-8"}`}>
+                  <div
+                    className={`absolute top-1 ${
+                      i18n.language === "ar"
+                        ? msg.from === "me"
+                          ? "-right-8"
+                          : "-left-8"
+                        : msg.from === "me"
+                          ? "-left-8"
+                          : "-right-8"
+                    }`}
+                  >
                     <button
                       type="button"
                       onClick={() =>
-                        setOpenMenuId((prev) => (prev === messageId ? null : messageId))
+                        setOpenMenuId((prev) =>
+                          prev === messageId ? null : messageId,
+                        )
                       }
-                      className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-full bg-[#2b2540]/80 border border-[#9B7EDE]/20 flex items-center justify-center"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-full bg-[#2b2540]/80 border border-[#9B7EDE]/20 flex items-center justify-center"
                     >
                       <DotsIcon />
                     </button>
@@ -196,7 +233,11 @@ function MessagesContent({
                           initial={{ opacity: 0, y: -4, scale: 0.98 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                          transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 24,
+                          }}
                           className={`absolute z-20 mt-2 min-w-35 rounded-xl border border-[#9B7EDE]/20 bg-[#1f1a3c] shadow-xl ${
                             msg.from === "me" ? "right-0" : "left-0"
                           }`}
@@ -255,21 +296,36 @@ function MessagesContent({
                         : ""
                   }
                 >
-                  <span className={isDeletedForAll ? "italic text-white/60" : ""}>
-                    {isDeletedForAll ? t("messages.deletedMessage") : msg.message}
+                  <span
+                    className={isDeletedForAll ? "italic text-white/60" : ""}
+                  >
+                    {isDeletedForAll
+                      ? t("messages.deletedMessage")
+                      : msg.message}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-2 text-[10px] text-purple-300/40">
-                  <span>{formatRelativeTime(msg.sentAt || msg.createdAt || msg.time, t)}</span>
+                  <span>
+                    {formatRelativeTime(
+                      msg.sentAt || msg.createdAt || msg.time,
+                      t,
+                    )}
+                  </span>
                   {msg.from === "me" && (
-                    <span className={msg.isRead ? "text-emerald-300" : "text-orange-300"}>
+                    <span
+                      className={
+                        msg.isRead ? "text-emerald-300" : "text-orange-300"
+                      }
+                    >
                       {msg.isRead ? t("messages.seen") : t("messages.sent")}
                     </span>
                   )}
                 </div>
                 {msg.from === "them" && (
                   <div className="self-start w-8 h-8 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center mt-1">
-                    <span className="text-white font-semibold text-[10px]">{selected.fullName?.[0] ?? "?"}</span>
+                    <span className="text-white font-semibold text-[10px]">
+                      {selected.fullName?.[0] ?? "?"}
+                    </span>
                   </div>
                 )}
               </div>
@@ -282,7 +338,16 @@ function MessagesContent({
   );
 }
 
-function MessageComposer({ selected, inputRef, input, onInputChange, onKeyDown, onSend, canSend, t }) {
+function MessageComposer({
+  selected,
+  inputRef,
+  input,
+  onInputChange,
+  onKeyDown,
+  onSend,
+  canSend,
+  t,
+}) {
   if (!selected) {
     return null;
   }
@@ -357,7 +422,9 @@ function ChatPanel({
     >
       <ChatHeader
         displaySelected={displaySelected}
-        lastActivityDate={displaySelected?.updatedAt || selected?.lastActivityDate}
+        lastActivityDate={
+          displaySelected?.updatedAt || selected?.lastActivityDate
+        }
         userStatus={userStatus}
         socketConnectionStatus={socketConnectionStatus}
         sidebarOpen={sidebarOpen}

@@ -19,6 +19,7 @@ import ErrorFallback from "./comp/error/ErrorFallback.jsx";
 import PeopleProfile from "./pages/PeopleProfile/PeopleProfile.jsx";
 import AISchedule from "./pages/AISchedule/AISchedule.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
+import FriendsMessages from "./pages/Friends/FriendsMessages/FriendsMessages.jsx";
 const router = createBrowserRouter([
   // ✅ PUBLIC ROUTES WITH BODY LAYOUT
   {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard/friends",
             element: <Friends />,
+          },
+          {
+            path:'/dashboard/messages',
+            element:<FriendsMessages/>
           },
           {
             path: "/dashboard/progress",

@@ -16,5 +16,186 @@
   "thursday": "Thursday",
   "friday": "Friday",
   "saturday": "Saturday",
-  "sunday": "Sunday"
+  "sunday": "Sunday",
+  "page": {
+    "title": "My Schedule",
+    "subtitle": "Plan and manage your study sessions",
+    "weeklySchedule": "Weekly Schedule",
+    "loadingSchedule": "Loading schedule...",
+    "proTipTitle": "Pro Tip",
+    "proTipText": "Schedule your most challenging subjects during your peak productivity hours. Most students perform best in the morning (8-11 AM) or late afternoon (3-5 PM).",
+    "editHint": "Click Edit to start editing your sessions."
+  },
+  "buttons": {
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "filter": "Filter",
+    "addTask": "Add Task",
+    "addSession": "Add Session",
+    "createTaskSchedule": "Create Task & Schedule",
+    "generateSessions": "Generate Sessions",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "labels": {
+    "all": "All",
+    "today": "Today",
+    "sessions": "sessions",
+    "noSessions": "No sessions",
+    "session": "Session",
+    "name": "Name",
+    "time": "Time",
+    "duration": "Duration",
+    "subject": "Subject",
+    "task": "Task",
+    "status": "Status",
+    "date": "Date",
+    "start": "Start",
+    "end": "End",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "from": "From",
+    "to": "To"
+  },
+  "summary": {
+    "thisWeek": "This Week",
+    "studyHoursLeft": "Study Hours Left",
+    "avgDaily": "Average Daily",
+    "studyTime": "Study Time",
+    "subjects": "Subjects",
+    "activeCourses": "Active Courses",
+    "upcoming": "Upcoming",
+    "deadlines": "Deadlines"
+  },
+  "form": {
+    "title": "Create Task",
+    "subtitle": "Sessions are generated automatically based on your inputs.",
+    "taskInput": "Task Input",
+    "taskName": "Task Name",
+    "subject": "Subject",
+    "dueDate": "Due Date",
+    "totalHours": "Total Hours",
+    "totalHoursMax": "Max: {{max}}h/week",
+    "priority": "Priority",
+    "studyHours": "Your Maximum Study Hours in a day.",
+    "generatedSessions": "Generated Sessions ({{count}})",
+    "generatingSessions": "Generating sessions...",
+    "noSessionsAdded": "No sessions added. Click \"Add Session\" to create one.",
+    "breakdown": "Breakdown",
+    "breakdownText": "{{hours}} hours split into {{sessions}} sessions",
+    "scheduleCreated": "Schedule created successfully!"
+  },
+  "priority": {
+    "select": "Select priority",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "placeholders": {
+    "taskName": "Task Name",
+    "sessionName": "Session name",
+    "totalHours": "Total Hours",
+    "maxStudyHours": "Your Maximum Study Hours in a day."
+  },
+  "loading": {
+    "general": "Loading...",
+    "subjects": "Loading subjects...",
+    "tasks": "Loading tasks...",
+    "creating": "Creating..."
+  },
+  "messages": {
+    "addTaskToStart": "Please add a task to start creating your sessions."
+  },
+  "errors": {
+    "taskNameRequired": "Task name is required.",
+    "dueDateRequired": "Due date is required.",
+    "dueDatePast": "Due date cannot be before today.",
+    "subjectRequired": "Subject is required.",
+    "totalHoursRequired": "Total Task Hours is required.",
+    "studyHoursRequired": "Fill in your maximum study hours per day.",
+    "priorityRequired": "Please choose the priority of your task.",
+    "addSessionRequired": "Please add a session to create your schedule.",
+    "maxHoursPerWeek": "Maximum hours for this subject is {{max}} hours per week.",
+    "generateSessionsFailed": "Failed to generate sessions.",
+    "createScheduleFailed": "Failed to create schedule.",
+    "createSessionFailed": "Failed to create session.",
+    "editSessionFailed": "Failed to edit session.",
+    "deleteSessionFailed": "Failed to delete session.",
+    "moveSessionFailed": "Failed to move session. Please try again.",
+    "dateRequired": "Date is required.",
+    "dateAfterToday": "Date must be placed after today.",
+    "overlap": "That time slot overlaps another session.",
+    "loadSubjectsFailed": "Failed to load subjects."
+  },
+  "dropConfirmation": {
+    "title": "Move Session",
+    "untitledSession": "Untitled Session",
+    "notAvailable": "N/A",
+    "oneHour": "1 hour",
+    "error": "Failed to move session. Please try again."
+  },
+  "deleteSessionModal": {
+    "warning": "This action cannot be undone."
+  },
+  "addSessionModal": {
+    "title": "Add New Session",
+    "durationLabel": "Duration",
+    "addButton": "Add Session",
+    "cancelButton": "Cancel"
+  },
+  "createSessionModal": {
+    "title": "Add New Session",
+    "nameLabel": "Name",
+    "taskLabel": "Task",
+    "selectTask": "Select Task",
+    "dateLabel": "Date",
+    "fromLabel": "From",
+    "toLabel": "To",
+    "durationLabel": "Duration",
+    "addButton": "Add Session",
+    "cancelButton": "Cancel",
+    "noTasksMessage": "Please add a task to start creating your sessions."
+  },
+  "sessionRow": {
+    "dateLabel": "Date",
+    "startLabel": "Start",
+    "endLabel": "End",
+    "durationPreview": "Duration preview",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "details": {
+    "close": "Close"
+  },
+  "status": {
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "missed": "Missed",
+    "cancelled": "Cancelled"
+  },
+  "statusShort": {
+    "scheduled": "S",
+    "completed": "C",
+    "missed": "M",
+    "cancelled": "X"
+  },
+  "time": {
+    "hourShort": "h",
+    "minuteShort": "m"
+  },
+  "timeLeft": "{{minutes}}m left",
+  "dayShort": {
+    "sun": "Sun",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  },
+  "aria": {
+    "editSession": "Edit session",
+    "deleteSession": "Delete session",
+    "viewDetails": "View session details"
+  }
 }

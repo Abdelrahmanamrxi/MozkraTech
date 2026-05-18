@@ -48,44 +48,16 @@ function Friends() {
               stiffness: 400,
               damping: 17,
             }}
-            className="bg-[#9B7EDE] w-fit mt-3 lg:mt-0 text-white flex flex-row gap-2 cursor-pointer items-center px-4 py-2 rounded-full text-sm"
+            className="bg-[#9B7EDE] w-fit mt-3 lg:mt-0 text-white flex flex-row gap-2 cursor-pointer items-center px-6 py-2 rounded-full text-sm"
           >
             <PlusIcon />
             {t("addFriends")}
           </motion.button>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="mt-6 inline-flex items-center gap-1 bg-[#3D3555]/60 border border-[#9B7EDE]/15 rounded-full p-1 font-Inter">
-          <button
-            onClick={() => setSection(false)}
-            className={`flex flex-row gap-2 items-center px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-all duration-250
-        ${
-          !showMessagesSection
-            ? "bg-[#9B7EDE] text-white shadow-[0_2px_16px_rgba(155,126,222,0.45)]"
-            : "text-purple-300/60 hover:text-purple-200"
-        }`}
-          >
-            <AnalyticsIcon />
-            {t("tabs.progress")}
-          </button>
+   
 
-          <button
-            onClick={() => setSection(true)}
-            className={`flex flex-row gap-2 items-center px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-all duration-250
-        ${
-          showMessagesSection
-            ? "bg-[#9B7EDE] text-white shadow-[0_2px_16px_rgba(155,126,222,0.45)]"
-            : "text-purple-300/60 hover:text-purple-200"
-        }`}
-          >
-            <SendIcon />
-            {t("tabs.messages")}
-          
-          </button>
-        </div>
-
-        {showMessagesSection ? <FriendsMessages /> : <FriendsProgress />}
+       <FriendsProgress/>
       </div>
 
       {/* Add Friends Modal */}

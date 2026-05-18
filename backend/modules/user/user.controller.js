@@ -518,7 +518,6 @@ export const getProfile = asyncHandler(async (req, res, next) => {
     isDeleted: false,
     isVerified: true,
   });
-
   if (!user) {
     return next(new HttpException("User Not Found", 404));
   }

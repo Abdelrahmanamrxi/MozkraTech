@@ -1,26 +1,53 @@
 /* eslint-disable no-unused-vars */
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Clock, CheckCircle, AlertCircle, XCircle } from "lucide-react";
-import { formatDuration, formatIsoDateLabel, formatIsoTimeLabel } from "../utils/timeUtility";
+import {
+  formatDuration,
+  formatIsoDateLabel,
+  formatIsoTimeLabel,
+} from "../utils/timeUtility";
+import { useTranslation } from "react-i18next";
 
-const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
+const SessionDetailsModal = ({ session, isOpen, onClose }) => {
+  const { t, i18n } = useTranslation("schedule");
+  const locale = i18n.language === "ar" ? "ar-EG" : "en-US";
   if (!session || !isOpen) return null;
 
   // Status configuration
   const statusConfig = {
-    scheduled: { color: "bg-yellow-500/20 border-yellow-500/30", textColor: "text-yellow-400", icon: Clock },
-    completed: { color: "bg-green-500/20 border-green-500/30", textColor: "text-green-400", icon: CheckCircle },
-    missed: { color: "bg-red-500/20 border-red-500/30", textColor: "text-red-400", icon: XCircle },
-    cancelled: { color: "bg-gray-500/20 border-gray-500/30", textColor: "text-gray-400", icon: AlertCircle },
+    scheduled: {
+      color: "bg-yellow-500/20 border-yellow-500/30",
+      textColor: "text-yellow-400",
+      icon: Clock,
+    },
+    completed: {
+      color: "bg-green-500/20 border-green-500/30",
+      textColor: "text-green-400",
+      icon: CheckCircle,
+    },
+    missed: {
+      color: "bg-red-500/20 border-red-500/30",
+      textColor: "text-red-400",
+      icon: XCircle,
+    },
+    cancelled: {
+      color: "bg-gray-500/20 border-gray-500/30",
+      textColor: "text-gray-400",
+      icon: AlertCircle,
+    },
   };
 
   const status = session.status || "scheduled";
   const config = statusConfig[status] || statusConfig.scheduled;
   const StatusIcon = config.icon;
 
-  const formatTime = (dateString) => formatIsoTimeLabel(dateString);
-  const formatFullDate = (dateString) =>
-    formatIsoDateLabel(dateString, lang === "ar" ? "ar-EG" : "en-US");
+  const formatTime = (dateString) => formatIsoTimeLabel(dateString, locale);
+  const formatFullDate = (dateString) => formatIsoDateLabel(dateString, locale);
+  const durationLabel = formatDuration(session.startTime, session.endTime, {
+    hourLabel: t("time.hourShort"),
+    minuteLabel: t("time.minuteShort"),
+    formatNumber: (value) => new Intl.NumberFormat(locale).format(value),
+  });
 
   return (
     <AnimatePresence>
@@ -48,8 +75,12 @@ const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-1">{session.name}</h3>
-                  <p className="text-xs text-white/50">{formatFullDate(session.startTime)}</p>
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    {session.name}
+                  </h3>
+                  <p className="text-xs text-white/50">
+                    {formatFullDate(session.startTime)}
+                  </p>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
@@ -70,7 +101,7 @@ const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
               >
                 <StatusIcon size={16} className={config.textColor} />
                 <span className={`text-sm font-medium ${config.textColor}`}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {t(`status.${status}`)}
                 </span>
               </motion.div>
 
@@ -85,8 +116,12 @@ const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
                 >
                   <Clock size={18} className="text-[#9B7EDE] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-white/60 mb-0.5">Start Time</p>
-                    <p className="text-sm font-semibold text-white truncate">{formatTime(session.startTime)}</p>
+                    <p className="text-xs text-white/60 mb-0.5">
+                      {t("labels.startTime")}
+                    </p>
+                    <p className="text-sm font-semibold text-white truncate">
+                      {formatTime(session.startTime)}
+                    </p>
                   </div>
                 </motion.div>
 
@@ -99,8 +134,12 @@ const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
                 >
                   <Clock size={18} className="text-[#9B7EDE] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-white/60 mb-0.5">End Time</p>
-                    <p className="text-sm font-semibold text-white truncate">{formatTime(session.endTime)}</p>
+                    <p className="text-xs text-white/60 mb-0.5">
+                      {t("labels.endTime")}
+                    </p>
+                    <p className="text-sm font-semibold text-white truncate">
+                      {formatTime(session.endTime)}
+                    </p>
                   </div>
                 </motion.div>
 
@@ -115,8 +154,12 @@ const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
                     <span className="text-xs font-bold text-[#C084FC]">⏱</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-white/60 mb-0.5">Duration</p>
-                    <p className="text-sm font-semibold text-white">{formatDuration(session.startTime, session.endTime)}</p>
+                    <p className="text-xs text-white/60 mb-0.5">
+                      {t("labels.duration")}
+                    </p>
+                    <p className="text-sm font-semibold text-white">
+                      {durationLabel}
+                    </p>
                   </div>
                 </motion.div>
 
@@ -129,11 +172,17 @@ const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
                     className="flex items-center gap-3 p-3 rounded-[12px] bg-white/5 border border-white/10"
                   >
                     <div className="w-5 h-5 rounded-full bg-[#9B7EDE]/30 flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-[#C084FC]">📚</span>
+                      <span className="text-xs font-bold text-[#C084FC]">
+                        📚
+                      </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-white/60 mb-0.5">Subject</p>
-                      <p className="text-sm font-semibold text-white truncate">{session.subjectId}</p>
+                      <p className="text-xs text-white/60 mb-0.5">
+                        {t("labels.subject")}
+                      </p>
+                      <p className="text-sm font-semibold text-white truncate">
+                        {session.subjectId}
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -149,7 +198,7 @@ const SessionDetailsModal = ({ session, isOpen, onClose, lang = "en" }) => {
                 onClick={onClose}
                 className="w-full mt-6 py-2.5 rounded-[12px] bg-white/5 border border-white/10 text-white/70 hover:text-white font-medium text-sm transition-colors"
               >
-                Close
+                {t("details.close")}
               </motion.button>
             </div>
           </motion.div>
