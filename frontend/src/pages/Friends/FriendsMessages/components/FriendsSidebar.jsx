@@ -2,7 +2,6 @@ import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { SearchIcon } from "../../../../comp/ui/Icons";
 
-
 function FriendsSidebar({
   sidebarOpen,
   t,
@@ -15,21 +14,21 @@ function FriendsSidebar({
   selectedFriendId,
   unreadByFriend,
   onSelectFriend,
-  userStatus
+  userStatus,
 }) {
-  const normalizedSelectedFriendId = selectedFriendId?.toString?.() ?? selectedFriendId;
-  console.log(userStatus)
+  const normalizedSelectedFriendId =
+    selectedFriendId?.toString?.() ?? selectedFriendId;
+  console.log(userStatus);
   const normalizedUserStatus =
     typeof userStatus === "string"
       ? { status: userStatus, lastActivityDate: null }
-      : {status:'offline'};
+      : { status: "offline" };
   const totalUnread = filteredFriends.reduce((sum, item) => {
     const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
     if (!friendId) return sum;
     return sum + (unreadByFriend[friendId] || 0);
   }, 0);
-  
-  
+
   function getLastMessagePreview(item) {
     if (item.lastMessage?.isDeletedForAll) {
       return t("messages.deletedMessage");
@@ -38,7 +37,8 @@ function FriendsSidebar({
     const content = item.lastMessage?.content;
     if (!content) return t("messages.noMessagesYet");
 
-    const senderId = item.lastMessage?.senderId?.toString?.() || item.lastMessage?.senderId;
+    const senderId =
+      item.lastMessage?.senderId?.toString?.() || item.lastMessage?.senderId;
     const friendId = item.friend?._id?.toString?.() || item.friend?._id;
     const friendFirstName = item.friend?.fullName?.split(" ")?.[0] || "Friend";
 
@@ -76,7 +76,9 @@ function FriendsSidebar({
           <div className="w-full h-full bg-[rgba(61,53,85,0.7)] backdrop-blur-lg rounded-2xl border border-[#9B7EDE]/15 flex flex-col">
             <div className="p-4 border-b border-[#9B7EDE]/10">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-white font-semibold text-sm">{t("messages.title")}</h3>
+                <h3 className="text-white font-semibold text-sm">
+                  {t("messages.title")}
+                </h3>
                 <span className="text-sm text-white font-semibold font-blinker">
                   {totalUnread} {t("messages.unread")}
                 </span>
@@ -113,35 +115,51 @@ function FriendsSidebar({
                 filteredFriends.map((item) => {
                   const friend = item.friend;
                   const friendId = friend._id?.toString?.() ?? friend._id;
-                  const unreadCount = unreadByFriend[friendId?.toString?.() ?? friendId] ?? item.unReadCount ?? 0;
+                  const unreadCount =
+                    unreadByFriend[friendId?.toString?.() ?? friendId] ??
+                    item.unReadCount ??
+                    0;
                   const isSelectedFriend =
                     normalizedSelectedFriendId === friend._id?.toString?.();
 
                   const isSelectedFriendOnline =
-                    isSelectedFriend && normalizedUserStatus?.status === "online";
+                    isSelectedFriend &&
+                    normalizedUserStatus?.status === "online";
 
                   const activityTimestamp =
                     isSelectedFriend && normalizedUserStatus?.lastActivityDate
                       ? normalizedUserStatus.lastActivityDate
                       : item.friend.lastActivityDate;
 
-                  const renderedActivity = normalizedUserStatus.status==="offline" ? "offline": friendActivityLabel(activityTimestamp, isSelectedFriendOnline);
-                  
+                  const renderedActivity =
+                    normalizedUserStatus.status === "offline"
+                      ? "offline"
+                      : friendActivityLabel(
+                          activityTimestamp,
+                          isSelectedFriendOnline,
+                        );
+
                   return (
                     <Motion.button
                       key={friend._id}
-                      onClick={() => onSelectFriend(friend, item.conversationId)}
+                      onClick={() =>
+                        onSelectFriend(friend, item.conversationId)
+                      }
                       whileHover={{ backgroundColor: "rgba(82,70,107,0.5)" }}
                       className={`w-full text-left rounded-xl p-3 flex items-center gap-3 cursor-pointer transition-all duration-150 mb-1
                         ${selectedFriendId === friend._id ? "bg-[rgba(155,126,222,0.2)] border border-[#9B7EDE]/30" : "border border-transparent"}`}
                     >
                       <div className="relative shrink-0">
                         <div className="w-11 h-11 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
-                          <span className="text-white font-semibold text-xs">{friend.fullName?.[0] ?? "?"}</span>
+                          <span className="text-white font-semibold text-xs">
+                            {friend.fullName?.[0] ?? "?"}
+                          </span>
                         </div>
                         <span
-                          className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${checkOnline(item.friend.lastActivityDate, friend._id)
-                            }`}
+                          className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${checkOnline(
+                            item.friend.lastActivityDate,
+                            friend._id,
+                          )}`}
                         />
                         <AnimatePresence>
                           {!isSelectedFriend && unreadCount > 0 && (
@@ -149,7 +167,11 @@ function FriendsSidebar({
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 20,
+                              }}
                               className="absolute top-0 right-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-semibold text-white px-1"
                             >
                               {unreadCount}
@@ -160,7 +182,9 @@ function FriendsSidebar({
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
-                          <span className="text-sm font-medium truncate text-white/90">{friend.fullName}</span>
+                          <span className="text-sm font-medium truncate text-white/90">
+                            {friend.fullName}
+                          </span>
                           <div className="flex flex-col items-end gap-2">
                             <span className="text-[10px] text-purple-300/40 shrink-0 ml-1">
                               {renderedActivity}
@@ -175,7 +199,9 @@ function FriendsSidebar({
                   );
                 })
               ) : (
-                <div className="text-center py-8 text-purple-300/40 text-sm">{t("messages.noFriends")}</div>
+                <div className="text-center py-8 text-purple-300/40 text-sm">
+                  {t("messages.noFriends")}
+                </div>
               )}
             </div>
           </div>

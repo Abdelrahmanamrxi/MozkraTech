@@ -10,73 +10,75 @@ import { checkFriendshipAchievements } from "../achievement/achievement.helper.j
 //------------------------------------------getFriends-------------------------------------------
 
 export const getFriends = asyncHandler(async (req, res, next) => {
-  const userId = req.user._id
-  const { search } = req.query
-  let query = {}
+  const userId = req.user._id;
+  const { search } = req.query;
+  let query = {};
 
   if (search) {
-    query.search = search
+    query.search = search;
   }
 
   const friendsList = await friendshipModel.aggregate([
     {
       $match: {
         $or: [{ requesterId: userId }, { receiverId: userId }],
-        status: "accepted"
-      }
+        status: "accepted",
+      },
     },
     {
       $lookup: {
-        from: 'users',
+        from: "users",
         localField: "requesterId",
         foreignField: "_id",
-        as: 'requesterId'
-      }
+        as: "requesterId",
+      },
     },
     {
       $lookup: {
-        from: 'users',
-        localField: 'receiverId',
+        from: "users",
+        localField: "receiverId",
         foreignField: "_id",
-        as: 'receiverId'
-      }
+        as: "receiverId",
+      },
     },
     {
-      $unwind: "$requesterId"
+      $unwind: "$requesterId",
     },
     {
-      $unwind: "$receiverId"
+      $unwind: "$receiverId",
     },
     {
       $addFields: {
         friend: {
-          $cond: [{ $eq: ["$requesterId._id", userId] }, "$receiverId", "$requesterId"]
-        }
-      }
+          $cond: [
+            { $eq: ["$requesterId._id", userId] },
+            "$receiverId",
+            "$requesterId",
+          ],
+        },
+      },
     },
     {
       $match: {
         "friend.fullName": {
           $regex: query.search || "",
-          $options: 'i'
-
-        }
-
-      }
+          $options: "i",
+        },
+      },
     },
     {
       $lookup: {
         from: "conversations",
         localField: "conversationId",
         foreignField: "_id",
-        as: "conversation"
-      }
+        as: "conversation",
+      },
     },
     {
       $unwind: {
         path: "$conversation",
-        preserveNullAndEmptyArrays: true
-      }
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
@@ -88,36 +90,40 @@ export const getFriends = asyncHandler(async (req, res, next) => {
               $expr: {
                 $and: [
                   { $eq: ["$conversationId", "$$convId"] },
-                  { $not: { $in: ["$$viewerId", { $ifNull: ["$deletedFor", []] }] } }
-                ]
-              }
-            }
+                  {
+                    $not: {
+                      $in: ["$$viewerId", { $ifNull: ["$deletedFor", []] }],
+                    },
+                  },
+                ],
+              },
+            },
           },
           {
             $sort: {
-              createdAt: -1
-            }
+              createdAt: -1,
+            },
           },
           {
-            $limit: 1
+            $limit: 1,
           },
           {
             $project: {
               _id: 1,
               content: {
-                $cond: ["$isDeletedForAll", "", "$content"]
+                $cond: ["$isDeletedForAll", "", "$content"],
               },
               senderId: 1,
               isRead: 1,
               createdAt: 1,
               isDeletedForAll: 1,
               deletedAt: 1,
-              deletedBy: 1
-            }
-          }
+              deletedBy: 1,
+            },
+          },
         ],
-        as: "lastMessage"
-      }
+        as: "lastMessage",
+      },
     },
     {
       $addFields: {
@@ -131,21 +137,21 @@ export const getFriends = asyncHandler(async (req, res, next) => {
                     {
                       $filter: {
                         input: "$conversation.participants",
-                        cond: { $eq: ["$$this.user", userId] }
-                      }
+                        cond: { $eq: ["$$this.user", userId] },
+                      },
                     },
-                    0
-                  ]
-                }
-              }
+                    0,
+                  ],
+                },
+              },
             },
-            0
-          ]
+            0,
+          ],
         },
         lastMessage: {
-          $arrayElemAt: ["$lastMessage", 0]
-        }
-      }
+          $arrayElemAt: ["$lastMessage", 0],
+        },
+      },
     },
     {
       $project: {
@@ -154,32 +160,26 @@ export const getFriends = asyncHandler(async (req, res, next) => {
           fullName: 1,
           updatedAt: 1,
           createdAt: 1,
-          lastActivityDate: 1
+          lastActivityDate: 1,
         },
         conversationId: 1,
         createdAt: 1,
         unReadCount: 1,
-        lastMessage: 1
-      }
-
-    }
-  ])
-  const friends = friendsList.map(f => ({
+        lastMessage: 1,
+      },
+    },
+  ]);
+  const friends = friendsList.map((f) => ({
     friendshipId: f._id,
     friend: f.friend,
     createdAt: f.createdAt,
     conversationId: f.conversationId,
     unReadCount: f.unReadCount,
-    lastMessage: f.lastMessage || null
+    lastMessage: f.lastMessage || null,
   }));
- 
 
   res.status(200).json({ friends });
-})
-
-
-
-
+});
 
 export const addFriend = asyncHandler(async (req, res, next) => {
   const { receiverId } = req.body;
@@ -196,7 +196,7 @@ export const addFriend = asyncHandler(async (req, res, next) => {
   const user = await userModel.findOne({
     _id: requesterId,
     isDeleted: false,
-    isVerified: true
+    isVerified: true,
   });
 
   if (!user) {
@@ -206,7 +206,7 @@ export const addFriend = asyncHandler(async (req, res, next) => {
   const receiver = await userModel.findOne({
     _id: receiverId,
     isDeleted: false,
-    isVerified: true
+    isVerified: true,
   });
 
   if (!receiver) {
@@ -216,8 +216,8 @@ export const addFriend = asyncHandler(async (req, res, next) => {
   const existing = await friendshipModel.findOne({
     $or: [
       { receiverId, requesterId },
-      { receiverId: requesterId, requesterId: receiverId }
-    ]
+      { receiverId: requesterId, requesterId: receiverId },
+    ],
   });
 
   if (existing) {
@@ -227,7 +227,7 @@ export const addFriend = asyncHandler(async (req, res, next) => {
   const friendship = await friendshipModel.create({
     receiverId,
     requesterId,
-    status: "pending"
+    status: "pending",
   });
 
   user.addXP(30);
@@ -237,52 +237,48 @@ export const addFriend = asyncHandler(async (req, res, next) => {
       message: `${user.fullName} has sent you a friend request!`,
       eventType: "friend_request_received",
       payload: {
-        senderId: requesterId
-      }
-    })
-  }
-  catch (err) {
-    console.log(err)
+        senderId: requesterId,
+      },
+    });
+  } catch (err) {
+    console.log(err);
   }
   return res.status(201).json({
     message: "Friend Request Sent Successfully",
-    friendship
+    friendship,
   });
 });
 
 export const acceptFriend = asyncHandler(async (req, res, next) => {
-  const userId = req.user._id
-  const { senderId } = req.body
+  const userId = req.user._id;
+  const { senderId } = req.body;
 
-  const { user, friend } = await checkWhetherUsersExist(userId, senderId)
+  const { user, friend } = await checkWhetherUsersExist(userId, senderId);
 
   const updated = await friendshipModel.findOneAndUpdate(
     {
       requesterId: senderId,
       receiverId: userId,
-      status: "pending"
+      status: "pending",
     },
     {
-      $set: { status: "accepted" }
+      $set: { status: "accepted" },
     },
     {
-      new: true
-    }
-  )
+      new: true,
+    },
+  );
 
   if (!updated) {
     return res.status(200).json({
-      message: "Already handled or request not found"
-    })
+      message: "Already handled or request not found",
+    });
   }
 
   const conversation = await conversationModel.create({
-    participants: [
-      { user: userId },
-      { user: senderId }
-    ],
-    participantType: 'user-to-user'
-  })
+    participants: [{ user: userId }, { user: senderId }],
+    participantType: "user-to-user",
+  });
 
   updated.conversationId = conversation._id;
   await updated.save();
@@ -293,54 +289,56 @@ export const acceptFriend = asyncHandler(async (req, res, next) => {
     await checkFriendshipAchievements(senderId)
   ])
 
-  await notificationModel.findOneAndDelete({
-    userId,
-    eventType: "friend_request_received",
-    "payload.senderId": senderId
-  }, { sort: { createdAt: -1 } })
+  await notificationModel.findOneAndDelete(
+    {
+      userId,
+      eventType: "friend_request_received",
+      "payload.senderId": senderId,
+    },
+    { sort: { createdAt: -1 } },
+  );
 
   await notificationModel.create({
     userId: senderId,
     message: `${user.fullName} has accepted your friend request!`,
     eventType: "friend_request_acceptance",
     payload: {
-      senderId: userId
-    }
-  })
+      senderId: userId,
+    },
+  });
 
-  res.status(200).json({ message: "Friendship Accepted." })
-})
+  res.status(200).json({ message: "Friendship Accepted." });
+});
 
 export const rejectFriend = asyncHandler(async (req, res, next) => {
-  const { senderId } = req.body
-  const userId = req.user._id
+  const { senderId } = req.body;
+  const userId = req.user._id;
 
-  const { user, friend } = await checkWhetherUsersExist(userId, senderId)
+  const { user, friend } = await checkWhetherUsersExist(userId, senderId);
 
   const deletedFriendship = await friendshipModel.findOneAndDelete({
     requesterId: senderId,
     receiverId: userId,
-    status: "pending"
-  })
+    status: "pending",
+  });
 
-  await notificationModel.findOneAndDelete({
-    userId,
-    eventType: "friend_request_received",
-    "payload.senderId": senderId
-  }, { sort: { createdAt: -1 } })
+  await notificationModel.findOneAndDelete(
+    {
+      userId,
+      eventType: "friend_request_received",
+      "payload.senderId": senderId,
+    },
+    { sort: { createdAt: -1 } },
+  );
 
   if (!deletedFriendship) {
     return res.status(200).json({
-      message: "Already handled or request not found"
-    })
+      message: "Already handled or request not found",
+    });
   }
 
-  res.status(200).json({ message: "User has been rejected." })
-})
-
-
-
-
+  res.status(200).json({ message: "User has been rejected." });
+});
 
 // // ------------------------------------------getAllFriends-------------------------------------------
 // export const getFriends = asyncHandler(async (req, res, next) => {
@@ -358,10 +356,6 @@ export const rejectFriend = asyncHandler(async (req, res, next) => {
 //     friends: user.friends
 //   });
 // });
-
-
-
-
 
 // // ------------------------------------------viewProfileFriend-------------------------------------------
 // export const viewProfileFriend = asyncHandler(async (req, res, next) => {
@@ -407,4 +401,3 @@ export const rejectFriend = asyncHandler(async (req, res, next) => {
 //         profile: friend
 //     });
 // });
-

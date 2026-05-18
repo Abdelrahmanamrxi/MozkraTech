@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-
-const messageSchema =  new mongoose.Schema(
+const messageSchema = new mongoose.Schema(
   {
     conversationId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -11,7 +10,7 @@ const messageSchema =  new mongoose.Schema(
     senderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: true,
     },
     senderType: {
       type: String,
@@ -20,12 +19,12 @@ const messageSchema =  new mongoose.Schema(
     },
     content: {
       type: String,
-      required: true
+      required: true,
     },
-    isRead:{
-      type:Boolean,
-      default:false,
-      required:true
+    isRead: {
+      type: Boolean,
+      default: false,
+      required: true,
     },
     deletedFor: [
       {
@@ -62,18 +61,18 @@ const messageSchema =  new mongoose.Schema(
     ],
     aiContext: {
       type: mongoose.Schema.Types.Mixed,
-      default: {}
+      default: {},
     },
     reactions: [
       {
         userId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User"
+          ref: "User",
         },
         emoji: { type: String },
         createdAt: {
           type: Date,
-          default: Date.now
+          default: Date.now,
         },
       },
     ],

@@ -130,9 +130,15 @@
     "title": "Account",
     "buttons": {
       "changePassword": "Change Password",
+      "logout": "Logout",
       "privacySettings": "Privacy Settings",
       "exportData": "Export Data",
       "deleteAccount": "Delete Account"
+    },
+    "logoutModal": {
+      "title": "Are you sure you want to logout?",
+      "cancel": "Cancel",
+      "confirm": "Log out"
     },
     "changePasswordModal": {
       "title": "Change Password",

@@ -26,12 +26,14 @@ export const signUp = asyncHandler(async (req, res, next) => {
 
   // check email
   const emailExist = await userModel.findOne({ email });
-  if (emailExist && emailExist.isDeleted===false) {
-
+  if (emailExist && emailExist.isDeleted === false) {
     return next(new HttpException("Email Already Exists", 404));
   }
-  if (emailExist && emailExist.isDeleted===true) {
-    const hashedPassword = await bcrypt.hash(password, +process.env.SALT_ROUNDS);
+  if (emailExist && emailExist.isDeleted === true) {
+    const hashedPassword = await bcrypt.hash(
+      password,
+      +process.env.SALT_ROUNDS,
+    );
     emailExist.isDeleted = false;
     emailExist.isVerified = false;
     emailExist.provider = "system";
@@ -120,11 +122,8 @@ export const login = asyncHandler(async (req, res, next) => {
     provider: "system",
   });
   if (!user) {
-    return next(
-      new HttpException("No User with Such Record Exists", 401),
-    );
+    return next(new HttpException("No User with Such Record Exists", 401));
   }
- 
 
   //compare password
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -171,7 +170,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
   const token = cookieToken;
 
   if (!token) {
-    return next(new HttpException("Refresh Token Not Found", 401));
+    return res.status(401).json({ message: "Refresh Token Not Found" });
   }
 
   let decoded;
@@ -216,6 +215,16 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
     message: "Token refreshed successfully",
     accessToken,
   });
+});
+
+// ----------------------------------logout-------------------------------------------
+export const logout = asyncHandler(async (req, res) => {
+  res.clearCookie("refreshToken", {
+    sameSite: "strict",
+    httpOnly: true,
+  });
+
+  return res.status(200).json({ message: "logout success" });
 });
 
 // ----------------------------------forget password-------------------------------------------
@@ -293,7 +302,7 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
 
   // check email
   const emailExist = await userModel.findOne({ email });
-  if (emailExist && emailExist.isDeleted===false) {
+  if (emailExist && emailExist.isDeleted === false) {
     return next(new HttpException("Email Already Exists", 404));
   }
 
@@ -414,8 +423,8 @@ export const loginWithGoogle = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new HttpException("Email Doesn't Exist"), 400);
   }
-  if(user.isDeleted===true){
-    return next(new HttpException("Account Doesn't Exist"))
+  if (user.isDeleted === true) {
+    return next(new HttpException("Account Doesn't Exist"));
   }
   if (user.provider != "google") {
     return next(new HttpException("Account Not Found.", 400));

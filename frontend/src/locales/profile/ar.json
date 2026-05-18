@@ -130,9 +130,15 @@
     "title": "الحساب",
     "buttons": {
       "changePassword": "تغيير كلمة المرور",
+      "logout": "تسجيل الخروج",
       "privacySettings": "إعدادات الخصوصية",
       "exportData": "تصدير البيانات",
       "deleteAccount": "حذف الحساب"
+    },
+    "logoutModal": {
+      "title": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+      "cancel": "إلغاء",
+      "confirm": "تسجيل الخروج"
     },
     "changePasswordModal": {
       "title": "تغيير كلمة المرور",

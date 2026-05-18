@@ -19,7 +19,7 @@ import api from "../middleware/api";
  */
 function normalizeStatus(status) {
   if (!status) return null;
-  if (typeof status === 'string') {
+  if (typeof status === "string") {
     return {
       status,
       lastActivityDate: null,
@@ -38,7 +38,10 @@ function normalizeStatus(status) {
  */
 function getMessageKey(message) {
   const fallbackTime = message.sentAt || message.createdAt;
-  return message._id?.toString() ?? `${message.conversationId}-${message.senderId}-${fallbackTime}`;
+  return (
+    message._id?.toString() ??
+    `${message.conversationId}-${message.senderId}-${fallbackTime}`
+  );
 }
 
 /**
@@ -56,10 +59,11 @@ async function getChat(selected, cursor) {
 
     return response.data;
   } catch (err) {
-    throw new Error(err.response?.data?.message || err.message || "Failed to Retrieve Chat");
+    throw new Error(
+      err.response?.data?.message || err.message || "Failed to Retrieve Chat",
+    );
   }
 }
-
 
 /**
  * Normalize raw chat messages from the API into a fixed structure used by the UI.
@@ -67,10 +71,10 @@ async function getChat(selected, cursor) {
  * ensures the UI renders oldest -> newest.
  */
 function normalizeChat(messages, selected) {
-
   return messages
     .map((message) => {
-      const senderId = message.senderId?._id?.toString() ?? message.senderId?.toString();
+      const senderId =
+        message.senderId?._id?.toString() ?? message.senderId?.toString();
       const isFromThem = selected._id?.toString() === senderId;
       const messageText = message.message ?? message.content ?? "";
       const isDeletedForAll = !!message.isDeletedForAll;
@@ -86,7 +90,6 @@ function normalizeChat(messages, selected) {
         isDeletedForAll,
         deletedAt: message.deletedAt ?? null,
         deletedBy: message.deletedBy ?? null,
-        
       };
     })
     .reverse();
@@ -173,7 +176,12 @@ function useFriendsMessages(selected) {
    * The hook merges older messages into existing state while avoiding duplicates.
    */
   const loadOlderMessages = useCallback(async () => {
-    if (!selected?.conversationId || !hasMoreHistory || isLoadingOlder || !oldestCursor) {
+    if (
+      !selected?.conversationId ||
+      !hasMoreHistory ||
+      isLoadingOlder ||
+      !oldestCursor
+    ) {
       return;
     }
 
@@ -191,21 +199,25 @@ function useFriendsMessages(selected) {
         }
 
         const seen = new Set();
-        const merged = [...normalizedOlderMessages, ...prev].filter((message) => {
-          const messageKey = getMessageKey(message);
-          if (seen.has(messageKey)) {
-            return false;
-          }
-          seen.add(messageKey);
-          return true;
-        });
+        const merged = [...normalizedOlderMessages, ...prev].filter(
+          (message) => {
+            const messageKey = getMessageKey(message);
+            if (seen.has(messageKey)) {
+              return false;
+            }
+            seen.add(messageKey);
+            return true;
+          },
+        );
 
         return merged;
       });
 
       const oldestLoaded = normalizedOlderMessages[0];
       if (oldestLoaded) {
-        setOldestCursor(oldestLoaded.sentAt || oldestLoaded.createdAt || oldestCursor);
+        setOldestCursor(
+          oldestLoaded.sentAt || oldestLoaded.createdAt || oldestCursor,
+        );
       }
 
       setHasMoreHistory(rawMessages.length === 20);
@@ -220,8 +232,8 @@ function useFriendsMessages(selected) {
   useEffect(() => {
     const socket = io(import.meta.env.VITE_SOCKET_URL, {
       auth: {
-        authorization: `Bearer ${accessToken}`
-      }
+        authorization: `Bearer ${accessToken}`,
+      },
     });
 
     socketRef.current = socket;
@@ -239,7 +251,8 @@ function useFriendsMessages(selected) {
     socket.on("receiveMessage", (payload) => {
       // Incoming message from the remote friend. We normalize it and attach
       // metadata such as friendId, conversationId, and the direction of the message.
-      const senderId = payload.senderId?._id?.toString() ?? payload.senderId?.toString();
+      const senderId =
+        payload.senderId?._id?.toString() ?? payload.senderId?.toString();
       const receiverId = payload.receiverId?.toString();
       const friendId = senderId;
       const isDeletedForAll = !!payload.isDeletedForAll;
@@ -247,7 +260,9 @@ function useFriendsMessages(selected) {
       setMessages((prev) => {
         // Check if message already exists by _id or fallback key
         const messageTime = payload.sentAt || payload.createdAt;
-        const msgKey = payload._id?.toString() ?? `${payload.conversationId}-${senderId}-${messageTime}`;
+        const msgKey =
+          payload._id?.toString() ??
+          `${payload.conversationId}-${senderId}-${messageTime}`;
         const exists = prev.some((msg) => {
           const key = getMessageKey(msg);
           return key === msgKey;
@@ -278,23 +293,27 @@ function useFriendsMessages(selected) {
     // This event adds the outbound message into local state and may also update
     // the current friend's online/status metadata for the active conversation.
     socket.on("successMessage", (payload) => {
-      const senderId = payload.senderId?._id?.toString() ?? payload.senderId?.toString();
+      const senderId =
+        payload.senderId?._id?.toString() ?? payload.senderId?.toString();
       const receiverId = payload.receiverId?.toString();
       const friendId = receiverId;
       const isCurrentConversation =
-        payload.conversationId?.toString() === selected?.conversationId?.toString();
+        payload.conversationId?.toString() ===
+        selected?.conversationId?.toString();
       const isDeletedForAll = !!payload.isDeletedForAll;
 
-      const normalizedStatus = normalizeStatus(payload.status)
+      const normalizedStatus = normalizeStatus(payload.status);
       // console.log(normalizedStatus)
       if (normalizedStatus && isCurrentConversation) {
-        setUserStatus(normalizedStatus)
+        setUserStatus(normalizedStatus);
       }
 
       setMessages((prev) => {
         // Check if message already exists by _id or fallback key
         const messageTime = payload.sentAt || payload.createdAt;
-        const msgKey = payload._id?.toString() ?? `${payload.conversationId}-${senderId}-${messageTime}`;
+        const msgKey =
+          payload._id?.toString() ??
+          `${payload.conversationId}-${senderId}-${messageTime}`;
         const exists = prev.some((msg) => {
           const key = getMessageKey(msg);
           return key === msgKey;
@@ -322,32 +341,36 @@ function useFriendsMessages(selected) {
       });
     });
 
-    socket.on("messageDeleted", ({ messageId, conversationId, deleteFor, deletedBy, deletedAt }) => {
-      if (!messageId) return;
+    socket.on(
+      "messageDeleted",
+      ({ messageId, conversationId, deleteFor, deletedBy, deletedAt }) => {
+        if (!messageId) return;
 
-      setMessages((prev) => {
-        if (deleteFor === "me") {
-          return prev.filter((msg) => msg._id?.toString() !== messageId.toString());
-        }
+        setMessages((prev) => {
+          if (deleteFor === "me") {
+            return prev.filter(
+              (msg) => msg._id?.toString() !== messageId.toString(),
+            );
+          }
 
-        if (deleteFor === "all") {
-          return prev.map((msg) =>
-            msg._id?.toString() === messageId.toString()
-              ? {
-                  ...msg,
-                  message: "",
-                  isDeletedForAll: true,
-                  deletedBy: deletedBy ?? msg.deletedBy,
-                  deletedAt: deletedAt ?? msg.deletedAt ?? Date.now(),
-                }
-              : msg,
-          );
-        }
+          if (deleteFor === "all") {
+            return prev.map((msg) =>
+              msg._id?.toString() === messageId.toString()
+                ? {
+                    ...msg,
+                    message: "",
+                    isDeletedForAll: true,
+                    deletedBy: deletedBy ?? msg.deletedBy,
+                    deletedAt: deletedAt ?? msg.deletedAt ?? Date.now(),
+                  }
+                : msg,
+            );
+          }
 
-        return prev;
-      });
-    });
-
+          return prev;
+        });
+      },
+    );
 
     socket.on("authError", (payload) => {
       console.warn("Socket auth error:", payload);
@@ -371,7 +394,8 @@ function useFriendsMessages(selected) {
 
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.conversationId?.toString() === conversationId?.toString() && msg.from === "them"
+          msg.conversationId?.toString() === conversationId?.toString() &&
+          msg.from === "them"
             ? { ...msg, isRead: true }
             : msg,
         ),
@@ -384,20 +408,20 @@ function useFriendsMessages(selected) {
       const isCurrentConversation =
         conversationId?.toString() === selected?.conversationId?.toString();
 
-      const normalizedStatus = normalizeStatus(status)
+      const normalizedStatus = normalizeStatus(status);
       if (normalizedStatus && isCurrentConversation) {
-        setUserStatus(normalizedStatus)
+        setUserStatus(normalizedStatus);
       }
-      
+
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.conversationId?.toString() === conversationId?.toString() && msg.from === "me"
+          msg.conversationId?.toString() === conversationId?.toString() &&
+          msg.from === "me"
             ? { ...msg, isRead: true }
             : msg,
         ),
       );
     });
-
 
     return () => {
       // Disconnect the socket when the selected conversation changes or when
@@ -413,20 +437,23 @@ function useFriendsMessages(selected) {
   const sendMessage = useCallback(({ destId, message }) => {
     const socket = socketRef.current;
     if (!socket) {
-      setStatus('sendError')
+      setStatus("sendError");
       return;
     }
     socket.emit("sendMessage", { destId, message });
   }, []);
 
-  const deleteMessage = useCallback(({ messageId, conversationId, deleteFor }) => {
-    const socket = socketRef.current;
-    if (!socket) {
-      setStatus('sendError')
-      return;
-    }
-    socket.emit("deleteMessage", { messageId, conversationId, deleteFor });
-  }, []);
+  const deleteMessage = useCallback(
+    ({ messageId, conversationId, deleteFor }) => {
+      const socket = socketRef.current;
+      if (!socket) {
+        setStatus("sendError");
+        return;
+      }
+      socket.emit("deleteMessage", { messageId, conversationId, deleteFor });
+    },
+    [],
+  );
 
   /**
    * Mark the current conversation as read locally and notify the backend.
@@ -435,7 +462,7 @@ function useFriendsMessages(selected) {
   const markAsRead = useCallback(({ conversationId }) => {
     const socket = socketRef.current;
     if (!socket) {
-      setStatus('sendError')
+      setStatus("sendError");
       return;
     }
     if (!conversationId) {
@@ -445,7 +472,8 @@ function useFriendsMessages(selected) {
     // Local read action: mark incoming messages in this chat as read immediately.
     setMessages((prev) =>
       prev.map((msg) =>
-        msg.conversationId?.toString() === conversationId?.toString() && msg.from === "them"
+        msg.conversationId?.toString() === conversationId?.toString() &&
+        msg.from === "them"
           ? { ...msg, isRead: true }
           : msg,
       ),
@@ -453,9 +481,6 @@ function useFriendsMessages(selected) {
 
     socket.emit("markAsRead", { conversationId });
   }, []);
-
-
-
 
   /**
    * Returned hook API:
@@ -472,7 +497,7 @@ function useFriendsMessages(selected) {
    * - `error`: any error from the initial conversation load.
    * - `olderLoadError`: any error from loading older message pages.
    */
- 
+
   return {
     status,
     socketConnectionStatus: status,
@@ -486,9 +511,8 @@ function useFriendsMessages(selected) {
     isLoadingOlder,
     isLoading,
     error,
-    olderLoadError
+    olderLoadError,
   };
-
 }
 
-export default useFriendsMessages
+export default useFriendsMessages;

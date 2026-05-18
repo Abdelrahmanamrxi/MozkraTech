@@ -59,11 +59,10 @@ export const sendMessage = async (socket) => {
       isRead: false,
     });
 
-
     conversation.lastMessage = newMessage._id;
     await conversation.save();
-    const receiverStatus = userStatus.get(destId.toString())
-    console.log(userStatus.get(destId.toString(),receiverStatus))
+    const receiverStatus = userStatus.get(destId.toString());
+    console.log(userStatus.get(destId.toString(), receiverStatus));
     socket.emit("successMessage", {
       conversationId: conversation._id,
       _id: newMessage._id,
@@ -74,7 +73,6 @@ export const sendMessage = async (socket) => {
       isDeletedForAll: newMessage.isDeletedForAll,
       status: receiverStatus || { status: "offline", lastActivityDate: null },
     });
-
 
     const receiverSocketId = connectioUser.get(destId.toString());
 
@@ -93,108 +91,118 @@ export const sendMessage = async (socket) => {
 };
 
 export const deleteMessage = async (socket) => {
-  socket.on("deleteMessage", async ({ messageId, deleteFor, conversationId }) => {
-    if (!messageId || !deleteFor) {
-      return socket.emit("sendError", {
-        message: "messageId and deleteFor are required",
-      });
-    }
-
-    const data = await authSocket({ socket });
-    if (data.statusCode !== 200) {
-      return socket.emit("authError", data);
-    }
-
-    const userId = data.user._id.toString();
-    const message = await messageModel.findById(messageId);
-    if (!message) {
-      return socket.emit("sendError", {
-        message: "Message not found",
-      });
-    }
-
-    if (conversationId && message.conversationId?.toString() !== conversationId.toString()) {
-      return socket.emit("sendError", {
-        message: "Conversation mismatch",
-      });
-    }
-
-    const conversation = await conversationModel.findOne({
-      _id: message.conversationId,
-      "participants.user": userId,
-    });
-
-    if (!conversation) {
-      return socket.emit("sendError", {
-        message: "Conversation not found",
-      });
-    }
-
-    if (deleteFor === "all") {
-      if (message.senderId?.toString() !== userId) {
+  socket.on(
+    "deleteMessage",
+    async ({ messageId, deleteFor, conversationId }) => {
+      if (!messageId || !deleteFor) {
         return socket.emit("sendError", {
-          message: "Not allowed to delete this message for everyone",
+          message: "messageId and deleteFor are required",
         });
       }
 
-      const deleteTimestamp = message.deletedAt || Date.now();
-      if (!message.isDeletedForAll || !message.deletedAt || !message.deletedBy) {
+      const data = await authSocket({ socket });
+      if (data.statusCode !== 200) {
+        return socket.emit("authError", data);
+      }
+
+      const userId = data.user._id.toString();
+      const message = await messageModel.findById(messageId);
+      if (!message) {
+        return socket.emit("sendError", {
+          message: "Message not found",
+        });
+      }
+
+      if (
+        conversationId &&
+        message.conversationId?.toString() !== conversationId.toString()
+      ) {
+        return socket.emit("sendError", {
+          message: "Conversation mismatch",
+        });
+      }
+
+      const conversation = await conversationModel.findOne({
+        _id: message.conversationId,
+        "participants.user": userId,
+      });
+
+      if (!conversation) {
+        return socket.emit("sendError", {
+          message: "Conversation not found",
+        });
+      }
+
+      if (deleteFor === "all") {
+        if (message.senderId?.toString() !== userId) {
+          return socket.emit("sendError", {
+            message: "Not allowed to delete this message for everyone",
+          });
+        }
+
+        const deleteTimestamp = message.deletedAt || Date.now();
+        if (
+          !message.isDeletedForAll ||
+          !message.deletedAt ||
+          !message.deletedBy
+        ) {
+          await messageModel.updateOne(
+            { _id: message._id },
+            {
+              $set: {
+                isDeletedForAll: true,
+                deletedAt: deleteTimestamp,
+                deletedBy: userId,
+              },
+            },
+          );
+        }
+
+        const payload = {
+          messageId: message._id.toString(),
+          conversationId: message.conversationId.toString(),
+          deleteFor: "all",
+          deletedBy: userId,
+          deletedAt: message.deletedAt || deleteTimestamp,
+        };
+
+        socket.emit("messageDeleted", payload);
+
+        const otherParticipant = conversation.participants.find(
+          (participant) => participant.user.toString() !== userId,
+        );
+
+        const otherParticipantSocketId = otherParticipant
+          ? connectioUser.get(otherParticipant.user.toString())
+          : null;
+
+        if (otherParticipantSocketId) {
+          socket.to(otherParticipantSocketId).emit("messageDeleted", payload);
+        }
+
+        return;
+      }
+
+      if (deleteFor === "me") {
         await messageModel.updateOne(
           { _id: message._id },
-          {
-            $set: {
-              isDeletedForAll: true,
-              deletedAt: deleteTimestamp,
-              deletedBy: userId,
-            },
-          },
+          { $addToSet: { deletedFor: userId } },
         );
+
+        socket.emit("messageDeleted", {
+          messageId: message._id.toString(),
+          conversationId: message.conversationId.toString(),
+          deleteFor: "me",
+          deletedBy: userId,
+        });
+        return;
       }
 
-      const payload = {
-        messageId: message._id.toString(),
-        conversationId: message.conversationId.toString(),
-        deleteFor: "all",
-        deletedBy: userId,
-        deletedAt: message.deletedAt || deleteTimestamp,
-      };
-
-      socket.emit("messageDeleted", payload);
-
-      const otherParticipant = conversation.participants.find(
-        (participant) => participant.user.toString() !== userId,
-      );
-
-      const otherParticipantSocketId = otherParticipant
-        ? connectioUser.get(otherParticipant.user.toString())
-        : null;
-
-      if (otherParticipantSocketId) {
-        socket.to(otherParticipantSocketId).emit("messageDeleted", payload);
-      }
-
-      return;
-    }
-
-    if (deleteFor === "me") {
-      await messageModel.updateOne(
-        { _id: message._id },
-        { $addToSet: { deletedFor: userId } },
-      );
-
-      socket.emit("messageDeleted", {
-        messageId: message._id.toString(),
-        conversationId: message.conversationId.toString(),
-        deleteFor: "me",
-        deletedBy: userId,
+      return socket.emit("sendError", {
+        message: "Invalid deleteFor option",
       });
-      return;
-    }
-
-    return socket.emit("sendError", {
-      message: "Invalid deleteFor option",
-    });
-  });
+    },
+  );
 };
 
 export const markAsRead = async (socket) => {
@@ -210,12 +218,12 @@ export const markAsRead = async (socket) => {
 
     const userId = data.user._id.toString();
     setUserOnline(userId);
-    
+
     const conversation = await conversationModel
       .findOneAndUpdate(
         { _id: conversationId, "participants.user": userId },
         { $set: { "participants.$.unReadCount": 0 } },
-        { new: true }
+        { new: true },
       )
       .select("participants");
 
@@ -230,7 +238,7 @@ export const markAsRead = async (socket) => {
     );
 
     const currentUserStatus = userStatus.get(userId);
-  
+
     if (!isParticipant) {
       return socket.emit("sendError", {
         message: "Not allowed to update this conversation",
@@ -259,21 +267,19 @@ export const markAsRead = async (socket) => {
       },
     );
 
-    const currentStatusPayload =
-      currentUserStatus ||
-      ({
-        status: "online",
-        lastActivityDate: Date.now(),
-      });
+    const currentStatusPayload = currentUserStatus || {
+      status: "online",
+      lastActivityDate: Date.now(),
+    };
 
     let otherParticipantStatus = userStatus.get(
       otherParticipant.user.toString(),
     );
 
     if (!otherParticipantStatus) {
-      const friend = await userModel.findById(otherParticipant.user).select(
-        "lastActivityDate",
-      );
+      const friend = await userModel
+        .findById(otherParticipant.user)
+        .select("lastActivityDate");
       otherParticipantStatus = {
         status: "offline",
         lastActivityDate: friend?.lastActivityDate || null,
