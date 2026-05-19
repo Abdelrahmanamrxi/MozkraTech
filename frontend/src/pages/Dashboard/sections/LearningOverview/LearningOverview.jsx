@@ -3,14 +3,33 @@ import GlassySection from "@/comp/ui/GlassySection";
 import LiquidGlassButton from "@/comp/ui/LiquidGlassButton";
 import { StartIcon, CalenderIcon } from "@/comp/ui/Icons";
 import { Card } from "@/comp/ui/TopCard";
-import { Calendar, HandshakeIcon } from "lucide-react";
+import { Calendar, Sparkles, Clock3, BrainCircuit } from "lucide-react";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next"; // Add this
+import { useTranslation } from "react-i18next";
 
 const normalizeDifficultyKey = (value) => {
   const key = String(value || "").toLowerCase();
+
   if (key === "easy" || key === "medium" || key === "hard") return key;
+
   return "medium";
+};
+
+const difficultyStyles = {
+  easy: {
+    bg: "bg-emerald-500/10 border border-emerald-400/20",
+    text: "text-emerald-300",
+  },
+
+  medium: {
+    bg: "bg-amber-500/10 border border-amber-400/20",
+    text: "text-amber-300",
+  },
+
+  hard: {
+    bg: "bg-rose-500/10 border border-rose-400/20",
+    text: "text-rose-300",
+  },
 };
 
 const LearningOverview = ({
@@ -23,163 +42,332 @@ const LearningOverview = ({
 
   const getDifficultyLabel = (difficulty) => {
     const key = normalizeDifficultyKey(difficulty);
+
     if (key === "easy")
       return t("learningOverview.todaysSchedule.difficulty.easy");
+
     if (key === "hard")
       return t("learningOverview.todaysSchedule.difficulty.hard");
+
     return t("learningOverview.todaysSchedule.difficulty.medium");
   };
 
   return (
-    <div>
-      <div className="flex flex-col lg:flex-row gap-8 mt-10 items-start">
-        {/* Left column — AI + Today's Schedule stacked */}
-        <div className="flex-1 flex flex-col gap-8">
-          <GlassySection>
-            <motion.svg
-              className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0"
-              width="90"
-              height="50"
-              viewBox="0 0 90 50"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              animate={{ rotate: [0, 8, -8, 0] }}
-              transition={{
-                duration: 6,
-                ease: "easeInOut",
-                repeat: Infinity,
-                repeatDelay: 2,
-              }}
+    <div className="mt-10">
+      {/* AI SECTION */}
+      <Card
+        variant="dark"
+        className="
+          relative
+          overflow-hidden
+          rounded-[28px]
+          p-6 sm:p-8
+          glassy-secondary-background
+          border border-white/10
+          shadow-[0_10px_50px_rgba(0,0,0,0.22)]
+        "
+      >
+        {/* Background Glow */}
+        <div className="absolute -top-20 -right-16 w-56 h-56 bg-violet-500/10 blur-3xl rounded-full pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row gap-6 justify-between lg:items-center">
+          {/* LEFT */}
+          <div className="flex gap-5">
+            {/* Icon Box */}
+            <div
+              className="
+                w-20 h-20
+                rounded-3xl
+                glassy-background
+                border border-white/10
+                flex items-center justify-center
+                shrink-0
+              "
             >
-              <g transform="translate(-10,0)">
-                <path
-                  d="M37.839 5.68658C38.0905 5.04897 38.993 5.04897 39.2445 5.68658L39.9559 7.49087C40.4167 8.65887 41.3413 9.58345 42.5092 10.0441L44.3136 10.7557C44.9511 11.0072 44.9511 11.9096 44.3136 12.161L42.5092 12.8726C41.3413 13.3333 40.4167 14.2579 39.9559 15.4259L39.2445 17.2302C38.993 17.8678 38.0905 17.8678 37.839 17.2302L37.1276 15.4259C36.6667 14.2579 35.7422 13.3333 34.5742 12.8726L32.7699 12.161C32.1324 11.9096 32.1324 11.0072 32.7699 10.7557L34.5742 10.0441C35.7422 9.58345 36.6667 8.65887 37.1276 7.49087L37.839 5.68658Z"
-                  stroke="#141B34"
-                  strokeWidth="1.5"
-                />
-              </g>
-              <g transform="translate(40,0)">
-                <path
-                  d="M15.7929 2.27523C16.4635 0.574922 18.8698 0.574922 19.5404 2.27523L21.4381 7.08667C22.6665 10.2014 25.1319 12.6669 28.2467 13.8952L33.0581 15.7929C34.7583 16.4635 34.7583 18.8698 33.0581 19.5404L28.2467 21.4381C25.1319 22.6665 22.6665 25.1319 21.4381 28.2467L19.5404 33.0581C18.8698 34.7583 16.4635 34.7583 15.7929 33.0581L13.8953 28.2467C12.6669 25.1319 10.2014 22.6665 7.08667 21.4381L2.27523 19.5404C0.574922 18.8698 0.574922 16.4635 2.27523 15.7929L7.08667 13.8952C10.2014 12.6669 12.6669 10.2014 13.8953 7.08667L15.7929 2.27523Z"
-                  stroke="#141B34"
-                  strokeWidth="2"
-                />
-              </g>
-            </motion.svg>
-
-            <div className="flex font-poppins flex-col">
-              <p className="font-semibold text-lg">
-                {t("learningOverview.aiSuggestion.label")}
-              </p>
-              <p className="font-blinker text-base">{aiRecommendation}</p>
-              <LiquidGlassButton
-                icon={StartIcon}
-                className="px-2 lg:w-1/5 w-1/2 mt-6 py-1"
+              <motion.div
+                animate={{ rotate: [0, 8, -8, 0] }}
+                transition={{
+                  duration: 6,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                }}
               >
-                {t("learningOverview.aiSuggestion.button")}
-              </LiquidGlassButton>
+                <BrainCircuit className="w-10 h-10 text-violet-300" />
+              </motion.div>
             </div>
-          </GlassySection>
 
-          {/* Today's Schedule */}
-          <Card variant="dark" className="cursor-pointer p-4">
-            <p className="font-poppins text-lg">
-              {t("learningOverview.todaysSchedule.label")}
-            </p>
-            <div className="flex flex-col gap-4 items-center">
-              {isScheduleLoading ? (
-                <p className="font-blinker text-sm text-white/70 py-3">
-                  {t("learningOverview.todaysSchedule.loading")}
+            {/* Text */}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles size={18} className="text-violet-300" />
+
+                <p className="font-poppins font-semibold text-xl">
+                  {t("learningOverview.aiSuggestion.label")}
                 </p>
-              ) : todaysSchedule.length === 0 ? (
-                <p className="font-blinker text-sm text-white/70 py-3">
-                  {t("learningOverview.todaysSchedule.empty")}
-                </p>
-              ) : (
-                todaysSchedule.map((subj, index) => {
-                  const difficultyKey = normalizeDifficultyKey(subj.difficulty);
-                  return (
-                    <GlassySection
-                      key={`${subj.subject}-${index}`}
-                      classname={"w-full mt-2 flex justify-between"}
-                    >
-                      <div className="flex flex-row items-center gap-3">
-                        <p className="tracking-wdiest flex flex-row gap-3 items-center">
+              </div>
+
+              <p className="font-blinker text-[15px] text-white/75 leading-relaxed max-w-2xl">
+                {aiRecommendation}
+              </p>
+            </div>
+          </div>
+
+          {/* BUTTON */}
+          <LiquidGlassButton
+            icon={StartIcon}
+            className="
+              px-5
+              py-2.5
+              rounded-2xl
+              lg:w-auto
+              w-full
+              transition-all duration-300
+              hover:brightness-110
+            "
+          >
+            {t("learningOverview.aiSuggestion.button")}
+          </LiquidGlassButton>
+        </div>
+      </Card>
+
+      {/* SCHEDULES */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 mt-8 items-start">
+        {/* TODAY SCHEDULE */}
+        <Card
+          variant="dark"
+          className="
+            xl:col-span-3
+            rounded-[28px]
+            glassy-secondary-background
+            border border-white/10
+            p-6
+            shadow-[0_10px_50px_rgba(0,0,0,0.22)]
+          "
+        >
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="font-poppins text-xl font-semibold">
+                {t("learningOverview.todaysSchedule.label")}
+              </p>
+
+              <p className="text-sm text-white/50 font-blinker mt-1">
+                Stay focused and keep your progress consistent
+              </p>
+            </div>
+
+            <div
+              className="
+                w-12 h-12
+                rounded-2xl
+                glassy-background
+                border border-white/10
+                flex items-center justify-center
+              "
+            >
+              <Clock3 className="text-violet-300" size={22} />
+            </div>
+          </div>
+
+          {/* CONTENT */}
+          <div className="flex flex-col gap-4">
+            {isScheduleLoading ? (
+              <p className="font-blinker text-sm text-white/70 py-4">
+                {t("learningOverview.todaysSchedule.loading")}
+              </p>
+            ) : todaysSchedule.length === 0 ? (
+              <p className="font-blinker text-sm text-white/70 py-4">
+                {t("learningOverview.todaysSchedule.empty")}
+              </p>
+            ) : (
+              todaysSchedule.map((subj, index) => {
+                const difficultyKey = normalizeDifficultyKey(subj.difficulty);
+
+                return (
+                  <div
+                    key={`${subj.subject}-${index}`}
+                    className="
+                      group
+                      relative
+                      overflow-hidden
+                      rounded-3xl
+                      glassy-background
+                      border border-white/10
+                      px-5
+                      py-4
+                      transition-all duration-300
+                      hover:border-white/20
+                      hover:bg-white/[0.06]
+                    "
+                  >
+                    {/* HOVER LIGHT */}
+                    <div
+                      className="
+                        absolute inset-0 opacity-0
+                        group-hover:opacity-100
+                        transition-opacity duration-500
+                        bg-gradient-to-r
+                        from-white/[0.04]
+                        to-transparent
+                        pointer-events-none
+                      "
+                    />
+
+                    <div className="relative z-10 flex items-center justify-between gap-4">
+                      {/* LEFT */}
+                      <div className="flex items-center gap-4">
+                        {/* TIME */}
+                        <div
+                          className="
+                            min-w-[82px]
+                            h-[60px]
+                            rounded-2xl
+                            bg-black/10
+                            border border-white/10
+                            flex items-center justify-center
+                            text-sm font-semibold text-white/85
+                          "
+                        >
                           {subj.time}
-                          <svg
-                            width="1"
-                            height="70"
-                            viewBox="0 0 1 70"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <line x1="0.5" x2="0.5" y2="70" stroke="white" />
-                          </svg>
-                        </p>
-                        <div className="flex flex-col">
-                          <p className="font-semibold">{subj.subject}</p>
-                          <p className="text-xs">{subj.session}</p>
+                        </div>
+
+                        {/* SUBJECT */}
+                        <div>
+                          <p className="font-poppins font-medium text-[16px]">
+                            {subj.subject}
+                          </p>
+
+                          <p className="text-sm text-white/50 mt-1 font-blinker">
+                            {subj.session}
+                          </p>
                         </div>
                       </div>
+
+                      {/* DIFFICULTY */}
                       <div
-                        className={`${difficultyKey === "easy" && "glassy-easy-background"}
-                  ${difficultyKey === "hard" && "glassy-hard-background"}
-                  ${difficultyKey === "medium" && "glassy-medium-background"}
-                  px-3 py-1 text-lg rounded-full font-blinker`}
+                        className={`
+                          ${difficultyStyles[difficultyKey].bg}
+                          ${difficultyStyles[difficultyKey].text}
+
+                          px-4
+                          py-2
+                          rounded-full
+                          text-sm
+                          font-semibold
+                          font-blinker
+                          transition-all duration-300
+                          group-hover:scale-105
+                        `}
                       >
                         {getDifficultyLabel(difficultyKey)}
                       </div>
-                    </GlassySection>
-                  );
-                })
-              )}
-            </div>
-          </Card>
-        </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </Card>
 
-        {/* Right column — Upcoming Schedule + Friends stacked */}
-        <div className="flex flex-col gap-8 shrink-0 lg:w-1/4 w-full">
-          <div className="glassy-secondary-background rounded-3xl p-5">
-            <p className="flex flex-row font-blinker font-semibold gap-5 items-center text-lg">
+        {/* UPCOMING */}
+        <Card
+          variant="dark"
+          className="
+            rounded-[28px]
+            glassy-secondary-background
+            border border-white/10
+            p-6
+            shadow-[0_10px_50px_rgba(0,0,0,0.22)]
+          "
+        >
+          {/* HEADER */}
+          <div className="mb-6">
+            <p className="flex items-center gap-3 font-poppins font-semibold text-xl">
               <CalenderIcon />
               {t("learningOverview.upcomingSchedule.label")}
             </p>
+
+            <p className="text-sm text-white/50 mt-1 font-blinker">
+              Upcoming exams and deadlines
+            </p>
+          </div>
+
+          {/* CONTENT */}
+          <div className="flex flex-col gap-4">
             {isScheduleLoading ? (
-              <p className="font-blinker text-sm text-white/70 mt-4">
+              <p className="font-blinker text-sm text-white/70">
                 {t("learningOverview.upcomingSchedule.loading")}
               </p>
             ) : upComingSchedule.length === 0 ? (
-              <p className="font-blinker text-sm text-white/70 mt-4">
+              <p className="font-blinker text-sm text-white/70">
                 {t("learningOverview.upcomingSchedule.empty")}
               </p>
             ) : (
               upComingSchedule.map((subj, index) => (
-                <Card
+                <div
                   key={`${subj.subject}-${index}`}
-                  className="mt-5 p-8 relative overflow-hidden"
-                  variant="dark"
+                  className="
+                    group
+                    relative
+                    overflow-hidden
+                    rounded-3xl
+                    glassy-background
+                    border border-white/10
+                    p-5
+                    transition-all duration-300
+                    hover:border-white/20
+                    hover:bg-white/[0.06]
+                  "
                 >
+                  {/* Hover Glow */}
                   <div
-                    className="glassy-secondary-background absolute top-2 right-3 px-2 py-1 rounded-full text-xs font-semibold font-blinker"
-                    style={{ color: "#f7ece1" }}
+                    className="
+                      absolute inset-0 opacity-0
+                      group-hover:opacity-100
+                      transition-opacity duration-500
+                      bg-gradient-to-br
+                      from-white/[0.04]
+                      to-transparent
+                      pointer-events-none
+                    "
+                  />
+
+                  {/* DAYS LEFT */}
+                  <div
+                    className="
+                      absolute top-4 right-4
+                      px-3 py-1
+                      rounded-full
+                      text-xs
+                      font-semibold
+                      bg-blue-500/10
+                      border border-blue-400/20
+                      text-blue-200
+                      font-blinker
+                      transition-all duration-300
+                      group-hover:scale-105
+                    "
                   >
                     {subj.daysLeft}{" "}
                     {t("learningOverview.upcomingSchedule.daysLeft")}
                   </div>
-                  <div className="flex flex-row justify-center">
-                    <p className="font-blinker text-lg font-semibold">
+
+                  <div className="relative z-10">
+                    <p className="font-poppins text-lg font-semibold mb-4">
                       {subj.subject}
                     </p>
+
+                    <div className="flex items-center gap-3 text-white/65 text-sm font-blinker">
+                      <Calendar size={18} />
+                      {subj.date}
+                    </div>
                   </div>
-                  <p className="flex flex-row gap-3 items-center font-blinker text-xs">
-                    <Calendar size={20} />
-                    {subj.date}
-                  </p>
-                </Card>
+                </div>
               ))
             )}
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

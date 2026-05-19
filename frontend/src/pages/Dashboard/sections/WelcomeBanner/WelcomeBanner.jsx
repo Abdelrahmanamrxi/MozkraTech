@@ -1,73 +1,84 @@
 /* eslint-disable no-unused-vars */
-import React from 'react'
-import LiquidGlassButton from '@/comp/ui/LiquidGlassButton.jsx';
-import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import LiquidGlassButton from "@/comp/ui/LiquidGlassButton.jsx";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
-import { CalenderIcon, WeeklyReportIcon, StreakIcon } from '@/comp/ui/Icons.jsx';
-import { Link } from 'react-router';
-import useTypewriter from '@/hooks/useTypewriter.jsx';
-import CardStack from './CardStack.jsx';
+import {
+  CalenderIcon,
+  WeeklyReportIcon,
+  StreakIcon,
+} from "@/comp/ui/Icons.jsx";
+import { Link } from "react-router";
+import useTypewriter from "@/hooks/useTypewriter.jsx";
+import CardStack from "./CardStack.jsx";
 
+function WelcomeBanner({ dashboardData }) {
+  const { t, i18n } = useTranslation(["dashboard"]);
 
-function WelcomeBanner({ mockUserData }) {
-  
-const {t,i18n}=useTranslation(['dashboard'])
- 
   const formattedDate = new Date().toLocaleDateString(
-    i18n.language === 'ar' ? 'ar-SA' : 'en-US',
+    i18n.language === "ar" ? "ar-SA" : "en-US",
     {
       weekday: "long",
       month: "long",
-      day: "numeric"
-    }
+      day: "numeric",
+    },
   );
 
   const getTimeOfDayGreeting = () => {
-  const hour = new Date().getHours();
-  
-  if (hour < 12) {
-    return 'weekly.morning';      // 00:00 - 11:59
-  } else if (hour < 18) {
-    return 'weekly.afternoon';    // 12:00 - 17:59
-  } 
-  else{
-    return 'weekly.afternoon'
-  }
-};
-const greetingKey=getTimeOfDayGreeting()
-const{displayed,done}=useTypewriter(formattedDate)
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      return "weekly.morning"; // 00:00 - 11:59
+    } else if (hour < 18) {
+      return "weekly.afternoon"; // 12:00 - 17:59
+    } else {
+      return "weekly.afternoon";
+    }
+  };
+  const greetingKey = getTimeOfDayGreeting();
+  const { displayed, done } = useTypewriter(formattedDate);
 
   return (
-    <section className="relative flex flex-row items-center justify-between   overflow-hidden">
-
+    <section className="relative flex flex-row items-center justify-between overflow-visible py-2">
       {/* ── Left: text + buttons ── */}
       <div className="flex flex-col gap-5 z-10">
         <p className="font-blinker mt-8 lg:mt-0 text-2xl">{displayed}</p>
         <h1 className="lg:text-5xl text-4xl font-semibold lg:w-3/4 leading-15 text-white font-poppins">
-        {t(greetingKey)}<span className="text-primary"> {mockUserData.name}</span>
+          {t(greetingKey)}
+          <span className="text-primary"> {dashboardData.name}</span>
         </h1>
-        <p className="lg:w-3/4 font-blinker text-lg lg:text-xl">{t('weekly.text')}</p>
+        <p className="lg:w-3/4 font-blinker text-lg lg:text-xl">
+          {t("weekly.text")}
+        </p>
         <div className="flex flex-row mt-3 lg:mt-0 items-center gap-3">
           <Link to="/schedule">
-            <LiquidGlassButton className='px-2 py-1 text-sm gap-2 lg:px-6 lg:py-2 lg:text-base lg:gap-2.5' icon={CalenderIcon}>{t('weekly.schedule')}</LiquidGlassButton>
+            <LiquidGlassButton
+              className="px-2 py-1 text-sm gap-2 lg:px-6 lg:py-2 lg:text-base lg:gap-2.5"
+              icon={CalenderIcon}
+            >
+              {t("weekly.schedule")}
+            </LiquidGlassButton>
           </Link>
           <Link to="/weeklyreport">
-            <LiquidGlassButton    icon={WeeklyReportIcon} className="bg-white text-primary px-2 py-1 text-sm gap-2 lg:px-6 lg:py-2 lg:text-base lg:gap-2.5">{t('weekly.report')}</LiquidGlassButton>
+            <LiquidGlassButton
+              icon={WeeklyReportIcon}
+              className="bg-white text-primary px-2 py-1 text-sm gap-2 lg:px-6 lg:py-2 lg:text-base lg:gap-2.5"
+            >
+              {t("weekly.report")}
+            </LiquidGlassButton>
           </Link>
-
-
         </div>
-
-        
       </div>
 
       {/* ── Desktop: full-size stack ── */}
-      <CardStack scale={1} mockUserData={mockUserData} className="hidden lg:block" />
+      <CardStack
+        scale={1}
+        dashboardData={dashboardData}
+        className="hidden lg:block"
+      />
 
       {/* ── Mobile: scaled-down stack pinned top-right ── */}
-   
-
     </section>
   );
 }

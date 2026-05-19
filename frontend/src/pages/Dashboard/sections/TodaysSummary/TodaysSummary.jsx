@@ -1,71 +1,261 @@
-import { AchievementIcon, CompletedIcon, FireIcon } from "@/comp/ui/Icons";
+import { AchievementIcon, FireIcon } from "@/comp/ui/Icons";
 import { NoteIcon, TimerIcon } from "@/comp/ui/Icons";
-import TopCard, { Card, T } from "@/comp/ui/TopCard";
+import { Card, T } from "@/comp/ui/TopCard";
 import useCountUp from "@/hooks/useCountUp";
 import Dots from "@/comp/ui/Dots";
-import Donut from "@/comp/ui/Donut";
 import ProgressBar from "@/comp/ui/ProgressBar";
 import { useTranslation } from "react-i18next";
 
-export default function TodaysSummary({ mockUserData }) {
-  const { t } = useTranslation(['dashboard']);
-  const [streak, goals, achievements, hours] = [useCountUp(mockUserData.streak, 365), useCountUp(mockUserData.goals, 400), useCountUp(mockUserData.achievements, 500), useCountUp(mockUserData.hours.hoursThisWeek, 0)];
-  const pct = Math.round(mockUserData.hours.hoursThisWeek / mockUserData.hours.totalHours * 100)
-  
+export default function TodaysSummary({ dashboardData }) {
+  const { t, i18n } = useTranslation(["dashboard"]);
+  const locale = i18n.language === "ar" ? "ar-EG" : "en-US";
+  const streakValue = dashboardData?.streak ?? 0;
+  const achievementsValue = dashboardData?.achievements ?? 0;
+  const studyHoursValue = dashboardData?.studyHours ?? 0;
+  const studyHoursGoal = dashboardData?.studyHoursGoal ?? 0;
+  const tasksDone = dashboardData?.tasks?.doneTasks ?? 0;
+  const tasksTotal = dashboardData?.tasks?.totalTasks ?? 0;
+  const nextDeadline = dashboardData?.nextDeadline ?? null;
+  const studyTimeToday = dashboardData?.studyTimeToday ?? 0;
+  const focusMix = dashboardData?.focusMix ?? {
+    easy: 0,
+    medium: 0,
+    hard: 0,
+    total: 0,
+  };
+
+  const [streak, achievements, hours] = [
+    useCountUp(streakValue, 365),
+    useCountUp(achievementsValue, 500),
+    useCountUp(studyHoursValue, 0),
+  ];
+
+  const safeStudyGoal = Math.max(studyHoursGoal, 1);
+  const progressValue = Math.min(studyHoursValue, safeStudyGoal);
+  const focusTotal = focusMix.total || 0;
+  const focusItems = [
+    {
+      key: "easy",
+      label: t("summary.focusMix.easy"),
+      value: focusMix.easy,
+      color: "#70c1b3",
+    },
+    {
+      key: "medium",
+      label: t("summary.focusMix.medium"),
+      value: focusMix.medium,
+      color: "#f0c36d",
+    },
+    {
+      key: "hard",
+      label: t("summary.focusMix.hard"),
+      value: focusMix.hard,
+      color: "#e07a7a",
+    },
+  ];
+
   return (
     <section className="mt-15">
-      <div className="grid font-blinker grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-20">
-        
-        <TopCard variant="purple" delay={0} icon={<FireIcon />} value={streak} sub={t('summary.currentStreak.sub')} label={t('summary.currentStreak.label')} />
+      <div className="grid font-blinker grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-10">
+        <Card variant="purple" delay={0} className="relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FireIcon />
+              <span className="font-semibold text-base" style={{ ...T.light }}>
+                {t("summary.currentStreak.label")}
+              </span>
+            </div>
+            <span
+              className="text-sm font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(255,255,255,0.18)", ...T.light }}
+            >
+              {t("summary.currentStreak.sub")}
+            </span>
+          </div>
+          <div className="mt-4 text-4xl font-semibold" style={{ ...T.light }}>
+            {streak}
+          </div>
+          <div className="text-sm mt-2" style={{ ...T.muted }}>
+            {t("summary.currentStreak.todayStudy", {
+              hours: studyTimeToday,
+            })}
+          </div>
+        </Card>
 
-        <TopCard variant="dark" delay={100}
-          icon={<CompletedIcon />}
-          value={goals} extra={<span className="font-semibold text-gray-200 text-lg">{t('summary.goalsCompleted.extra')}</span>}
-          sub={t('summary.goalsCompleted.sub')} label={t('summary.goalsCompleted.label')}
-        />
+        <Card
+          variant="dark"
+          delay={100}
+          className="justify-between relative overflow-hidden"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <NoteIcon />
+              <span className="font-semibold text-base" style={{ ...T.light }}>
+                {t("summary.nextDeadline.label")}
+              </span>
+            </div>
+            <span
+              className="text-sm font-semibold px-2.5 py-1 rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.18)",
+                color: "#f7ece1",
+              }}
+            >
+              {t("summary.nextDeadline.sub")}
+            </span>
+          </div>
 
-        <TopCard variant="purple" delay={200}
-          icon={<AchievementIcon />}
-          value={achievements} sub={t('summary.achievements.sub')} label={t('summary.achievements.label')}
-        />
+          {nextDeadline ? (
+            <div className="mt-4 flex flex-col gap-3">
+              <div
+                className="text-3xl lg:text-4xl font-semibold"
+                style={{ ...T.light }}
+              >
+                {t("summary.nextDeadline.hoursLeft", {
+                  hours: Math.round(nextDeadline.hoursLeft || 0),
+                })}
+              </div>
+              <div
+                className="rounded-2xl px-3 py-2"
+                style={{ background: "rgba(255,255,255,0.12)" }}
+              >
+                <div className="text-base font-semibold" style={{ ...T.light }}>
+                  {t("summary.nextDeadline.task", {
+                    name: nextDeadline.name,
+                  })}
+                </div>
+              </div>
+              <div className="text-sm" style={{ ...T.muted }}>
+                {t("summary.nextDeadline.due", {
+                  date: nextDeadline.date.toLocaleDateString(locale, {
+                    month: "short",
+                    day: "numeric",
+                  }),
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 text-base" style={{ ...T.muted }}>
+              {t("summary.nextDeadline.none")}
+            </div>
+          )}
+        </Card>
+
+        <Card variant="purple" delay={200} className="relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AchievementIcon />
+              <span className="font-semibold text-base" style={{ ...T.light }}>
+                {t("summary.achievements.label")}
+              </span>
+            </div>
+            <span
+              className="text-sm font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(255,255,255,0.18)", ...T.light }}
+            >
+              {t("summary.achievements.sub")}
+            </span>
+          </div>
+          <div className="mt-4 text-4xl font-semibold" style={{ ...T.light }}>
+            {achievements}
+          </div>
+          <div className="text-sm mt-2" style={{ ...T.muted }}>
+            {t("summary.achievements.total", { count: achievementsValue })}
+          </div>
+        </Card>
 
         {/* Study Hours */}
-        <Card variant="light" delay={300}>
-          <div className="flex lg:flex-row flex-col items-center gap-2">
-            <TimerIcon />
-            <span className="text-sm lg:text-start text-center font-semibold" style={{ color: 'white' }}>{t('summary.studyHours.label')}</span>
+        <Card variant="light" delay={300} className="relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TimerIcon />
+              <span className="font-semibold text-base" style={{ ...T.light }}>
+                {t("summary.studyHours.label")}
+              </span>
+            </div>
+            <span
+              className="text-sm font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(255,255,255,0.2)", ...T.light }}
+            >
+              {t("summary.studyHours.subLabel")}
+            </span>
           </div>
-          <div className="mt-3">
-            <span className="font-bold text-lg lg:text-3xl font-poppins">{hours}</span>
+          <div className="mt-4 text-4xl font-semibold" style={{ ...T.light }}>
+            {hours}
           </div>
-          <div className="text-xs mt-1" style={{ color: 'white' }}>{t('summary.studyHours.subLabel')}</div>
-          <ProgressBar value={28.5} max={40} delay={600} />
+          <div className="text-sm mt-2" style={{ ...T.muted }}>
+            {t("summary.studyHours.goal", { hours: studyHoursGoal })}
+          </div>
+          <ProgressBar value={progressValue} max={safeStudyGoal} delay={600} />
         </Card>
 
         {/* Tasks */}
-        <Card variant="light" delay={400}>
-          <div className="flex items-center gap-2">
-            <NoteIcon />
-            <span className="font-semibold" style={{ ...T.light }}>{t('summary.tasks.label')}</span>
+        <Card variant="purple" delay={400} className="relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <NoteIcon />
+              <span className="font-semibold text-base" style={{ ...T.light }}>
+                {t("summary.tasks.label")}
+              </span>
+            </div>
+            <span
+              className="text-sm font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(255,255,255,0.2)", ...T.light }}
+            >
+              {Math.max(tasksTotal - tasksDone, 0)}{" "}
+              {t("summary.tasks.remaining")}
+            </span>
           </div>
-          <div className='font-semibold mt-2' style={{ ...T.light }} >{mockUserData.tasks.doneTasks}/{mockUserData.tasks.totalTasks}</div>
-          <div className="text-white text-sm">{mockUserData.tasks.totalTasks - mockUserData.tasks.doneTasks} {t('summary.tasks.remaining')}</div>
-          <Dots done={12} total={18} delay={600} />
+          <div className="mt-4 text-4xl font-semibold" style={{ ...T.light }}>
+            {tasksDone}/{tasksTotal}
+          </div>
+          <div className="text-sm mt-2" style={{ ...T.muted }}>
+            {t("summary.tasks.completed", { count: tasksDone })}
+          </div>
+          <Dots done={tasksDone} total={tasksTotal} delay={600} />
         </Card>
 
         {/* Donut */}
-        <Card variant="light" delay={500}>
-          <span className="font-semibold" style={{ ...T.light }}>{t('summary.donutChart.label')}</span>
-          <div className="flex lg:flex-row flex-col items-center gap-4 mt-2">
-            <Donut pct={pct} />
-            <div className="flex flex-col gap-2">
-              {[["#9067c6", t('summary.donutChart.completed')], ["white", t('summary.donutChart.remaining')]].map(([bg, label]) => (
-                <div key={label} className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: bg }} />
-                  <span style={{ ...T.light, fontSize: 12 }}>{label}</span>
+        <Card variant="light" delay={500} className="relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-base" style={{ ...T.light }}>
+              {t("summary.focusMix.label")}
+            </span>
+            <span
+              className="text-sm font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(255,255,255,0.2)", ...T.light }}
+            >
+              {t("summary.focusMix.total", { count: focusTotal })}
+            </span>
+          </div>
+          <div className="text-sm mt-1" style={{ ...T.light }}>
+            {t("summary.focusMix.sub")}
+          </div>
+          <div className="flex flex-col gap-3 mt-3">
+            {focusItems.map((item) => {
+              const pct = focusTotal
+                ? Math.round((item.value / focusTotal) * 100)
+                : 0;
+              return (
+                <div key={item.key} className="flex items-center gap-2">
+                  <span className="text-sm w-16" style={{ ...T.light }}>
+                    {item.label}
+                  </span>
+                  <div className="flex-1 h-2 rounded-full bg-white/20 overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${pct}%`, background: item.color }}
+                    />
+                  </div>
+                  <span
+                    className="text-sm w-10 text-right"
+                    style={{ ...T.light }}
+                  >
+                    {pct}% · {item.value}
+                  </span>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </Card>
       </div>

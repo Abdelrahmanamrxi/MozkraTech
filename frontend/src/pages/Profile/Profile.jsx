@@ -18,23 +18,23 @@ function Profile() {
     if (!dbUser) return;
     const createdAt = dbUser.createdAt ? new Date(dbUser.createdAt) : null;
 
-    setUser((prev) => ({
-      ...prev,
-      name: dbUser.fullName ?? prev.name,
+    setUser({
+      name: dbUser.fullName ?? "",
       email: dbUser.email ?? "",
       phone: dbUser.phone ?? "",
       location: dbUser.location ?? "",
       bio: dbUser.bio ?? "",
       summary: dbUser.summary ?? "",
       profileImage: dbUser.profileImage,
-      level: dbUser.level ?? prev.level,
+      currentStreak: dbUser.currentStreak ?? 0,
+      level: dbUser.level ?? 1,
       memberSince: createdAt
         ? createdAt.toLocaleDateString(undefined, {
             month: "long",
             year: "numeric",
           })
-        : prev.memberSince,
-    }));
+        : "",
+    });
   };
 
   const refreshUser = async () => {
