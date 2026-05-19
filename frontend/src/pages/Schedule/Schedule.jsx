@@ -129,7 +129,7 @@ const Schedule = () => {
   const { data: userProfile } = useQuery({
     queryKey: ["user-profile"],
     queryFn: async () => {
-      const response = await api.post("/user/get-profile");
+      const response = await api.get("/user/get-profile");
       return response.data?.user ?? null;
     },
     staleTime: 5 * 60 * 1000,
@@ -308,7 +308,8 @@ const Schedule = () => {
       const dk = dateKey(date);
       result[dk] = [];
     });
-
+    
+    if(tasksData.length>0)
     tasksData.forEach((task) => {
       if (!task.dueDate) return;
       
@@ -587,7 +588,7 @@ const Schedule = () => {
                     }
                     setIsEditMode((p) => !p);
                   }}
-                  className={`cursor-pointer p-2 rounded-full transition-all duration-300 ${
+                  className={`cursor-pointer p-2 self-start  rounded-full transition-all duration-300 ${
                     isEditMode ? "bg-[#9B7EDE]/60 shadow-lg shadow-[#9B7EDE]/30" : "bg-white/5 hover:bg-white/10"
                   }`}
                   title={isEditMode ? t("buttons.confirm") : t("buttons.edit")}

@@ -298,6 +298,8 @@ function Home() {
         }
       : null;
 
+    console.log(doneTasks,totalTasks)
+
     return {
       name: user.fullName || "User",
       streak: metrics.streak ?? user.currentStreak ?? 0,
@@ -327,7 +329,7 @@ function Home() {
   return (
     <div className=" text-white main-background lg:p-15 p-5 sm:p-8">
       <WelcomeBanner dashboardData={dashboardData} />
-      <TodaysSummary dashboardData={dashboardData} />
+      <TodaysSummary dashboardData={dashboardData} isLoading={isTasksLoading} />
       <LearningOverview
         todaysSchedule={todaysSchedule}
         upComingSchedule={upComingSchedule}

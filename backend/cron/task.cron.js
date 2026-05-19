@@ -16,7 +16,7 @@ export const deleteDueTasks=()=>{
 
     const deletedTasks=await taskModel.deleteMany({_id:{$in:taskIds}})
 
-    console.log(`${deletedTasks.length} has been deleted`)
+    console.log(`${deletedTasks.deletedCount} task(s) have been deleted`)
     
   } catch (err) {
     console.log(err);

@@ -316,7 +316,7 @@ const LearningOverview = ({
             rounded-3xl
             glassy-background
             border border-white/10
-            p-5
+            p-9
             transition-all duration-300
             hover:border-white/20
             hover:bg-white/[0.06]
@@ -338,7 +338,7 @@ const LearningOverview = ({
                   {/* DAYS LEFT */}
                   <div
                     className="
-              absolute top-4 right-4
+              absolute top-2 right-2
               px-3 py-1
               rounded-full
               text-xs

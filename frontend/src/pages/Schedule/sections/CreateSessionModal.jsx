@@ -88,6 +88,7 @@ function CreateSessionModal({ setAddModal }) {
   };
 
   const selectedTaskName =
+    tasks.length>0 &&
     tasks.find((task) => task._id === newSession.taskId)?.name ||
     t("createSessionModal.selectTask");
 

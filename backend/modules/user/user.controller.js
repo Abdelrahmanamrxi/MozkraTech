@@ -532,7 +532,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
     achievementModel.countDocuments({ userId: user._id }),
   ]);
 
-  const studyHours = tasks.reduce((sum, t) => sum + t.hoursSpent, 0);
+  const studyHours = tasks.reduce((sum, t) => sum + (t.hoursSpent || 0), 0);
 
   return res.status(200).json({
     message: "getProfile success",

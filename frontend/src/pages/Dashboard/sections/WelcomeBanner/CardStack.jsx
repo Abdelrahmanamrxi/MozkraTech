@@ -61,6 +61,7 @@ const CardStack = ({ scale = 1, className = "", dashboardData }) => {
           transform: `scale(${scale})`,
           transformOrigin: "top right",
         }}
+        
       >
         {/* Card 1 — Weekly Streak */}
         <motion.div
