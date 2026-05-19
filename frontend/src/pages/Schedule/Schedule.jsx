@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CirclePlus,
+  Edit2,
 } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import ScheduleSummary from "./sections/ScheduleSummary";
@@ -25,6 +26,8 @@ import TodayBanner from "./sections/TodayBanner";
 import WeekNav from "./sections/WeekNav";
 import DayHeader from "./sections/DayHeader";
 import WeekScrubber from "./sections/WeekScrubber";
+import TaskBadge from "./sections/TaskBadge";
+import EditTaskModal from "./sections/EditTaskModal";
 import {
   DAY_NAMES,
   TODAY,
@@ -91,6 +94,7 @@ const Schedule = () => {
   const [scheduleData, setScheduleData] = useState({});
   const [dragOverDay, setDragOverDay] = useState(null);
   const [editingSession, setEditingSession] = useState(null);
+  const [editingTask, setEditingTask] = useState(null);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
   const [showAddSessionPopup, setShowAddSessionPopup] = useState(false);
   const [filterSubject, setFilterSubject] = useState("All");
@@ -127,6 +131,15 @@ const Schedule = () => {
     queryFn: async () => {
       const response = await api.post("/user/get-profile");
       return response.data?.user ?? null;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: tasksData = [] } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const response = await api.get("/tasks");
+      return response.data?.tasks ?? [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -286,6 +299,37 @@ const Schedule = () => {
     [gridStartHour, gridEndHour],
   );
 
+  // Map tasks by dateKey, filtering to current week and respecting subject filter
+  const tasksByDate = useMemo(() => {
+    if (!tasksData || !weekDates) return {};
+    
+    const result = {};
+    weekDates.forEach((date) => {
+      const dk = dateKey(date);
+      result[dk] = [];
+    });
+
+    tasksData.forEach((task) => {
+      if (!task.dueDate) return;
+      
+      // Check if task due date is in this week
+      const taskDate = new Date(task.dueDate);
+      const taskDateKey = taskDate.toISOString().split("T")[0];
+      
+      if (!result.hasOwnProperty(taskDateKey)) return;
+      
+      // Respect subject filter
+      if (filterSubject !== "All") {
+        const taskSubjectId = task.subjectId?._id ?? task.subjectId;
+        if (String(taskSubjectId) !== String(filterSubject)) return;
+      }
+
+      result[taskDateKey].push(task);
+    });
+
+    return result;
+  }, [tasksData, weekDates, filterSubject]);
+
   // ── Week navigation ───────────────────────────────────────────────────────
   const goToPrevWeek = useCallback(() => {
     if (!canPrev) return;
@@ -421,28 +465,6 @@ const Schedule = () => {
             {t("page.title")}
           </p>
           <p className="text-xs text-[#B8A7E5]">{t("page.subtitle")}</p>
-          <div className="flex flex-row gap-3 items-center mt-3 flex-wrap">
-            {!isScheduleEmpty && (
-              <motion.button
-                onClick={() => {
-                  if (isEditMode) {
-                    setEditingSession(null);
-                    setDragOverDay(null);
-                  }
-                  setIsEditMode((p) => !p);
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`rounded-full cursor-pointer font-Inter text-sm px-5 py-2 h-9 transition-colors border border-white/10 ${
-                  isEditMode
-                    ? "bg-[#7C5FBD] text-white"
-                    : "bg-[#3D3555] text-white"
-                }`}
-              >
-                {isEditMode ? t("buttons.confirm") : t("buttons.edit")}
-              </motion.button>
-            )}
-          </div>
         </div>
 
         <div className="flex flex-row gap-3 mt-3 text-white relative flex-wrap">
@@ -530,6 +552,16 @@ const Schedule = () => {
           />
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {editingTask && (
+          <EditTaskModal
+            task={editingTask}
+            onCancel={() => setEditingTask(null)}
+            setEditingTask={setEditingTask}
+            subjects={subjects}
+          />
+        )}
+      </AnimatePresence>
 
       <ScheduleSummary
         metrics={metrics}
@@ -542,15 +574,32 @@ const Schedule = () => {
       ) : (
         <div className="bg-[#3D3555]/60 relative p-4 sm:p-6 lg:p-8 w-full rounded-[24px] text-white font-Inter border-t border-[#9B7EDE]/20 mt-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-            <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-3">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3">
               <p className="text-2xl text-center lg:text-start sm:text-3xl font-semibold">
                 {t("page.weeklySchedule")}
               </p>
+              {!isScheduleEmpty && (
+                <button
+                  onClick={() => {
+                    if (isEditMode) {
+                      setEditingSession(null);
+                      setDragOverDay(null);
+                    }
+                    setIsEditMode((p) => !p);
+                  }}
+                  className={`cursor-pointer p-2 rounded-full transition-all duration-300 ${
+                    isEditMode ? "bg-[#9B7EDE]/60 shadow-lg shadow-[#9B7EDE]/30" : "bg-white/5 hover:bg-white/10"
+                  }`}
+                  title={isEditMode ? t("buttons.confirm") : t("buttons.edit")}
+                >
+                  <Edit2 size={20} className="text-white" />
+                </button>
+              )}
               <div>
                 <LiquidGlassButton
                   onClick={() => setAddModal(true)}
                   icon={CirclePlus}
-                  className="bg-primary/30 mb-4 lg:mb-0 cursor-pointer flex gap-3 flex-row justify-center items-center text-sm lg:text-base sm:text-xs text-white px-2 lg:px-3 py-1 rounded-full"
+                  className="bg-primary/30 mb-0 lg:mb-0 cursor-pointer flex gap-3 flex-row justify-center items-center text-sm lg:text-base sm:text-xs text-white px-2 lg:px-3 py-1 rounded-full"
                 >
                   {t("buttons.addSession")}
                 </LiquidGlassButton>
@@ -629,6 +678,19 @@ const Schedule = () => {
                             isToday={isToday}
                           />
                         )}
+
+                        {/* Task Badges - rendered before DayColumn */}
+                        <div className="px-1 sm:px-0 max-h-32 overflow-y-auto">
+                          <AnimatePresence>
+                            {(tasksByDate[dk] || []).map((task) => (
+                              <TaskBadge
+                                key={task._id}
+                                task={task}
+                                onEdit={setEditingTask}
+                              />
+                            ))}
+                          </AnimatePresence>
+                        </div>
 
                         <DayColumn
                           day={dk}

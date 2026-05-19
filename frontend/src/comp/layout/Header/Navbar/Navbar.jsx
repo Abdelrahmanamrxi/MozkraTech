@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef } from "react";
 import Notifications from "../Notifications/Notifications";
 import { buildAssetUrl } from "../../../../utils/assetUrl";
+import { useNotificationUnreadCount } from "../../../../hooks/useNotifications";
 
 function Navbar({ profileImage }) {
   const { t } = useTranslation(["common"]);
@@ -26,6 +27,8 @@ function Navbar({ profileImage }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const isDashboard = location.pathname.startsWith("/dashboard");
+  const unreadCount = useNotificationUnreadCount(isDashboard);
 
   const changeLanguage = (lang) => {
     setCurrentLang(lang);
@@ -246,17 +249,21 @@ function Navbar({ profileImage }) {
         {location.pathname.startsWith("/dashboard") && (
           <>
             {/* Notification */}
-            <div className="relative">
+            <div className="relative" ref={bellRef}>
               <motion.button
-                ref={bellRef}
                 onClick={() => {
                   setNotifications(!notificationsOpen);
                 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 flex items-center justify-center rounded-full
+                className="relative w-10 h-10 flex items-center justify-center rounded-full
                 bg-white/10 border border-white/20 backdrop-blur-md"
               >
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center text-[0.65rem] font-semibold bg-red-500 text-white border border-white/25 shadow-[0_0_10px_rgba(239,68,68,0.55)] z-10">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
                 <svg
                   width="24"
                   height="24"
@@ -292,6 +299,7 @@ function Navbar({ profileImage }) {
                   <Notifications
                     setNotifications={setNotifications}
                     bellRef={bellRef}
+                    isOpen={notificationsOpen}
                   />
                 )}
               </AnimatePresence>

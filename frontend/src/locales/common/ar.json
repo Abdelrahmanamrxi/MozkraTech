@@ -15,7 +15,29 @@
     "notifications":{
         "title": "الإشعارات",
         "close": "إغلاق",
-        "recent": "الأحدث"
+        "recent": "الأحدث",
+        "empty": "لا توجد إشعارات بعد",
+        "prev": "السابق",
+        "next": "التالي",
+        "pagination": "{{from}} - {{to}} من {{total}}",
+        "filters": {
+          "all": "الكل",
+          "requests": "الطلبات",
+          "streaks": "السلاسل",
+          "achievements": "الإنجازات",
+          "viewProfile": "زيارة الملف"
+        },
+        "messages": {
+          "friend_request_received": "أرسل لك {{name}} طلب صداقة!",
+          "friend_request_acceptance": "قبل {{name}} طلب صداقتك!",
+          "view_profile": "شاهد {{name}} ملفك الشخصي!",
+          "system_welcome": "مرحبًا {{name}}، ابدأ الدراسة بإنشاء مهمتك الأولى!",
+          "system_welcome_back": "مرحبًا بعودتك {{name}}، تم استعادة حسابك بنجاح!",
+          "system_announcement": "{{name}}",
+          "streak_milestone_reached": "{{name}}: {{description}} {{icon}}!!",
+          "achievement_unlocked": "{{name}}: {{description}} {{icon}}!!",
+          "message_received": "أرسل لك {{name}} رسالة"
+        }
     }
   },
   "loginPage": {

@@ -10,7 +10,6 @@ export function NotificationsUtilityRow({
   notifOpen,
   setNotifOpen,
   unreadCount,
-  notifications,
   profileImage,
 }) {
   const { t } = useTranslation(["common"]);
@@ -43,15 +42,7 @@ export function NotificationsUtilityRow({
             <span className="relative">
               <Bell size={18} style={{ color: "rgba(255,255,255,0.82)" }} />
               {unreadCount > 0 && (
-                <span
-                  className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center text-[0.6rem] font-semibold"
-                  style={{
-                    background: "#9067c6",
-                    color: "white",
-                    border: "1px solid rgba(255,255,255,0.25)",
-                    boxShadow: "0 0 10px rgba(144,103,198,0.55)",
-                  }}
-                >
+                <span className="absolute -top-1.5 -end-1.5 min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center text-[0.6rem] font-semibold bg-red-500 text-white border border-white/25 shadow-[0_0_10px_rgba(239,68,68,0.55)]">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -117,6 +108,7 @@ export function NotificationsUtilityRow({
               setNotifications={setNotifOpen}
               bellRef={null}
               mobile
+              isOpen={notifOpen}
             />
           </motion.div>
         )}

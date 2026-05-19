@@ -18,3 +18,34 @@ export const createTaskSchema=joi.object({
 
     })
 })
+
+export const updateTaskSchema=joi.object({
+    params:joi.object({
+        taskId:joi.string().required().messages({
+            "string.empty":"Task ID is required"
+        })
+    }),
+    body:joi.object({
+        name:joi.string().optional(),
+        subjectId:joi.string().optional(),
+        totalHours:joi.number().min(1).optional(),
+        priority: joi.string().valid("low", "medium", "high").optional(),
+        dueDate:joi.date().optional()
+    })
+})
+
+export const deleteTaskSchema=joi.object({
+    params:joi.object({
+        taskId:joi.string().required().messages({
+            "string.empty":"Task ID is required"
+        })
+    })
+})
+
+export const confirmTaskSchema=joi.object({
+    params:joi.object({
+        taskId:joi.string().required().messages({
+            "string.empty":"Task ID is required"
+        })
+    })
+})

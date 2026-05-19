@@ -17,10 +17,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotificationsUtilityRow } from "./NavbarMobileParts";
 import { useTranslation } from "react-i18next";
-import {
-  DEMO_NOTIFICATIONS,
-  DEMO_UNREAD_COUNT,
-} from "./NavbarMobile.constants";
+import { useNotificationUnreadCount } from "@/hooks/useNotifications";
 
 const iconMap = {
   Home,
@@ -36,6 +33,8 @@ export default function NavbarMobile({ profileImage }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const location = useLocation();
+  const isDashboard = location.pathname.startsWith("/dashboard");
+  const unreadCount = useNotificationUnreadCount(isDashboard);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -419,8 +418,7 @@ export default function NavbarMobile({ profileImage }) {
                 <NotificationsUtilityRow
                   notifOpen={notifOpen}
                   setNotifOpen={setNotifOpen}
-                  unreadCount={DEMO_UNREAD_COUNT}
-                  notifications={DEMO_NOTIFICATIONS}
+                  unreadCount={unreadCount}
                   profileImage={profileImage}
                 />
               )}

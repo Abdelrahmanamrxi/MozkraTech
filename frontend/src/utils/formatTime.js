@@ -1,4 +1,4 @@
-export function formatRelativeTime(timestamp, t) {
+export function formatRelativeTime(timestamp, t, language = 'en') {
   if (!timestamp) return '';
   
   const date = new Date(timestamp);
@@ -8,6 +8,7 @@ export function formatRelativeTime(timestamp, t) {
   const diffMinutes = Math.floor(diffSeconds / 60);
   const diffHours = Math.floor(diffMinutes / 60);
   const diffDays = Math.floor(diffHours / 24);
+  const locale = language === 'ar' ? 'ar-EG' : 'en-US';
 
   // If no translation function provided, use default English
   if (!t) {
@@ -19,7 +20,7 @@ export function formatRelativeTime(timestamp, t) {
     if (diffHours < 24) return `${diffHours} hrs ago`;
     if (diffDays === 1) return '1 day ago';
     if (diffDays <= 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
   }
 
   // Use translation function
@@ -32,7 +33,7 @@ export function formatRelativeTime(timestamp, t) {
   if (diffDays === 1) return t('time.oneDayAgo');
   if (diffDays <= 7) return t('time.daysAgo', { count: diffDays });
   
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }
 
 /* ── helpers ── */

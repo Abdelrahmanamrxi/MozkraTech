@@ -126,7 +126,11 @@
     "dateRequired": "التاريخ مطلوب.",
     "dateAfterToday": "لازم التاريخ يكون بعد النهاردة.",
     "overlap": "الوقت ده متداخل مع جلسة تانية.",
-    "loadSubjectsFailed": "حصل خطأ في تحميل المواد."
+    "loadSubjectsFailed": "حصل خطأ في تحميل المواد.",
+    "nameRequired": "الاسم مطلوب.",
+    "updateFailed": "حصل خطأ في تحديث المهمة.",
+    "confirmFailed": "حصل خطأ في تأكيد المهمة.",
+    "deleteTaskFailed": "حصل خطأ في حذف المهمة."
   },
   "dropConfirmation": {
     "title": "نقل الجلسة",
@@ -200,5 +204,30 @@
     "editSession": "تعديل الجلسة",
     "deleteSession": "حذف الجلسة",
     "viewDetails": "عرض تفاصيل الجلسة"
+  },
+  "taskBadge": {
+    "dueSoon": "التاريخ النهائي: {{date}}"
+  },
+  "editTaskModal": {
+    "title": "تعديل المهمة",
+    "nameLabel": "الاسم",
+    "dueDateLabel": "تاريخ التسليم",
+    "priorityLabel": "الأولوية",
+    "statusLabel": "الحالة",
+    "subjectLabel": "المادة",
+    "totalHoursLabel": "إجمالي الساعات",
+    "edit": "حفظ",
+    "cancel": "إلغاء"
+  },
+  "deleteTaskModal": {
+    "title": "حذف المهمة",
+    "warning": "حذف هذه المهمة سيحذف كل جلساتها المرتبطة بها. لا يمكن التراجع عن هذا.",
+    "confirm": "حذف",
+    "cancel": "إلغاء"
+  },
+  "taskActions": {
+    "confirm": "تأكيد",
+    "edit": "تعديل",
+    "delete": "حذف"
   }
 }

@@ -237,9 +237,8 @@ function SessionForm({ setShowAddSessionPopup }) {
     onSuccess: (data) => {
       console.log(data);
       setMessage(data?.message || t("form.scheduleCreated"));
-      queryClient.invalidateQueries({
-        queryKey: ["schedule"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["schedule"] });
       setShowAddSessionPopup(false);
     },
     onError: (error) => {

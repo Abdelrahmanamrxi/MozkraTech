@@ -16,7 +16,7 @@ const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 async function getTasks() {
   const response = await api.get("/tasks");
-  return response.data;
+  return response.data?.tasks ?? [];
 }
 async function createSession(newSession){
   const {name,date,startTime,endTime,taskId}=newSession
@@ -30,13 +30,10 @@ function CreateSessionModal({ setAddModal }) {
  
   const today = toLocalDateInputValue();
   const[err,setError]=useState("")
-  const { data, isLoading, error } = useQuery({
+  const { data: tasks = [], isLoading, error } = useQuery({
     queryKey: ["tasks"],
     queryFn: getTasks,
   });
-
-
-  const tasks = data?.tasks ?? [];
 
   const [newSession, setNewSession] = useState({
     name: "",
@@ -51,6 +48,9 @@ function CreateSessionModal({ setAddModal }) {
     onSuccess:()=>{
       queryClient.invalidateQueries({
         queryKey:['schedule']
+      })
+      queryClient.invalidateQueries({
+        queryKey:['tasks']
       })
       setAddModal(false)
     },
@@ -88,7 +88,7 @@ function CreateSessionModal({ setAddModal }) {
   };
 
   const selectedTaskName =
-    tasks.find((t) => t._id === newSession.taskId)?.name ||
+    tasks.find((task) => task._id === newSession.taskId)?.name ||
     t("createSessionModal.selectTask");
 
   return (

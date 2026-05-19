@@ -126,7 +126,11 @@
     "dateRequired": "Date is required.",
     "dateAfterToday": "Date must be placed after today.",
     "overlap": "That time slot overlaps another session.",
-    "loadSubjectsFailed": "Failed to load subjects."
+    "loadSubjectsFailed": "Failed to load subjects.",
+    "nameRequired": "Name is required.",
+    "updateFailed": "Failed to update task.",
+    "confirmFailed": "Failed to confirm task.",
+    "deleteTaskFailed": "Failed to delete task."
   },
   "dropConfirmation": {
     "title": "Move Session",
@@ -199,5 +203,30 @@
     "editSession": "Edit session",
     "deleteSession": "Delete session",
     "viewDetails": "View session details"
+  },
+  "taskBadge": {
+    "dueSoon": "Due: {{date}}"
+  },
+  "editTaskModal": {
+    "title": "Edit Task",
+    "nameLabel": "Name",
+    "dueDateLabel": "Due Date",
+    "priorityLabel": "Priority",
+    "statusLabel": "Status",
+    "subjectLabel": "Subject",
+    "totalHoursLabel": "Total Hours",
+    "edit": "Save",
+    "cancel": "Cancel"
+  },
+  "deleteTaskModal": {
+    "title": "Delete Task",
+    "warning": "Deleting this task will also delete all its related sessions. This cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "taskActions": {
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 }

@@ -15,8 +15,29 @@
     "notifications":{
       "title":"Notifications",
       "recent":"Recent",
-      "close":"Close"
-       
+      "close":"Close",
+      "empty":"No notifications yet",
+      "prev":"Prev",
+      "next":"Next",
+      "pagination":"{{from}} - {{to}} of {{total}}",
+      "filters": {
+        "all": "All",
+        "requests": "Requests",
+        "streaks": "Streaks",
+        "achievements": "Achievements",
+        "viewProfile": "Viewed Profile"
+      },
+      "messages": {
+        "friend_request_received": "{{name}} has sent you a friend request!",
+        "friend_request_acceptance": "{{name}} has accepted your friend request!",
+        "view_profile": "{{name}} viewed your profile!",
+        "system_welcome": "Welcome {{name}}, start studying by creating your first task!",
+        "system_welcome_back": "Welcome back {{name}}, your account has been restored successfully!",
+        "system_announcement": "{{name}}",
+        "streak_milestone_reached": "{{name}}: {{description}} {{icon}}!!",
+        "achievement_unlocked": "{{name}}: {{description}} {{icon}}!!",
+        "message_received": "{{name}} sent you a message"
+      }
     }
   },
   "loginPage": {

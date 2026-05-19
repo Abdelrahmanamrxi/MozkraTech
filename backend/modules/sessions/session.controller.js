@@ -195,18 +195,18 @@ export const getSchedule = asyncHandler(async (req, res, next) => {
         const plannedHours = session.totalDuration / 60
         totalHoursThisWeek += plannedHours
 
-        // ✅ spentHoursThisWeek = scheduled only
+        // ✅ spentHoursThisWeek = scheduled sessions with actual duration
         if (status === "scheduled" && session.duration != null) {
             spentHoursThisWeek += session.duration / 60
         }
 
-        // 📊 avgDaily = ONLY mismatch sessions (per day)
+        // 📊 avgDaily = only count mismatches (duration !== totalDuration) or completed sessions
         if (
-            session.duration !== session.totalDuration
-            || session.status==="completed"
+            (session.duration != null && session.duration !== session.totalDuration)
+            || status === "completed"
         ) {
             totalMismatchMinutes +=
-                (session.totalDuration - session.duration)
+                Math.abs(session.totalDuration - (session.duration || 0))
         }
 
         // today scheduled sessions
@@ -219,13 +219,13 @@ export const getSchedule = asyncHandler(async (req, res, next) => {
         }
     })
 
-    // ---------------- DAYS (DAILY mismatch) ----------------
+    // ---------------- DAYS WITH MISMATCHES ----------------
     const daysWithMismatch = new Set(
         sessions
             .filter(
                 s =>
-                    s.duration != null &&
-                    s.duration !== s.totalDuration
+                    (s.duration != null && s.duration !== s.totalDuration)
+                    || s.status?.toLowerCase().trim() === "completed"
             )
             .map(s =>
                 new Date(s.startTime)
@@ -235,6 +235,7 @@ export const getSchedule = asyncHandler(async (req, res, next) => {
     )
 
     // ---------------- AVG DAILY ----------------
+    // Average mismatch per day (only for days with mismatches/completions)
     const avgDailyHours =
         (totalMismatchMinutes / 60) /
         (daysWithMismatch.size || 1)
@@ -267,7 +268,7 @@ export const getSchedule = asyncHandler(async (req, res, next) => {
             spentHoursThisWeek:
                 Math.round(spentHoursThisWeek * 100) / 100,
 
-            // 📊 avg daily mismatch (ONLY days with mismatch sessions)
+            // 📊 avg daily mismatch (only days with mismatches or completions)
             avgDailyHours:
                 Math.round(avgDailyHours * 100) / 100,
 
@@ -312,6 +313,14 @@ export const editSession = asyncHandler(async (req, res, next) => {
             const hours = duration / (1000 * 60 * 60);
 
             const task=await taskModel.findOneAndUpdate({_id:taskId},{$inc:{hoursSpent:hours}})
+            
+            // Auto-complete task if hoursSpent >= totalHours
+            if(task && task.hoursSpent + hours >= task.totalHours){
+                await taskModel.findOneAndUpdate(
+                    {_id:taskId},
+                    {status:'completed', completedAt:new Date()}
+                )
+            }
             
             session.status=status
 
@@ -446,7 +455,17 @@ export const updateSession = asyncHandler(async (req, res, next) => {
         session.completedAt = new Date();
 
         await session.save();
-        await taskModel.findOneAndUpdate({_id:session.taskId},{$inc:{hoursSpent:session.totalDuration}})
+        
+        const task = await taskModel.findOneAndUpdate({_id:session.taskId},{$inc:{hoursSpent:session.totalDuration}})
+        
+        // Auto-complete task if hoursSpent >= totalHours
+        if(task && task.hoursSpent + session.totalDuration >= task.totalHours){
+            await taskModel.findOneAndUpdate(
+                {_id:session.taskId},
+                {status:'completed', completedAt:new Date()}
+            )
+        }
+        
         await CheckSessionAchievements(session.userId);
 
         return res.status(200).json({ message: "Session marked as completed", session });
