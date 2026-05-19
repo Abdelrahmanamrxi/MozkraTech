@@ -52,7 +52,7 @@ function WelcomeBanner({ dashboardData }) {
           {t("weekly.text")}
         </p>
         <div className="flex flex-row mt-3 lg:mt-0 items-center gap-3">
-          <Link to="/schedule">
+          <Link to="/dashboard/schedule">
             <LiquidGlassButton
               className="px-2 py-1 text-sm gap-2 lg:px-6 lg:py-2 lg:text-base lg:gap-2.5"
               icon={CalenderIcon}

@@ -6,6 +6,7 @@ import { Card } from "@/comp/ui/TopCard";
 import { Calendar, Sparkles, Clock3, BrainCircuit } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useNavigate, Link } from "react-router-dom";
 
 const normalizeDifficultyKey = (value) => {
   const key = String(value || "").toLowerCase();
@@ -39,6 +40,7 @@ const LearningOverview = ({
   isScheduleLoading = false,
 }) => {
   const { t } = useTranslation(["dashboard"]);
+  const navigate = useNavigate();
 
   const getDifficultyLabel = (difficulty) => {
     const key = normalizeDifficultyKey(difficulty);
@@ -274,12 +276,12 @@ const LearningOverview = ({
         <Card
           variant="dark"
           className="
-            rounded-[28px]
-            glassy-secondary-background
-            border border-white/10
-            p-6
-            shadow-[0_10px_50px_rgba(0,0,0,0.22)]
-          "
+    rounded-[28px]
+    glassy-secondary-background
+    border border-white/10
+    p-6
+    shadow-[0_10px_50px_rgba(0,0,0,0.22)]
+  "
         >
           {/* HEADER */}
           <div className="mb-6">
@@ -308,46 +310,46 @@ const LearningOverview = ({
                 <div
                   key={`${subj.subject}-${index}`}
                   className="
-                    group
-                    relative
-                    overflow-hidden
-                    rounded-3xl
-                    glassy-background
-                    border border-white/10
-                    p-5
-                    transition-all duration-300
-                    hover:border-white/20
-                    hover:bg-white/[0.06]
-                  "
+            group
+            relative
+            overflow-hidden
+            rounded-3xl
+            glassy-background
+            border border-white/10
+            p-5
+            transition-all duration-300
+            hover:border-white/20
+            hover:bg-white/[0.06]
+          "
                 >
                   {/* Hover Glow */}
                   <div
                     className="
-                      absolute inset-0 opacity-0
-                      group-hover:opacity-100
-                      transition-opacity duration-500
-                      bg-gradient-to-br
-                      from-white/[0.04]
-                      to-transparent
-                      pointer-events-none
-                    "
+              absolute inset-0 opacity-0
+              group-hover:opacity-100
+              transition-opacity duration-500
+              bg-gradient-to-br
+              from-white/[0.04]
+              to-transparent
+              pointer-events-none
+            "
                   />
 
                   {/* DAYS LEFT */}
                   <div
                     className="
-                      absolute top-4 right-4
-                      px-3 py-1
-                      rounded-full
-                      text-xs
-                      font-semibold
-                      bg-blue-500/10
-                      border border-blue-400/20
-                      text-blue-200
-                      font-blinker
-                      transition-all duration-300
-                      group-hover:scale-105
-                    "
+              absolute top-4 right-4
+              px-3 py-1
+              rounded-full
+              text-xs
+              font-semibold
+              bg-blue-500/10
+              border border-blue-400/20
+              text-blue-200
+              font-blinker
+              transition-all duration-300
+              group-hover:scale-105
+            "
                   >
                     {subj.daysLeft}{" "}
                     {t("learningOverview.upcomingSchedule.daysLeft")}
@@ -366,6 +368,42 @@ const LearningOverview = ({
                 </div>
               ))
             )}
+          </div>
+
+          {/* VIEW FULL SCHEDULE BUTTON */}
+          <div className="flex justify-center w-full mt-6">
+            <Link to="/dashboard/schedule" className="inline-block">
+              <LiquidGlassButton
+                className="
+        group flex flex-row items-center justify-center gap-2
+        py-2.5 px-5 text-sm
+        md:py-3 md:px-7 md:text-base
+        rounded-2xl
+        bg-white/5 backdrop-blur-md
+        border border-white/10
+        text-white/80 font-medium font-blinker
+        transition-all duration-300
+        hover:bg-white/10 hover:border-white/20 hover:text-white
+      "
+              >
+                <div className="flex flex-row items-center gap-2 whitespace-nowrap">
+                  <span>{t("weekly.schedule")}</span>
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300 transform group-hover:translate-x-1 text-white/70 group-hover:text-white flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </div>
+              </LiquidGlassButton>
+            </Link>
           </div>
         </Card>
       </div>
