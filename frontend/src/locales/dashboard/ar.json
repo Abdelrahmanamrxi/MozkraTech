@@ -9,29 +9,44 @@
   "summary": {
     "currentStreak": {
       "label": "الانقطاع الحالي",
-      "sub": "أيام"
+      "sub": "أيام",
+      "todayStudy": "دراسة اليوم: {{hours}}س"
     },
     "goalsCompleted": {
       "label": "الأهداف المكتملة",
       "sub": "الأهداف",
-      "extra": "/ 10"
+      "extra": "/ {{total}}"
     },
     "achievements": {
       "label": "الإنجازات",
-      "sub": "المكتسبة"
+      "sub": "المكتسبة",
+      "total": "الإجمالي: {{count}}"
     },
     "studyHours": {
       "label": "ساعات الدراسة",
-      "subLabel": "الساعات هذا الأسبوع"
+      "subLabel": "الساعات هذا الأسبوع",
+      "goal": "الهدف الأسبوعي: {{hours}}س"
     },
     "tasks": {
       "label": "المهام",
-      "remaining": "مهام متبقية"
+      "remaining": "مهام متبقية",
+      "completed": "المكتمل: {{count}}"
     },
-    "donutChart": {
-      "label": "ساعات الدراسة",
-      "completed": "مكتمل",
-      "remaining": "متبقي"
+    "nextDeadline": {
+      "label": "أقرب موعد",
+      "sub": "موعد المهمة",
+      "hoursLeft": "المتبقي: {{hours}}س",
+      "task": "المهمة: {{name}}",
+      "due": "الموعد: {{date}}",
+      "none": "لا توجد مواعيد قريبة"
+    },
+    "focusMix": {
+      "label": "توازن التركيز",
+      "sub": "توزيع صعوبة جلسات هذا الأسبوع",
+      "easy": "سهل",
+      "medium": "متوسط",
+      "hard": "صعب",
+      "total": "جلسات هذا الأسبوع: {{count}}"
     }
   },
   "learningOverview": {

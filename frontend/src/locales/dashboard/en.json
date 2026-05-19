@@ -9,29 +9,44 @@
   "summary": {
     "currentStreak": {
       "label": "Current Streak",
-      "sub": "Days"
+      "sub": "Days",
+      "todayStudy": "Study today: {{hours}}h"
     },
     "goalsCompleted": {
       "label": "Goals Completed",
       "sub": "Goals",
-      "extra": "/ 10"
+      "extra": "/ {{total}}"
     },
     "achievements": {
       "label": "Achievements",
-      "sub": "earned"
+      "sub": "earned",
+      "total": "Total unlocked: {{count}}"
     },
     "studyHours": {
       "label": "Study Hours",
-      "subLabel": "Hours This Week"
+      "subLabel": "Hours This Week",
+      "goal": "Weekly goal: {{hours}}h"
     },
     "tasks": {
       "label": "Tasks",
-      "remaining": "tasks remaining"
+      "remaining": "tasks remaining",
+      "completed": "Completed: {{count}}"
     },
-    "donutChart": {
-      "label": "Study Hours",
-      "completed": "Completed",
-      "remaining": "Remaining"
+    "nextDeadline": {
+      "label": "Next Deadline",
+      "sub": "Task deadline",
+      "hoursLeft": "Remaining: {{hours}}h",
+      "task": "Task: {{name}}",
+      "due": "Due: {{date}}",
+      "none": "No upcoming deadlines"
+    },
+    "focusMix": {
+      "label": "Focus Mix",
+      "sub": "Weekly session difficulty balance",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard",
+      "total": "Sessions this week: {{count}}"
     }
   },
   "learningOverview": {
