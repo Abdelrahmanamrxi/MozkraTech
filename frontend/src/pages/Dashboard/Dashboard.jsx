@@ -155,7 +155,7 @@ function Home() {
       const { name } = resolveSubject(session);
       const daysLeft = Math.max(
         0,
-        Math.ceil((startDate.getTime() - startOfToday.getTime()) / MS_PER_DAY),
+        Math.floor((startDate.getTime() - startOfToday.getTime()) / MS_PER_DAY),
       );
 
       return {
@@ -257,14 +257,16 @@ function Home() {
     }
 
     const { name } = resolveSubject(nextSession.session);
+    const sessionName = nextSession.session.name || name;
     const minutesToStart = Math.max(
       0,
       Math.round((nextSession.startDate - now) / (1000 * 60)),
     );
+    const hoursToStart=Math.floor(minutesToStart/60)
 
     return {
       studyTimeToday,
-      upcomingSubject: { subject: name, time: minutesToStart },
+      upcomingSubject: { subject: sessionName, sessionName, time: hoursToStart},
     };
   }, [sessions, resolveSubject]);
 

@@ -41,17 +41,19 @@ const CardStack = ({ scale = 1, className = "", dashboardData }) => {
   const studyTimeToday = dashboardData?.studyTimeToday ?? 0;
   const upcomingSubject = dashboardData?.upcomingSubject ?? {
     subject: "",
+    sessionName: "",
     time: 0,
   };
-  const hasUpcoming = Boolean(upcomingSubject.subject);
+  const upcomingSessionName = upcomingSubject.sessionName || upcomingSubject.subject;
+  const hasUpcoming = Boolean(upcomingSessionName);
   const upcomingLabel = hasUpcoming
-    ? upcomingSubject.subject
+    ? upcomingSessionName
     : i18n.language === "ar"
       ? "لا توجد جلسة قادمة"
       : "No upcoming session";
   return (
     <div
-      className={`relative flex-shrink-0 ${className}`}
+      className={`relative shrink-0 ${className}`}
       style={{ width: W, height: H }}
     >
       <div
@@ -122,7 +124,7 @@ const CardStack = ({ scale = 1, className = "", dashboardData }) => {
               style={{ fontFamily: "Blinker, sans-serif" }}
             >
               {i18n.language === "ar" ? "في" : "in"} {upcomingSubject.time}{" "}
-              minutes
+              {i18n.language=== "ar"?"ساعة":"hour (s)"}
             </p>
           )}
         </motion.div>

@@ -2,6 +2,7 @@ import React from "react";
 import { Bell, UserCircle2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
 import Notifications from "../../Notifications/Notifications";
 import { Link } from "react-router-dom";
 import { buildAssetUrl } from "../../../../../utils/assetUrl";
@@ -42,7 +43,7 @@ export function NotificationsUtilityRow({
             <span className="relative">
               <Bell size={18} style={{ color: "rgba(255,255,255,0.82)" }} />
               {unreadCount > 0 && (
-                <span className="absolute -top-1.5 -end-1.5 min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center text-[0.6rem] font-semibold bg-red-500 text-white border border-white/25 shadow-[0_0_10px_rgba(239,68,68,0.55)]">
+                <span className="absolute -top-1.5 -inset-e-1.5 min-w-4 h-4 px-1 rounded-full flex items-center justify-center text-[0.6rem] font-semibold bg-red-500 text-white border border-white/25 shadow-[0_0_10px_rgba(239,68,68,0.55)]">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -94,25 +95,24 @@ export function NotificationsUtilityRow({
       </div>
 
       {/* Notifications overlay using shared Notifications component */}
-      <AnimatePresence initial={false}>
-        {notifOpen && (
-          <motion.div
-            key="mobile-notification-overlay"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-50 bg-black/55 flex items-center justify-center px-3"
-          >
-            <Notifications
-              setNotifications={setNotifOpen}
-              bellRef={null}
-              mobile
-              isOpen={notifOpen}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {notifOpen && typeof document !== "undefined"
+        ? createPortal(
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.18 }}
+              className="fixed inset-0 z-9999 flex items-center justify-center bg-black/55 px-4 py-[max(16px,env(safe-area-inset-top))]"
+            >
+              <Notifications
+                setNotifications={setNotifOpen}
+                bellRef={null}
+                mobile
+                isOpen={notifOpen}
+              />
+            </motion.div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

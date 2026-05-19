@@ -10,6 +10,7 @@ import {
   Users,
   ChevronRight,
   MessageCircleMore,
+  Clock,
 } from "lucide-react";
 import i18n from "i18next";
 import Logo from "../../../../logo/Logo";
@@ -25,6 +26,7 @@ const iconMap = {
   Calendar,
   Users,
   MessageCircleMore,
+  Clock,
 };
 
 export default function NavbarMobile({ profileImage }) {
@@ -35,6 +37,12 @@ export default function NavbarMobile({ profileImage }) {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
   const unreadCount = useNotificationUnreadCount(isDashboard);
+  const mobileLang = i18n.language?.startsWith("ar") ? "ar" : "en";
+
+  useEffect(() => {
+    document.documentElement.dir = mobileLang === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = mobileLang;
+  }, [mobileLang]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -59,6 +67,11 @@ export default function NavbarMobile({ profileImage }) {
       label: t("navbar.schedule"),
       icon: "Calendar",
       href: "/dashboard/schedule",
+    },
+    {
+      label: t("navbar.timer", { defaultValue: "Timer" }),
+      icon: "Clock",
+      href: "/dashboard/timer",
     },
     { label: t("navbar.friends"), icon: "Users", href: "/dashboard/friends" },
     {
@@ -126,29 +139,29 @@ export default function NavbarMobile({ profileImage }) {
         {open && (
           <motion.div
             key="drawer"
-            initial={{ x: i18n.language === "en" ? "100%" : "-100%" }}
+            initial={{ x: mobileLang === "en" ? "100%" : "-100%" }}
             animate={{ x: 0 }}
-            exit={{ x: i18n.language === "en" ? "100%" : "-100%" }}
+            exit={{ x: mobileLang === "en" ? "100%" : "-100%" }}
             transition={{
               type: "spring",
               stiffness: 380,
               damping: 42,
               mass: 0.8,
             }}
-            className={`fixed top-0 bottom-0 ${i18n.language === "en" ? "right-0" : "left-0"} z-50 w-3/4 flex flex-col`}
+            className={`fixed top-0 bottom-0 ${mobileLang === "en" ? "right-0" : "left-0"} z-50 w-3/4 flex flex-col`}
             style={{
               background:
                 "linear-gradient(160deg, rgba(34,29,54,0.99) 0%, rgba(20,16,40,1) 100%)",
               borderLeft:
-                i18n.language === "en"
+                mobileLang === "en"
                   ? "1px solid rgba(255,255,255,0.07)"
                   : "none",
               borderRight:
-                i18n.language === "ar"
+                mobileLang === "ar"
                   ? "1px solid rgba(255,255,255,0.07)"
                   : "none",
               boxShadow:
-                i18n.language === "en"
+                mobileLang === "en"
                   ? "-12px 0 40px rgba(0,0,0,0.55)"
                   : "12px 0 40px rgba(0,0,0,0.55)",
               willChange: "transform",
@@ -157,19 +170,19 @@ export default function NavbarMobile({ profileImage }) {
           >
             {/* Glow accents - RTL aware */}
             <div
-              className={`absolute top-0 ${i18n.language === "en" ? "right-0" : "left-0"} w-48 h-48 pointer-events-none`}
+              className={`absolute top-0 ${mobileLang === "en" ? "right-0" : "left-0"} w-48 h-48 pointer-events-none`}
               style={{
                 background:
-                  i18n.language === "en"
+                  mobileLang === "en"
                     ? "radial-gradient(circle at top right, rgba(144,103,198,0.18) 0%, transparent 60%)"
                     : "radial-gradient(circle at top left, rgba(144,103,198,0.18) 0%, transparent 60%)",
               }}
             />
             <div
-              className={`absolute bottom-0 ${i18n.language === "en" ? "left-0" : "right-0"} w-48 h-48 pointer-events-none`}
+              className={`absolute bottom-0 ${mobileLang === "en" ? "left-0" : "right-0"} w-48 h-48 pointer-events-none`}
               style={{
                 background:
-                  i18n.language === "en"
+                  mobileLang === "en"
                     ? "radial-gradient(circle at bottom left, rgba(144,103,198,0.09) 0%, transparent 60%)"
                     : "radial-gradient(circle at bottom right, rgba(144,103,198,0.09) 0%, transparent 60%)",
               }}
@@ -184,75 +197,6 @@ export default function NavbarMobile({ profileImage }) {
 
               {/* Language Switcher & Close Button */}
               <div className="flex items-center gap-2">
-                {/* Language Switcher */}
-                <div className="flex items-center gap-1 p-1 rounded-full bg-white/5 border border-white/15 backdrop-blur-md">
-                  <motion.button
-                    onClick={() => {
-                      i18n.changeLanguage("en");
-                      document.documentElement.dir = "ltr";
-                    }}
-                    className={`relative px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200
-                      ${
-                        i18n.language === "en"
-                          ? "text-white"
-                          : "text-white/50 hover:text-white/80"
-                      }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <AnimatePresence>
-                      {i18n.language === "en" && (
-                        <motion.div
-                          layoutId="lang-active-mobile"
-                          className="absolute inset-0 rounded-full bg-white/20 border border-white/20 backdrop-blur-sm"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 400,
-                            damping: 25,
-                          }}
-                        />
-                      )}
-                    </AnimatePresence>
-                    <span className="relative z-10">EN</span>
-                  </motion.button>
-
-                  <motion.button
-                    onClick={() => {
-                      i18n.changeLanguage("ar");
-                      document.documentElement.dir = "rtl";
-                    }}
-                    className={`relative px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200
-                      ${
-                        i18n.language === "ar"
-                          ? "text-white"
-                          : "text-white/50 hover:text-white/80"
-                      }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <AnimatePresence>
-                      {i18n.language === "ar" && (
-                        <motion.div
-                          layoutId="lang-active-mobile"
-                          className="absolute inset-0 rounded-full bg-white/20 border border-white/20 backdrop-blur-sm"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 400,
-                            damping: 25,
-                          }}
-                        />
-                      )}
-                    </AnimatePresence>
-                    <span className="relative z-10">AR</span>
-                  </motion.button>
-                </div>
-
                 {/* Close Button */}
                 <motion.button
                   onClick={() => setOpen(false)}
@@ -422,6 +366,74 @@ export default function NavbarMobile({ profileImage }) {
                   profileImage={profileImage}
                 />
               )}
+
+              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-1">
+                <motion.button
+                  onClick={() => {
+                    i18n.changeLanguage("en");
+                    document.documentElement.lang = "en";
+                    document.documentElement.dir = "ltr";
+                  }}
+                  className={`relative flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 ${
+                    mobileLang === "en"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white/80"
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <AnimatePresence>
+                    {mobileLang === "en" && (
+                      <motion.div
+                        layoutId="lang-active-mobile"
+                        className="absolute inset-0 rounded-xl bg-white/20 border border-white/20 backdrop-blur-sm"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 25,
+                        }}
+                      />
+                    )}
+                  </AnimatePresence>
+                  <span className="relative z-10">EN</span>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => {
+                    i18n.changeLanguage("ar");
+                    document.documentElement.lang = "ar";
+                    document.documentElement.dir = "rtl";
+                  }}
+                  className={`relative flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 ${
+                    mobileLang === "ar"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white/80"
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <AnimatePresence>
+                    {mobileLang === "ar" && (
+                      <motion.div
+                        layoutId="lang-active-mobile"
+                        className="absolute inset-0 rounded-xl bg-white/20 border border-white/20 backdrop-blur-sm"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 25,
+                        }}
+                      />
+                    )}
+                  </AnimatePresence>
+                  <span className="relative z-10">AR</span>
+                </motion.button>
+              </div>
 
               {location.pathname === "/" && (
                 <>
