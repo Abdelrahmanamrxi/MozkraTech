@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import useDebounce from "@/hooks/useDebounce";
@@ -15,7 +15,6 @@ import ChatPanel from "./components/ChatPanel";
  */
 async function getFriends(search) {
   const response = await api.get(`/friends?search=${search}`);
-  console.log(response);
   return response.data;
 }
 
@@ -59,6 +58,7 @@ export default function FriendsMessages() {
   // DOM refs and scroll tracking
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const chatPanelContainerRef = useRef(null);
   const shouldStickToBottomRef = useRef(true);
   const initialScrollDoneRef = useRef(false);
   const inputRef = useRef(null);
@@ -73,7 +73,43 @@ export default function FriendsMessages() {
     queryFn: () => getFriends(debouncedQuery),
     retry: false,
   });
-  console.log(data)
+
+  const clearSelection = useCallback(() => {
+    setSelected(null);
+    setSidebarOpen(true);
+    setInput("");
+    shouldStickToBottomRef.current = true;
+    initialScrollDoneRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    const handleDesktopOutsideClick = (event) => {
+      if (!selected) {
+        return;
+      }
+
+      if (window.innerWidth < 1024) {
+        return;
+      }
+
+      const chatPanelNode = chatPanelContainerRef.current;
+      if (!chatPanelNode) {
+        return;
+      }
+
+      if (chatPanelNode.contains(event.target)) {
+        return;
+      }
+
+      clearSelection();
+    };
+
+    document.addEventListener("mousedown", handleDesktopOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleDesktopOutsideClick);
+    };
+  }, [clearSelection, selected]);
 
   /**
    * Manage real-time chat state for the currently selected friend.
@@ -456,7 +492,6 @@ export default function FriendsMessages() {
     }
   }, [selectedMessages.length, selected?.conversationId, isLoadingOlder]);
 
-  console.log();
   return (
     <div className=" font-Inter">
       <div className="p-9 sm:p-11">
@@ -467,48 +502,56 @@ export default function FriendsMessages() {
       </div>
       <div className="flex items-center justify-center  p-4 sm:p-11">
         <div className=" w-full  h-[75vh] min-h-125 flex gap-3 relative">
-          <FriendsSidebar
-            sidebarOpen={sidebarOpen}
-            t={t}
-            search={search}
-            onSearchChange={setSearch}
-            filteredFriends={filteredFriends}
-            isLoading={isLoading}
-            error={error}
-            friendActivityLabel={friendActivityLabelWithTranslation}
-            selectedFriendId={selected?._id}
-            unreadByFriend={unreadByFriend}
-            onSelectFriend={selectFriend}
-            userStatus={userStatus}
-          />
+          <div className={`${selected ? "hidden" : "flex"} lg:flex w-full lg:w-auto`}>
+            <FriendsSidebar
+              sidebarOpen={sidebarOpen}
+              t={t}
+              search={search}
+              onSearchChange={setSearch}
+              filteredFriends={filteredFriends}
+              isLoading={isLoading}
+              error={error}
+              friendActivityLabel={friendActivityLabelWithTranslation}
+              selectedFriendId={selected?._id}
+              unreadByFriend={unreadByFriend}
+              onSelectFriend={selectFriend}
+              userStatus={userStatus}
+            />
+          </div>
 
-          <ChatPanel
-            selected={selected}
-            displaySelected={displaySelected}
-            friendActivityLabel={friendActivityLabelWithTranslation}
-            sidebarOpen={sidebarOpen}
-            onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
-            isLoading={chatIsLoading}
-            error={selectedMessages.length ? null : chatError}
-            historyError={olderLoadError}
-            userStatus={userStatus}
-            socketConnectionStatus={socketConnectionStatus}
-            selectedMessages={selectedMessages}
-            hasMoreHistory={hasMoreHistory}
-            isLoadingOlder={isLoadingOlder}
-            messagesContainerRef={messagesContainerRef}
-            onMessagesScroll={handleMessagesScroll}
-            onLoadOlder={loadOlderMessages}
-            messagesEndRef={messagesEndRef}
-            inputRef={inputRef}
-            input={input}
-            onInputChange={setInput}
-            onKeyDown={handleKey}
-            onSend={handleSend}
-            onDeleteMessage={deleteMessage}
-            canSend={canSend}
-            t={t}
-          />
+          <div
+            ref={chatPanelContainerRef}
+            className={`${selected ? "flex" : "hidden"} lg:flex flex-1 min-w-0`}
+          >
+            <ChatPanel
+              selected={selected}
+              displaySelected={displaySelected}
+              friendActivityLabel={friendActivityLabelWithTranslation}
+              sidebarOpen={sidebarOpen}
+              onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+              onExitChat={clearSelection}
+              isLoading={chatIsLoading}
+              error={selectedMessages.length ? null : chatError}
+              historyError={olderLoadError}
+              userStatus={userStatus}
+              socketConnectionStatus={socketConnectionStatus}
+              selectedMessages={selectedMessages}
+              hasMoreHistory={hasMoreHistory}
+              isLoadingOlder={isLoadingOlder}
+              messagesContainerRef={messagesContainerRef}
+              onMessagesScroll={handleMessagesScroll}
+              onLoadOlder={loadOlderMessages}
+              messagesEndRef={messagesEndRef}
+              inputRef={inputRef}
+              input={input}
+              onInputChange={setInput}
+              onKeyDown={handleKey}
+              onSend={handleSend}
+              onDeleteMessage={deleteMessage}
+              canSend={canSend}
+              t={t}
+            />
+          </div>
         </div>
       </div>
     </div>

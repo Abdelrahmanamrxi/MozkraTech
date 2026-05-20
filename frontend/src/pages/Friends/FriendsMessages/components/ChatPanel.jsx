@@ -44,13 +44,22 @@ function ChatHeader({
   socketConnectionStatus,
   sidebarOpen,
   onToggleSidebar,
+  onExitChat,
   t,
 }) {
   const normalizedUserStatus =
     typeof userStatus === "string"
       ? { status: userStatus, lastActivityDate: null }
       : userStatus;
-      console.log(normalizedUserStatus)
+
+  const handleHeaderAction = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      onExitChat?.();
+      return;
+    }
+
+    onToggleSidebar?.();
+  };
 
   const isOnline = normalizedUserStatus?.status === "online";
   const effectiveLastActivity =
@@ -63,10 +72,17 @@ function ChatHeader({
         <Motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          onClick={onToggleSidebar}
+          onClick={handleHeaderAction}
           className="w-8 h-8 rounded-xl bg-[rgba(82,70,107,0.5)] hover:bg-[rgba(82,70,107,0.8)] border border-[#9B7EDE]/15 flex items-center justify-center text-purple-300 transition-colors shrink-0"
+          aria-label={t("messages.backToList", "Back")}
         >
-          {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+          {typeof window !== "undefined" && window.innerWidth < 1024 ? (
+            <ChevronLeft />
+          ) : sidebarOpen ? (
+            <ChevronLeft />
+          ) : (
+            <ChevronRight />
+          )}
         </Motion.button>
 
         <div className="relative shrink-0">
@@ -414,6 +430,7 @@ function ChatPanel({
   userStatus,
   sidebarOpen,
   onToggleSidebar,
+  onExitChat,
   isLoading,
   error,
   historyError,
@@ -456,6 +473,7 @@ function ChatPanel({
         socketConnectionStatus={socketConnectionStatus}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={onToggleSidebar}
+        onExitChat={onExitChat}
         friendActivityLabel={friendActivityLabel}
         t={t}
       />
