@@ -24,6 +24,7 @@ function PeopleProfile() {
     queryFn: () => getProfileByID(id),
     retry: 1,
   });
+  console.log(data)
 
   const navigate = useNavigate();
 
@@ -79,6 +80,7 @@ function PeopleProfile() {
       t("badges.tenDayStreak"),
     ],
     bio: d.user.bio ? d.user.bio : t("fallback.bio"),
+    profileImage:d.user.profileImage
   };
 
   const progressRing = user.xpProgress;

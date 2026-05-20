@@ -73,6 +73,7 @@ export default function FriendsMessages() {
     queryFn: () => getFriends(debouncedQuery),
     retry: false,
   });
+  console.log(data)
 
   /**
    * Manage real-time chat state for the currently selected friend.

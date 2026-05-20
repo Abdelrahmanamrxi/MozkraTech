@@ -26,7 +26,7 @@ export const getChat = asyncHandler(async (req, res) => {
     .find(query)
     .populate(
       "senderId",
-      "fullName email profilePicture image lastActivityDate",
+      "fullName email profileImage image lastActivityDate",
     )
     .sort({ createdAt: -1 })
     .limit(20);
@@ -36,6 +36,7 @@ export const getChat = asyncHandler(async (req, res) => {
       _id: msg._id,
       message: msg.isDeletedForAll ? "" : msg.content,
       senderId: msg.senderId,
+      senderProfileImage: msg.senderId?.profileImage ?? null,
       createdAt: msg.createdAt,
       isRead: msg.isRead,
       isDeletedForAll: msg.isDeletedForAll,

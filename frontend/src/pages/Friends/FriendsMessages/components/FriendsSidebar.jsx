@@ -142,7 +142,7 @@ function FriendsSidebar({
                           activityTimestamp,
                           isSelectedFriendOnline,
                         );
-
+                      console.log(friend)
                   return (
                     <Motion.button
                       key={friend._id}
@@ -154,11 +154,13 @@ function FriendsSidebar({
                         ${selectedFriendId === friend._id ? "bg-[rgba(155,126,222,0.2)] border border-[#9B7EDE]/30" : "border border-transparent"}`}
                     >
                       <div className="relative shrink-0">
-                        <div className="w-11 h-11 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
+                        {friend.profileImage?
+                        <img className="w-11 h-11 rounded-full" src={`${import.meta.env.VITE_SERVER_URL}${friend.profileImage}`}/>
+                        :<div className="w-11 h-11 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
                           <span className="text-white font-semibold text-xs">
                             {friend.fullName?.[0] ?? "?"}
                           </span>
-                        </div>
+                        </div>}
                         <span
                           className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${checkOnline(
                             item.friend.lastActivityDate,

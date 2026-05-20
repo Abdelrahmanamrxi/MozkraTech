@@ -161,6 +161,7 @@ export const getFriends = asyncHandler(async (req, res, next) => {
           updatedAt: 1,
           createdAt: 1,
           lastActivityDate: 1,
+          profileImage:1
         },
         conversationId: 1,
         createdAt: 1,

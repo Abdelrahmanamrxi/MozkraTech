@@ -78,7 +78,9 @@ function normalizeChat(messages, selected) {
       const isFromThem = selected._id?.toString() === senderId;
       const messageText = message.message ?? message.content ?? "";
       const isDeletedForAll = !!message.isDeletedForAll;
-
+      const senderProfileImage =
+        message.senderProfileImage ?? message.senderId?.profileImage ?? null;
+    
       return {
         ...message,
         message: isDeletedForAll ? "" : messageText,
@@ -90,6 +92,8 @@ function normalizeChat(messages, selected) {
         isDeletedForAll,
         deletedAt: message.deletedAt ?? null,
         deletedBy: message.deletedBy ?? null,
+        profileImage: isFromThem ? selected.profileImage : senderProfileImage,
+        
       };
     })
     .reverse();
@@ -156,6 +160,7 @@ function useFriendsMessages(selected) {
       };
     },
   });
+  console.log(data)
 
   useEffect(() => {
     if (!data) {
@@ -256,6 +261,7 @@ function useFriendsMessages(selected) {
       const receiverId = payload.receiverId?.toString();
       const friendId = senderId;
       const isDeletedForAll = !!payload.isDeletedForAll;
+      const senderProfileImage = payload.senderProfileImage ?? null;
 
       setMessages((prev) => {
         // Check if message already exists by _id or fallback key
@@ -284,6 +290,7 @@ function useFriendsMessages(selected) {
             isDeletedForAll,
             deletedAt: payload.deletedAt ?? null,
             deletedBy: payload.deletedBy ?? null,
+            profileImage: senderProfileImage,
           },
         ];
       });
@@ -301,6 +308,7 @@ function useFriendsMessages(selected) {
         payload.conversationId?.toString() ===
         selected?.conversationId?.toString();
       const isDeletedForAll = !!payload.isDeletedForAll;
+      const senderProfileImage = payload.senderProfileImage ?? null;
 
       const normalizedStatus = normalizeStatus(payload.status);
       // console.log(normalizedStatus)
@@ -336,6 +344,7 @@ function useFriendsMessages(selected) {
             isDeletedForAll,
             deletedAt: payload.deletedAt ?? null,
             deletedBy: payload.deletedBy ?? null,
+            profileImage: senderProfileImage,
           },
         ];
       });

@@ -69,9 +69,11 @@ export const sendMessage = async (socket) => {
       message: newMessage.content,
       sentAt: newMessage.createdAt,
       senderId: userId.toString(),
+      senderProfileImage: data.user?.profileImage ?? null,
       receiverId: destId.toString(),
       isDeletedForAll: newMessage.isDeletedForAll,
       status: receiverStatus || { status: "offline", lastActivityDate: null },
+      
     });
 
     const receiverSocketId = connectioUser.get(destId.toString());
@@ -83,6 +85,7 @@ export const sendMessage = async (socket) => {
         message: newMessage.content,
         sentAt: newMessage.createdAt,
         senderId: userId.toString(),
+        senderProfileImage: data.user?.profileImage ?? null,
         receiverId: destId.toString(),
         isDeletedForAll: newMessage.isDeletedForAll,
       });

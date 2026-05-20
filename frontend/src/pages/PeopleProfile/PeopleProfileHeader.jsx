@@ -24,7 +24,7 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
         minute: "2-digit",
       })
     : "";
-
+      console.log(user.profileImage)
   return (
     <Motion.div variants={itemVariants} whileHover={{ y: -2 }} className={`${glassPanel} p-6 md:p-10 h-full`}>
       <style>{`
@@ -68,14 +68,16 @@ export default function PeopleProfileHeader({ user, friendship, isFriendshipPend
               }}
             />
             <div className="relative h-32 w-32 rounded-[30px] border border-white/35 bg-linear-to-br from-white/25 to-white/5 p-1 shadow-2xl md:h-36 md:w-36">
-              <div
+             {user.profileImage?
+             <img className="rounded-[30px]" src={`${import.meta.env.VITE_SERVER_URL}${user.profileImage}`}/>
+             : <div
                 className="flex h-full w-full items-center justify-center rounded-[26px] text-5xl font-Inter font-black text-white"
                 style={{
                   background: "linear-gradient(160deg, rgba(36,32,56,0.92) 0%, rgba(141,134,201,0.38) 100%)",
                 }}
               >
                 {user.fullName[0]}
-              </div>
+              </div>}
             </div>
             <div
               className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border px-4 py-1 text-[10px] font-Inter font-black tracking-widest text-white backdrop-blur-xl"

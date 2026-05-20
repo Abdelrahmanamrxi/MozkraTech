@@ -254,7 +254,7 @@ export const getProfileByID = asyncHandler(async (req, res, next) => {
   const user = await userModel
     .findOne({ _id: id, isDeleted: false, isVerified: true })
     .select(
-      "level fullName currentXP currentStreak createdAt bio summary subjects viewers",
+      "level fullName currentXP currentStreak createdAt bio summary subjects viewers profileImage",
     )
     .populate("subjects", "name");
 
@@ -345,6 +345,7 @@ export const getProfileByID = asyncHandler(async (req, res, next) => {
       bio: user.bio,
       summary: user.summary,
       subjects: user.subjects,
+      profileImage:user.profileImage
     };
   } else if (isPending) {
     safeUser = {
@@ -353,6 +354,7 @@ export const getProfileByID = asyncHandler(async (req, res, next) => {
       summary: user.summary,
       createdAt: user.createdAt,
       subjects: [],
+      profileImage:user.profileImage
     };
   } else {
     safeUser = {
@@ -361,6 +363,7 @@ export const getProfileByID = asyncHandler(async (req, res, next) => {
       bio: "Hidden",
       summary: "Hidden",
       subjects: [],
+      profileImage:user.profileImage
     };
   }
 

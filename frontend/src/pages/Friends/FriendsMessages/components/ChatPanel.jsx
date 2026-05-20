@@ -11,6 +11,31 @@ import {
 import { formatRelativeTime } from "@/utils/formatTime.js";
 import { useTranslation } from "react-i18next";
 
+function MessageAvatar({ fullName, profileImage, direction }) {
+  const hasImage = !!profileImage;
+  const fallbackInitial = fullName?.[0] ?? "?";
+
+  return (
+    <div
+      className="shrink-0 w-8 h-8 rounded-full overflow-hidden border border-[#9B7EDE]/20"
+    >
+      {hasImage ? (
+        <img
+          className="w-full h-full object-cover"
+          src={`${import.meta.env.VITE_SERVER_URL}${profileImage}`}
+          alt={fullName || "User avatar"}
+        />
+      ) : (
+        <div className="w-full h-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
+          <span className="text-white font-semibold text-[10px]">
+            {fallbackInitial}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ChatHeader({
   displaySelected,
   lastActivityDate,
@@ -31,7 +56,7 @@ function ChatHeader({
   const effectiveLastActivity =
     normalizedUserStatus?.lastActivityDate || lastActivityDate;
   const activityStatus = friendActivityLabel(effectiveLastActivity, isOnline);
-
+ 
   return (
     <div className="px-4 py-3 border-b border-[#9B7EDE]/20 flex items-center justify-between shrink-0">
       <div className="flex items-center gap-3">
@@ -45,11 +70,12 @@ function ChatHeader({
         </Motion.button>
 
         <div className="relative shrink-0">
+          {displaySelected?.profileImage ? <img className="w-10 h-10 rounded-full" src={`${import.meta.env.VITE_SERVER_URL}${displaySelected.profileImage}`}/>:
           <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
             <span className="text-white font-semibold text-xs">
               {displaySelected?.fullName?.[0] ?? "?"}
             </span>
-          </div>
+          </div>}
           <span
             className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${isOnline ? "bg-green-500" : "bg-gray-500"}`}
           />
@@ -202,6 +228,13 @@ function MessagesContent({
               transition={{ type: "spring", stiffness: 340, damping: 24 }}
               className={`group flex items-end gap-2 ${msg.from === "me" ? "justify-end" : "justify-start"}`}
             >
+                {msg.from === "them" && (
+                  <MessageAvatar
+                    fullName={selected.fullName}
+                    profileImage={msg.profileImage}
+                    direction={msg.from}
+                  />
+                )}
               <div
                 className={`flex flex-col gap-1 max-w-[75%] ${msg.from === "me" ? "items-end" : "items-start"} relative`}
               >
@@ -322,13 +355,6 @@ function MessagesContent({
                     </span>
                   )}
                 </div>
-                {msg.from === "them" && (
-                  <div className="self-start w-8 h-8 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center mt-1">
-                    <span className="text-white font-semibold text-[10px]">
-                      {selected.fullName?.[0] ?? "?"}
-                    </span>
-                  </div>
-                )}
               </div>
             </Motion.div>
           );
