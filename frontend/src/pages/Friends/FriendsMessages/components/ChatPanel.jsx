@@ -25,6 +25,7 @@ function ChatHeader({
     typeof userStatus === "string"
       ? { status: userStatus, lastActivityDate: null }
       : userStatus;
+      console.log(normalizedUserStatus)
 
   const isOnline = normalizedUserStatus?.status === "online";
   const effectiveLastActivity =

@@ -18,11 +18,15 @@ function FriendsSidebar({
 }) {
   const normalizedSelectedFriendId =
     selectedFriendId?.toString?.() ?? selectedFriendId;
-  console.log(userStatus);
-  const normalizedUserStatus =
+
+   const normalizedUserStatus =
     typeof userStatus === "string"
       ? { status: userStatus, lastActivityDate: null }
-      : { status: "offline" };
+      : userStatus;
+      console.log(normalizedUserStatus)
+
+  const isOnline = normalizedUserStatus?.status === "online";
+  console.log(isOnline)
   const totalUnread = filteredFriends.reduce((sum, item) => {
     const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
     if (!friendId) return sum;
@@ -132,7 +136,7 @@ function FriendsSidebar({
                       : item.friend.lastActivityDate;
 
                   const renderedActivity =
-                    normalizedUserStatus.status === "offline"
+                      !isOnline
                       ? "offline"
                       : friendActivityLabel(
                           activityTimestamp,
