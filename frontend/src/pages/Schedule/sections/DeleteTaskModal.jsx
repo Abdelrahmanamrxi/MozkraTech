@@ -18,7 +18,6 @@ function DeleteTaskModal({ task, onCancel, onSuccess }) {
   const deleteMutation = useMutation({
     mutationFn: (taskId) => deleteTask(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["schedule"] });
       onSuccess?.();
     },

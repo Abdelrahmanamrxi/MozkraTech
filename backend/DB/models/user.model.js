@@ -120,10 +120,6 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    totalPoints: {
-      type: Number,
-      default: 0,
-    },
     level: {
       type: Number,
       default: 1,
@@ -150,6 +146,16 @@ const userSchema = new mongoose.Schema(
     weeklyStudyHours: {
       type: Number,
       default: 0,
+    },
+    // number of times the user reached their weekly study goal this week
+    completedGoals: {
+      type: Number,
+      default: 0,
+    },
+    // week start date when the last completed goal was recorded (used to prevent double-counting)
+    lastCompletedGoalWeekStart: {
+      type: Date,
+      default: null,
     },
     preferredTime: {
       type: String,

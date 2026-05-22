@@ -62,6 +62,8 @@ function Home() {
     retry: 1,
   });
 
+  const tasks = scheduleData?.tasks ?? [];
+
   const { data: subjectsData, isLoading: isSubjectsLoading } = useQuery({
     queryKey: ["subjects"],
     queryFn: async () => {
@@ -81,19 +83,8 @@ function Home() {
     retry: 1,
   });
 
-  const { data: tasksData, isLoading: isTasksLoading } = useQuery({
-    queryKey: ["tasks"],
-    queryFn: async () => {
-      const response = await api.get("/tasks");
-      return response.data;
-    },
-    staleTime: 5 * 60 * 1000,
-    retry: 1,
-  });
-
   const sessions = scheduleData?.sessions ?? [];
   const subjects = subjectsData?.subjects ?? [];
-  const tasks = tasksData?.tasks ?? [];
 
   const subjectsById = useMemo(() => {
     const map = new Map();
@@ -331,13 +322,13 @@ function Home() {
   return (
     <div className=" text-white main-background lg:p-15 p-5 sm:p-8">
       <WelcomeBanner dashboardData={dashboardData} />
-      <TodaysSummary dashboardData={dashboardData} isLoading={isTasksLoading} />
+      <TodaysSummary dashboardData={dashboardData} isLoading={isScheduleLoading} />
       <LearningOverview
         todaysSchedule={todaysSchedule}
         upComingSchedule={upComingSchedule}
         aiRecommendation={dashboardData.aiRecommendation}
         isScheduleLoading={
-          isScheduleLoading || isSubjectsLoading || isTasksLoading
+          isScheduleLoading || isSubjectsLoading
         }
       />
     </div>

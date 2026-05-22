@@ -35,12 +35,9 @@ export default function FriendsMessages() {
 
   /**
    * Determine the display text for a friend's activity status.
-   * If the friend has no last activity timestamp, show offline.
-   * If the friend was active within the last minute, show online.
-   * Otherwise, show a translated relative time.
+   * Keep the label neutral so the UI does not surface online/away wording.
    */
   const friendActivityLabelWithTranslation = (time, isOnline = false) => {
-    if (isOnline) return t("messages.status.online");
     if (!time) return t("messages.status.offline");
 
     return formatRelativeTime(time, t);
@@ -345,6 +342,15 @@ export default function FriendsMessages() {
       });
   }, [messages, selected?._id]);
 
+  const selectedFriendPresence = useMemo(
+    () => ({
+      status: userStatus?.status ?? null,
+      lastActivityDate:
+        userStatus?.lastActivityDate || selected?.lastActivityDate || null,
+    }),
+    [selected?.lastActivityDate, userStatus],
+  );
+
   const canSend =
     socketConnectionStatus === "connected" && !!input.trim() && !!selected?._id;
 
@@ -516,6 +522,7 @@ export default function FriendsMessages() {
               unreadByFriend={unreadByFriend}
               onSelectFriend={selectFriend}
               userStatus={userStatus}
+              activeFriendPresence={selectedFriendPresence}
             />
           </div>
 
@@ -533,7 +540,7 @@ export default function FriendsMessages() {
               isLoading={chatIsLoading}
               error={selectedMessages.length ? null : chatError}
               historyError={olderLoadError}
-              userStatus={userStatus}
+              presence={selectedFriendPresence}
               socketConnectionStatus={socketConnectionStatus}
               selectedMessages={selectedMessages}
               hasMoreHistory={hasMoreHistory}

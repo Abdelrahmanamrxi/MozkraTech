@@ -237,7 +237,6 @@ function SessionForm({ setShowAddSessionPopup }) {
     onSuccess: (data) => {
       console.log(data);
       setMessage(data?.message || t("form.scheduleCreated"));
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["schedule"] });
       setShowAddSessionPopup(false);
     },
@@ -315,7 +314,7 @@ function SessionForm({ setShowAddSessionPopup }) {
           exit={{ opacity: 0, scale: 0.96, y: 20 }}
           transition={{ duration: 0.3 }}
           onClick={(e) => e.stopPropagation()}
-          className="sf-scroll bg-gradient-to-br from-[#1B142D] via-[#1A1530] to-[#141022] font-poppins border border-white/10 rounded-[24px] p-6 sm:p-8 max-w-2xl w-full shadow-2xl max-h-[85vh] overflow-y-auto space-y-6"
+          className="sf-scroll bg-linear-to-br from-[#1B142D] via-[#1A1530] to-[#141022] font-poppins border border-white/10 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl max-h-[85vh] overflow-y-auto space-y-6"
         >
           {!scheduleCreatedMessage ? (
             <>
@@ -495,9 +494,9 @@ function SessionForm({ setShowAddSessionPopup }) {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="rounded-[12px] border border-red-500/30 bg-red-500/10 p-3 flex items-start gap-3"
+                  className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 flex items-start gap-3"
                 >
-                  <div className="w-1 h-1 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></div>
+                  <div className="w-1 h-1 rounded-full bg-red-500 mt-1.5 shrink-0"></div>
                   <p className="text-xs text-red-300">{Error.server}</p>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
@@ -524,7 +523,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setShowAddModal(true)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-[8px] bg-[#9B7EDE]/20 text-[#B8A7E5] text-xs hover:bg-[#9B7EDE]/30 transition"
+                      className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#9B7EDE]/20 text-[#B8A7E5] text-xs hover:bg-[#9B7EDE]/30 transition"
                     >
                       <Plus className="w-3 h-3" /> {t("buttons.addSession")}
                     </motion.button>
@@ -586,7 +585,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                   onClick={handleCreateSchedule}
                   disabled={scheduleMutation.isPending}
                   whileTap={{ scale: 0.97 }}
-                  className="flex-1 px-4 py-3 rounded-[12px] bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 rounded-xl bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {scheduleMutation.isPending ? (
                     <span className="flex items-center justify-center gap-2">
@@ -612,7 +611,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                   }}
                   disabled={mutation.isPending}
                   whileTap={{ scale: 0.97 }}
-                  className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 bg-white/5 text-sm text-[#B8A7E5] hover:bg-white/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-sm text-[#B8A7E5] hover:bg-white/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {t("buttons.generateSessions")}
                 </motion.button>
@@ -620,7 +619,7 @@ function SessionForm({ setShowAddSessionPopup }) {
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setShowAddSessionPopup(false)}
                   disabled={scheduleMutation.isPending || mutation.isPending}
-                  className="flex-1 px-4 py-3 rounded-[12px] border border-white/10 text-sm text-white/60 hover:text-white/90 transition disabled:opacity-50"
+                  className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-sm text-white/60 hover:text-white/90 transition disabled:opacity-50"
                 >
                   {t("buttons.cancel")}
                 </motion.button>
@@ -643,7 +642,7 @@ function SessionForm({ setShowAddSessionPopup }) {
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setShowAddSessionPopup(false)}
-                className="px-6 py-2 rounded-[12px] bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition"
+                className="px-6 py-2 rounded-xl bg-[#9B7EDE] text-white text-sm font-semibold hover:bg-[#8B6ECE] transition"
               >
                 {t("buttons.close")}
               </motion.button>

@@ -40,17 +40,17 @@ function ChatHeader({
   displaySelected,
   lastActivityDate,
   friendActivityLabel,
-  userStatus,
+  presence,
   socketConnectionStatus,
   sidebarOpen,
   onToggleSidebar,
   onExitChat,
   t,
 }) {
-  const normalizedUserStatus =
-    typeof userStatus === "string"
-      ? { status: userStatus, lastActivityDate: null }
-      : userStatus;
+  const normalizedPresence =
+    typeof presence === "string"
+      ? { status: presence, lastActivityDate: null }
+      : presence;
 
   const handleHeaderAction = () => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
@@ -61,10 +61,12 @@ function ChatHeader({
     onToggleSidebar?.();
   };
 
-  const isOnline = normalizedUserStatus?.status === "online";
+  const isOnline = normalizedPresence?.status === "online";
   const effectiveLastActivity =
-    normalizedUserStatus?.lastActivityDate || lastActivityDate;
-  const activityStatus = friendActivityLabel(effectiveLastActivity, isOnline);
+    normalizedPresence?.lastActivityDate || lastActivityDate;
+  const activityLabel = effectiveLastActivity
+    ? friendActivityLabel?.(effectiveLastActivity, isOnline)
+    : t("messages.status.offline");
  
   return (
     <div className="px-4 py-3 border-b border-[#9B7EDE]/20 flex items-center justify-between shrink-0">
@@ -101,15 +103,16 @@ function ChatHeader({
           <h2 className="text-white font-semibold text-sm leading-tight">
             {displaySelected?.fullName}
           </h2>
-          <div className="flex items-center gap-2">
-            <p className="text-xs text-[#B8A7E5]">{activityStatus}</p>
-            <span className="text-xs text-[#B8A7E5]/60">•</span>
+          <div className="flex flex-col gap-0.5">
             <p
               className={`text-xs ${socketConnectionStatus === "connected" ? "text-emerald-400" : "text-red-400"}`}
             >
               {socketConnectionStatus === "connected"
                 ? t("messages.connected")
                 : t("messages.disconnected")}
+            </p>
+            <p className="text-[11px] text-[#B8A7E5]/70">
+              {activityLabel}
             </p>
           </div>
         </div>
@@ -450,6 +453,7 @@ function ChatPanel({
   onDeleteMessage,
   canSend,
   friendActivityLabel,
+  presence,
   t,
 }) {
   return (
@@ -467,9 +471,9 @@ function ChatPanel({
       <ChatHeader
         displaySelected={displaySelected}
         lastActivityDate={
-          displaySelected?.updatedAt || selected?.lastActivityDate
+          displaySelected?.lastActivityDate || selected?.lastActivityDate
         }
-        userStatus={userStatus}
+        presence={presence}
         socketConnectionStatus={socketConnectionStatus}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={onToggleSidebar}

@@ -15,23 +15,44 @@ function FriendsSidebar({
   unreadByFriend,
   onSelectFriend,
   userStatus,
+  activeFriendPresence,
 }) {
   const normalizedSelectedFriendId =
     selectedFriendId?.toString?.() ?? selectedFriendId;
 
-   const normalizedUserStatus =
-    typeof userStatus === "string"
-      ? { status: userStatus, lastActivityDate: null }
-      : userStatus;
-      console.log(normalizedUserStatus)
+  const normalizedActiveFriendPresence =
+    typeof activeFriendPresence === "string"
+      ? { status: activeFriendPresence, lastActivityDate: null }
+      : activeFriendPresence;
 
-  const isOnline = normalizedUserStatus?.status === "online";
-  console.log(isOnline)
   const totalUnread = filteredFriends.reduce((sum, item) => {
     const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
     if (!friendId) return sum;
     return sum + (unreadByFriend[friendId] || 0);
   }, 0);
+
+  const isRecentlyActive = (activity) => {
+    if (!activity) return false;
+    const timestamp = new Date(activity).getTime();
+    if (Number.isNaN(timestamp)) return false;
+    return Date.now() - timestamp <= 5 * 60 * 1000;
+  };
+
+  const getFriendPresence = (item) => {
+    const friendId = item.friend?._id?.toString?.() ?? item.friend?._id;
+    const selectedId = normalizedSelectedFriendId;
+    const isSelected = selectedId === friendId?.toString?.();
+
+    if (isSelected && normalizedActiveFriendPresence) {
+      return normalizedActiveFriendPresence;
+    }
+
+    const activity = item.friend?.lastActivityDate;
+    return {
+      status: isRecentlyActive(activity) ? "online" : "offline",
+      lastActivityDate: activity || null,
+    };
+  };
 
   function getLastMessagePreview(item) {
     if (item.lastMessage?.isDeletedForAll) {
@@ -54,18 +75,6 @@ function FriendsSidebar({
     return `${senderLabel}: ${content}`;
   }
 
-  function checkOnline(activity, friendId) {
-    const isSelectedFriend =
-      normalizedSelectedFriendId === friendId?.toString?.();
-
-    if (isSelectedFriend) {
-      return normalizedUserStatus?.status === "online"
-        ? "bg-green-500"
-        : "bg-gray-500";
-    }
-
-    return "bg-gray-500";
-  }
   return (
     <AnimatePresence initial={false}>
       {sidebarOpen && (
@@ -125,24 +134,8 @@ function FriendsSidebar({
                     0;
                   const isSelectedFriend =
                     normalizedSelectedFriendId === friend._id?.toString?.();
-
-                  const isSelectedFriendOnline =
-                    isSelectedFriend &&
-                    normalizedUserStatus?.status === "online";
-
-                  const activityTimestamp =
-                    isSelectedFriend && normalizedUserStatus?.lastActivityDate
-                      ? normalizedUserStatus.lastActivityDate
-                      : item.friend.lastActivityDate;
-
-                  const renderedActivity =
-                      !isOnline
-                      ? "offline"
-                      : friendActivityLabel(
-                          activityTimestamp,
-                          isSelectedFriendOnline,
-                        );
-                      console.log(friend)
+                  const friendPresence = getFriendPresence(item);
+                  const isOnline = friendPresence?.status === "online";
                   return (
                     <Motion.button
                       key={friend._id}
@@ -154,18 +147,21 @@ function FriendsSidebar({
                         ${selectedFriendId === friend._id ? "bg-[rgba(155,126,222,0.2)] border border-[#9B7EDE]/30" : "border border-transparent"}`}
                     >
                       <div className="relative shrink-0">
-                        {friend.profileImage?
-                        <img className="w-11 h-11 rounded-full" src={`${import.meta.env.VITE_SERVER_URL}${friend.profileImage}`}/>
-                        :<div className="w-11 h-11 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
-                          <span className="text-white font-semibold text-xs">
-                            {friend.fullName?.[0] ?? "?"}
-                          </span>
-                        </div>}
+                        {friend.profileImage ? (
+                          <img
+                            className="w-11 h-11 rounded-full"
+                            src={`${import.meta.env.VITE_SERVER_URL}${friend.profileImage}`}
+                            alt={friend.fullName || "Friend"}
+                          />
+                        ) : (
+                          <div className="w-11 h-11 rounded-full bg-linear-to-br from-[#9b7ede] to-[#7c5fbd] flex items-center justify-center">
+                            <span className="text-white font-semibold text-xs">
+                              {friend.fullName?.[0] ?? "?"}
+                            </span>
+                          </div>
+                        )}
                         <span
-                          className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${checkOnline(
-                            item.friend.lastActivityDate,
-                            friend._id,
-                          )}`}
+                          className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-[#1B1630] ${isOnline ? "bg-green-500" : "bg-gray-500"}`}
                         />
                         <AnimatePresence>
                           {!isSelectedFriend && unreadCount > 0 && (
@@ -191,12 +187,13 @@ function FriendsSidebar({
                           <span className="text-sm font-medium truncate text-white/90">
                             {friend.fullName}
                           </span>
-                          <div className="flex flex-col items-end gap-2">
-                            <span className="text-[10px] text-purple-300/40 shrink-0 ml-1">
-                              {renderedActivity}
-                            </span>
-                          </div>
                         </div>
+                        <p className="text-[11px] text-purple-200/50 truncate">
+                          {friendActivityLabel(
+                            friendPresence?.lastActivityDate,
+                            isOnline,
+                          )}
+                        </p>
                         <p className="text-xs text-purple-200/60 truncate">
                           {getLastMessagePreview(item)}
                         </p>

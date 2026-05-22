@@ -3,10 +3,12 @@ import HttpException from "../../utils/HttpException.js"
 import { asyncHandler } from "../../utils/asyncHandler/index.js"
 import friendshipModel from "../../DB/models/friendship.model.js"
 import { notificationModel } from "../../DB/models/notifications.model.js"
-import { checkWhetherUsersExist } from "./friends.service.js"
+import { checkWhetherUsersExist,sortLeaderboard } from "./friends.service.js"
 import conversationModel from "../../DB/models/Conversation.model.js"
 import achievementModel from "../../DB/models/achievement.model.js"
 import { checkFriendshipAchievements } from "../achievement/achievement.helper.js"
+import taskModel from "../../DB/models/task.model.js"
+import subjectModel from "../../DB/models/subject.model.js"
 //------------------------------------------getFriends-------------------------------------------
 
 export const getFriends = asyncHandler(async (req, res, next) => {
@@ -161,6 +163,7 @@ export const getFriends = asyncHandler(async (req, res, next) => {
           updatedAt: 1,
           createdAt: 1,
           lastActivityDate: 1,
+          level:1,
           profileImage:1
         },
         conversationId: 1,
@@ -341,64 +344,216 @@ export const rejectFriend = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: "User has been rejected." });
 });
 
-// // ------------------------------------------getAllFriends-------------------------------------------
-// export const getFriends = asyncHandler(async (req, res, next) => {
-//   const user = await userModel.findById(req.user._id).populate({
-//     path: "friends",
-//     select: "fullName email profileImage level currentStreak",
-//   });
 
-//   if (!user) {
-//     return next(new HttpException("User not found", 404));
-//   }
+export const getLeaderboard=asyncHandler(async(req,res,next)=>{
+const sortBy = req.query.sortBy || 'overallProgress'; 
+const userId = req.user._id;
+const me = userId.toString();
 
-//   res.status(200).json({
-//     success: true,
-//     friends: user.friends
-//   });
-// });
+const friends = await friendshipModel.find({
+  $or: [{ requesterId: userId }, { receiverId: userId }],
+  status: 'accepted'
+})
+.populate('requesterId', 'name profileImage currentStreak longestStreak currentXP level fullName weeklyStudyHours')
+.populate('receiverId',  'name profileImage currentStreak longestStreak currentXP level fullName weeklyStudyHours');
 
-// // ------------------------------------------viewProfileFriend-------------------------------------------
-// export const viewProfileFriend = asyncHandler(async (req, res, next) => {
-//     // 1. Get the friend's ID from URL parameters
-//     const { id } = req.params;
 
-//     // 2. Find the friend in the database
-//     const friend = await userModel.findOne({ _id: id, isDeleted: false });
+const userMap = new Map();
 
-//     if (!friend) {
-//         return next(new HttpException("Friend profile not found", 404));
-//     }
+friends.forEach(f => {
+  for (const user of [f.requesterId, f.receiverId]) {
+    const id = user._id.toString();
+    if (!userMap.has(id)) {
+      userMap.set(id, {
+        _id:              user._id,
+        name:             user.name,
+        fullName:         user.fullName,
+        profileImage:     user.profileImage,
+        currentStreak:    user.currentStreak,
+        longestStreak:    user.longestStreak,
+        currentXP:        user.currentXP,
+        level:            user.level,
+        weeklyStudyHours: user.weeklyStudyHours,
+        isMe:             id === me
+      });
+    }
+  }
+});
 
-//     // 3. Check if this person is actually in your friends list
-//     const isStillFriend = req.user.friends.includes(id);
-//     if (!isStillFriend) {
-//         return next(new HttpException("You can only view profiles of your friends", 403));
-//     }
+const uniquePeople = Array.from(userMap.values());
+const userIds = uniquePeople.map(u => u._id);
 
-//     // 4. Viewers Logic: Check if I (req.user._id) visited this friend before
-//     const viewerEntry = friend.viewers.find(viewer => {
-//         return viewer.userId.toString() === req.user._id.toString();
-//     });
 
-//     if (viewerEntry) {
-//         // If I visited before, just add a new timestamp
-//         viewerEntry.time.push(Date.now());
-//         // Keep only the last 5 visit times
-//         if (viewerEntry.time.length > 5) {
-//             viewerEntry.time = viewerEntry.time.slice(-5);
-//         }
-//     } else {
-//         // If this is my first visit, add my ID to their viewers list
-//         friend.viewers.push({ userId: req.user._id, time: [Date.now()] });
-//     }
+const tasks = await taskModel.find({ userId: { $in: userIds } });
 
-//     // 5. Save the changes to the friend's document
-//     await friend.save();
 
-//     // 6. Return the friend's profile data to the frontend
-//     return res.status(200).json({
-//         message: "Viewing friend profile success",
-//         profile: friend
-//     });
-// });
+const taskStatsMap = new Map();
+
+tasks.forEach(task => {
+  const id = task.userId.toString();
+
+  if (!taskStatsMap.has(id)) {
+    taskStatsMap.set(id, { hoursSpent: 0, totalHours: 0 });
+  }
+
+  const stats = taskStatsMap.get(id);
+  stats.hoursSpent += task.hoursSpent  || 0;
+  stats.totalHours += task.totalHours  || 0;
+});
+
+// Merge user profile + task stats
+const leaderboard = uniquePeople.map(user => {
+  const stats = taskStatsMap.get(user._id.toString()) || { hoursSpent: 0, totalHours: 0 };
+
+  return {
+    ...user,
+    hoursSpent:  stats.hoursSpent,
+    totalHours:  stats.totalHours,
+  };
+});
+
+// Sort — pick your primary metric (or expose all 4 and let the client sort)
+const sortWay = sortLeaderboard[sortBy] ?? sortLeaderboard.overallProgress;
+leaderboard.sort(sortWay)
+res.status(200).json({leaderboard})
+})
+
+export const compareFriendProgress=asyncHandler(async(req,res,next)=>{
+  const userId = req.user._id
+  const { friendId } = req.params
+
+  const [me, friend] = await Promise.all([
+    userModel.findOne({ _id: userId, isDeleted: false, isVerified: true }),
+    userModel.findOne({ _id: friendId, isDeleted: false, isVerified: true }),
+  ])
+
+  if (!friend) {
+    return next(new HttpException("There is no user matching your criteria.", 404))
+  }
+
+  if (!me) {
+    return next(new HttpException("Current user not found.", 404))
+  }
+
+  const [
+    myTasks,
+    friendsTasks,
+    mySubjects,
+    friendSubjects,
+    myAchievementCount,
+    friendAchievementCount,
+  ] = await Promise.all([
+    taskModel.find({ userId }).populate("subjectId"),
+    taskModel.find({ userId: friendId }).populate("subjectId"),
+    subjectModel.find({ userId }),
+    subjectModel.find({ userId: friendId }),
+    achievementModel.countDocuments({ userId }),
+    achievementModel.countDocuments({ userId: friendId }),
+  ])
+
+  const buildTaskStats = (tasks) => {
+    const cappedHoursSpent = tasks.reduce(
+      (sum, task) => sum + Math.min(task.hoursSpent || 0, task.totalHours || 0),
+      0,
+    )
+    const rawHoursSpent = tasks.reduce((sum, task) => sum + (task.hoursSpent || 0), 0)
+    const totalHours = tasks.reduce((sum, task) => sum + (task.totalHours || 0), 0)
+    const completedGoals = tasks.filter(
+      (task) => (task.hoursSpent || 0) >= (task.totalHours || 0) && (task.totalHours || 0) > 0,
+    ).length
+    const taskProgress = totalHours > 0 ? Math.min(100, (cappedHoursSpent / totalHours) * 100) : null
+
+    return {
+      totalHours,
+      hoursSpent: rawHoursSpent,
+      completedGoals,
+      taskProgress,
+    }
+  }
+
+  const buildWeeklyProgress = (hoursSpent, weeklyStudyHours) => {
+    if (!weeklyStudyHours || weeklyStudyHours <= 0) {
+      return null
+    }
+
+    return Math.min(100, (hoursSpent / weeklyStudyHours) * 100)
+  }
+
+  const buildSubjectComparison = (subjects, tasks) => {
+    const subjectMap = new Map(subjects.map((subject) => [subject._id.toString(), subject]))
+
+    // Group tasks by subjectId (support multiple tasks per subject)
+    const taskGroups = tasks.reduce((map, task) => {
+      const key = task.subjectId?._id?.toString?.() || task.subjectId?.toString?.()
+      if (!key) return map
+      if (!map.has(key)) map.set(key, [])
+      map.get(key).push(task)
+      return map
+    }, new Map())
+
+    const subjectIds = new Set([
+      ...subjectMap.keys(),
+      ...Array.from(taskGroups.keys()),
+    ].filter(Boolean))
+
+    return Array.from(subjectIds).map((subjectId) => {
+      const subject = subjectMap.get(subjectId)
+      const taskList = taskGroups.get(subjectId) || []
+
+      const totalHours = taskList.reduce((sum, t) => sum + (t.totalHours || 0), 0)
+      const hoursSpent = taskList.reduce((sum, t) => sum + (t.hoursSpent || 0), 0)
+
+      return {
+        subjectId,
+        subjectName: subject?.name || taskList[0]?.name || "Unknown subject",
+        hoursPerWeek: subject?.hoursPerWeek || 0,
+        totalHours,
+        hoursSpent,
+      }
+    })
+  }
+
+  const meStats = buildTaskStats(myTasks)
+  const friendStats = buildTaskStats(friendsTasks)
+  const meWeeklyProgress = buildWeeklyProgress(meStats.hoursSpent, me.weeklyStudyHours)
+  const friendWeeklyProgress = buildWeeklyProgress(friendStats.hoursSpent, friend.weeklyStudyHours)
+
+  res.status(200).json({
+    me: {
+      _id: me._id,
+      fullName: me.fullName,
+      profileImage: me.profileImage,
+      level: me.level,
+      rank: me.rank,
+      currentStreak: me.currentStreak,
+      achievementCount: myAchievementCount,
+      weeklyStudyHours: me.weeklyStudyHours,
+      completedGoals: me.completedGoals || 0,
+      weeklyGoalProgress: meWeeklyProgress,
+      overallProgress: meWeeklyProgress ?? 0,
+      ...meStats,
+    },
+    friend: {
+      _id: friend._id,
+      fullName: friend.fullName,
+      profileImage: friend.profileImage,
+      level: friend.level,
+      rank: friend.rank,
+      currentStreak: friend.currentStreak,
+      achievementCount: friendAchievementCount,
+      weeklyStudyHours: friend.weeklyStudyHours,
+      completedGoals: friend.completedGoals || 0,
+      weeklyGoalProgress: friendWeeklyProgress,
+      overallProgress: friendWeeklyProgress ?? 0,
+      ...friendStats,
+    },
+    comparison: {
+      myTasks,
+      friendsTasks,
+      subjects: {
+        me: buildSubjectComparison(mySubjects, myTasks),
+        friend: buildSubjectComparison(friendSubjects, friendsTasks),
+      },
+    },
+  })
+})

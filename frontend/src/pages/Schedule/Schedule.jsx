@@ -74,6 +74,38 @@ async function buildInitialData(date, filter = "All") {
   return response.data;
 }
 
+function groupSessionsByDate(sessions = []) {
+  return sessions.reduce((acc, session, idx) => {
+    const startIso =
+      typeof session.startTime === "string"
+        ? session.startTime
+        : new Date(session.startTime).toISOString();
+    const endIso =
+      typeof session.endTime === "string"
+        ? session.endTime
+        : new Date(session.endTime).toISOString();
+
+    const dateMatch = startIso.match(/^(\d{4}-\d{2}-\d{2})/);
+    const key = dateMatch
+      ? dateMatch[1]
+      : new Date(startIso).toISOString().split("T")[0];
+
+    const normalized = {
+      ...session,
+      id: session._id ?? session.id ?? `${key}-${idx}`,
+      startTime: startIso,
+      endTime: endIso,
+      status: session.status ?? "scheduled",
+      subjectId: session.subjectId?._id ?? session.subjectId ?? null,
+      subjectName: session.subjectId?.name ?? session.subjectName ?? null,
+    };
+
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(normalized);
+    return acc;
+  }, {});
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // LOADING SKELETON  — shown while fetching
 // ─────────────────────────────────────────────────────────────────────────────
@@ -101,7 +133,6 @@ const Schedule = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [pendingDrop, setPendingDrop] = useState(null);
   const [metrics, setMetrics] = useState(null);
-  const [rawApiData, setRawApiData] = useState(null);
   const [addModal, setAddModal] = useState(false);
   const [weekStart, setWeekStart] = useState(() => getWeekStart(TODAY));
   // FIX: Use 0 as default so the ruler starts flush — measured value replaces it after mount
@@ -135,66 +166,21 @@ const Schedule = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: tasksData = [] } = useQuery({
-    queryKey: ["tasks"],
-    queryFn: async () => {
-      const response = await api.get("/tasks");
-      return response.data?.tasks ?? [];
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
   const { data, isLoading, error } = useQuery({
     queryKey: ["schedule", weekStart, filterSubject],
     queryFn: async () => {
-      const response = await buildInitialData(weekStart, filterSubject);
-      setRawApiData(response);
-      return response;
+      return buildInitialData(weekStart, filterSubject);
     },
     retry: 1,
-    select: (data) => {
-      const sessions = data.sessions || [];
-      return sessions.reduce((acc, session, idx) => {
-        const startIso =
-          typeof session.startTime === "string"
-            ? session.startTime
-            : new Date(session.startTime).toISOString();
-        const endIso =
-          typeof session.endTime === "string"
-            ? session.endTime
-            : new Date(session.endTime).toISOString();
-
-        const dateMatch = startIso.match(/^(\d{4}-\d{2}-\d{2})/);
-        const key = dateMatch
-          ? dateMatch[1]
-          : new Date(startIso).toISOString().split("T")[0];
-
-        const normalized = {
-          ...session,
-          id: session._id ?? session.id ?? `${key}-${idx}`,
-          startTime: startIso,
-          endTime: endIso,
-          status: session.status ?? "scheduled",
-          subjectId: session.subjectId?._id ?? session.subjectId ?? null,
-          subjectName: session.subjectId?.name ?? session.subjectName ?? null,
-        };
-
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(normalized);
-        return acc;
-      }, {});
-    },
   });
 
-  useEffect(() => {
-    if (data) setScheduleData(data);
-  }, [data]);
+  const tasksData = data?.tasks ?? [];
 
   useEffect(() => {
-    if (rawApiData?.metrics) {
-      setMetrics(rawApiData.metrics);
-    }
-  }, [rawApiData]);
+    if (!data) return;
+    setScheduleData(groupSessionsByDate(data.sessions || []));
+    setMetrics(data.metrics ?? null);
+  }, [data]);
 
   const { t, i18n } = useTranslation("schedule");
   const locale = i18n.language === "ar" ? "ar-EG" : "en-US";
@@ -526,7 +512,10 @@ const Schedule = () => {
       {/* ── Modals ── */}
       <AnimatePresence>
         {showAddSessionPopup && (
-          <SessionForm setShowAddSessionPopup={setShowAddSessionPopup} />
+          <SessionForm
+            setShowAddSessionPopup={setShowAddSessionPopup}
+            tasks={tasksData}
+          />
         )}
       </AnimatePresence>
       <AnimatePresence>
@@ -727,7 +716,9 @@ const Schedule = () => {
           />
         </div>
       )}
-      {addModal && <CreateSessionModal setAddModal={setAddModal} />}
+      {addModal && (
+        <CreateSessionModal setAddModal={setAddModal} tasks={tasksData} />
+      )}
 
       <div className="border-t flex flex-col lg:flex-row font-Inter text-white items-start lg:items-center gap-4 rounded-[24px] p-5 sm:p-6 border-[#9B7EDE]/30 mt-8 mb-16 bg-gradient-to-br from-[#9B7EDE]/10 to-transparent">
         <TipBackgroundIcon />

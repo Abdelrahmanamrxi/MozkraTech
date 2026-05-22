@@ -30,7 +30,7 @@ export default function Timer() {
   const { data: timerPreferences } = useQuery({
     queryKey: ["timer-profile"],
     queryFn: async () => {
-      const { data } = await api.post("/user/get-profile");
+      const { data } = await api.get("/user/get-profile");
       return data?.user?.timer ?? null;
     },
     select: (timer) => ({

@@ -3,11 +3,13 @@ import {
   createSubject,
   deleteSubject,
   getUserSubjects,
+  updateSubject,
 } from "./subject.controller.js";
 import { validation } from "../../middleware/validation.js";
 import {
   createSubjectSchema,
   deleteSubjectSchema,
+  updateSubjectSchema,
 } from "./subject.validation.js";
 import { authentication } from "../../middleware/auth.js";
 
@@ -27,6 +29,13 @@ subjectRouter.delete(
   authentication,
   validation(deleteSubjectSchema),
   deleteSubject,
+);
+
+subjectRouter.patch(
+  "/:subjectId",
+  authentication,
+  validation(updateSubjectSchema),
+  updateSubject,
 );
 
 export default subjectRouter;

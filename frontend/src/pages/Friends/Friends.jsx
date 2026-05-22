@@ -57,7 +57,7 @@ function Friends() {
 
    
 
-       <FriendsProgress/>
+  <FriendsProgress onAddFriends={() => setIsAddFriendsOpen(true)} />
       </div>
 
       {/* Add Friends Modal */}

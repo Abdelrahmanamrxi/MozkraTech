@@ -8,11 +8,7 @@ import {
   deleteAccount,
   getProfileByID,
   dashboard,
-  addFriend,
   getProfile,
-  acceptFriendRequest,
-  declineFriendRequest,
-  deleteFriend,
   searchForUsers,
 } from "./user.controller.js";
 import { validation } from "../../middleware/validation.js";
@@ -80,30 +76,7 @@ userRouter.post(
   authorization([roleTypes.admin]),
   dashboard,
 );
-userRouter.patch(
-  "/add-friend/:userId",
-  authentication,
-  validation(addFriendSchema),
-  addFriend,
-);
-userRouter.patch(
-  "/accept-friend/:userId",
-  authentication,
-  validation(addFriendSchema),
-  acceptFriendRequest,
-);
-userRouter.patch(
-  "/decline-friend/:userId",
-  authentication,
-  validation(addFriendSchema),
-  declineFriendRequest,
-);
-userRouter.patch(
-  "/delete-friend/:userId",
-  authentication,
-  validation(addFriendSchema),
-  deleteFriend,
-);
+
 userRouter.get("/get-profile", authentication, getProfile);
 
 export default userRouter;

@@ -23,7 +23,7 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
     dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
     priority: task.priority || "medium",
     status: task.status || "ongoing",
-    subjectId: task.subjectId || "",
+    subjectId: task.subjectId?._id || task.subjectId || "",
     totalHours: task.totalHours || ""
   });
 
@@ -57,8 +57,9 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
       dueDate: form.dueDate,
       priority: form.priority,
       status: form.status,
-      subjectId: form.subjectId,
       totalHours: form.totalHours
+      ,
+      ...(form.subjectId ? { subjectId: form.subjectId } : {})
     });
     return response.data;
   }
@@ -66,7 +67,6 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
   const editMutation = useMutation({
     mutationFn: updateTask,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["schedule"] });
       setEditingTask(null);
     },
@@ -84,7 +84,6 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
         task={task}
         onCancel={() => setIsDeleting(false)}
         onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: ["tasks"] });
           queryClient.invalidateQueries({ queryKey: ["schedule"] });
           setEditingTask(null);
         }}
@@ -141,7 +140,7 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
               value={form.dueDate}
               min={getTodayString()}
               onChange={(e) => update("dueDate", e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-[10px] px-3 py-2 text-sm text-white outline-none focus:border-[#9B7EDE]/60 [color-scheme:dark]"
+              className="bg-white/5 border border-white/10 rounded-[10px] px-3 py-2 text-sm text-white outline-none focus:border-[#9B7EDE]/60 scheme-dark"
             />
             {error.dueDate && <p className="text-xs text-red-400">{error.dueDate}</p>}
           </label>
@@ -176,7 +175,7 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 5 }}
                     exit={{ opacity: 0, y: -5 }}
-                    className="absolute z-20 w-full bg-[#3a3252] border border-white/10 rounded-[12px] shadow-2xl p-1"
+                    className="absolute z-20 w-full bg-[#3a3252] border border-white/10 rounded-xl shadow-2xl p-1"
                   >
                     {PRIORITY_OPTIONS.map((opt) => (
                       <li key={opt.value}>
@@ -186,7 +185,7 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
                             update("priority", opt.value);
                             setIsPriorityOpen(false);
                           }}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-[8px] transition-colors ${
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
                             form.priority === opt.value
                               ? "bg-[#9B7EDE] text-white"
                               : "text-white/70 hover:bg-white/5"
@@ -239,7 +238,7 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 5 }}
                     exit={{ opacity: 0, y: -5 }}
-                    className="absolute z-20 w-full bg-[#3a3252] border border-white/10 rounded-[12px] shadow-2xl p-1"
+                    className="absolute z-20 w-full bg-[#3a3252] border border-white/10 rounded-xl shadow-2xl p-1"
                   >
                     {["ongoing", "completed"].map((statusOption) => (
                       <li key={statusOption}>
@@ -249,7 +248,7 @@ const EditTaskModal = ({ task, onCancel, setEditingTask, subjects = [] }) => {
                             update("status", statusOption);
                             setIsStatusOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-2 text-sm rounded-[8px] transition-colors capitalize ${
+                            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors capitalize ${
                             form.status === statusOption
                               ? "bg-[#9B7EDE] text-white"
                               : "text-white/70 hover:bg-white/5"

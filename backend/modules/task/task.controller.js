@@ -2,6 +2,7 @@ import taskModel from "../../DB/models/task.model.js";
 import sessionModel from "../../DB/models/session.model.js";
 import {asyncHandler}  from "../../utils/asyncHandler/index.js";
 import HttpException from "../../utils/HttpException.js";
+import incrementWeeklyGoalIfNeeded from '../../utils/weeklyGoal.js'
 
 export const createTask=asyncHandler(async (req,res,next)=>{
     const userId=req.user._id
@@ -54,7 +55,7 @@ export const updateTask=asyncHandler(async(req,res,next)=>{
         return next(new HttpException("Due date cannot be in the past",400))
     }
 
-    if(dueDate){
+    if(dueDate && status!=="completed"){
         const sessionAfterDue=await sessionModel.findOne({
             taskId,
             userId,
@@ -89,6 +90,10 @@ export const updateTask=asyncHandler(async(req,res,next)=>{
     }
 
     await task.save()
+    // After task completion, evaluate weekly goal increment
+    if(status === 'completed'){
+        await incrementWeeklyGoalIfNeeded(userId)
+    }
 
     res.status(200).json({message:"Task updated successfully",task})
 })
@@ -107,6 +112,7 @@ export const confirmTask=asyncHandler(async(req,res,next)=>{
     task.completedAt=new Date()
 
     await task.save()
+    await incrementWeeklyGoalIfNeeded(userId)
 
     res.status(200).json({message:"Task marked as completed",task})
 })

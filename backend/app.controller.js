@@ -9,6 +9,7 @@ import cors from "cors";
 import { deleteDueTasks } from "./cron/task.cron.js";
 import { updateMissedSessions } from "./cron/session.cron.js";
 import { remindUserSession,remindUserTask } from "./cron/reminder.cron.js";
+import { weeklyResetCompletedGoals } from "./cron/weeklyReset.cron.js";
 import morgan from "morgan";
 import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
@@ -64,6 +65,7 @@ const bootstrap = async (app, express) => {
   deleteDueTasks()
   remindUserSession()
   remindUserTask()
+  weeklyResetCompletedGoals()
 
 
 

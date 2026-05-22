@@ -11,6 +11,7 @@ import HttpException from '../../utils/HttpException.js'
 import { formatLocalDateTime,toLocalTime,toLocalTimeForAI } from '../../utils/customHelpers/customHelpers.js'
 import { hasSessionConflict } from '../../utils/sessionHelper/sessionHelper.js'
 import { CheckSessionAchievements } from '../achievement/achievement.helper.js'
+import incrementWeeklyGoalIfNeeded from '../../utils/weeklyGoal.js'
 
 export const createSession=asyncHandler(async(req,res,next)=>{
     const userId=req.user._id
@@ -132,17 +133,30 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
         status:'scheduled'
     }).select("startTime endTime name")    
 
-    // Checking each session with existing sessions to see if there are overlaps
-   for (const session of updatedSessions) {
-        hasSessionConflict(existingSessions,session)
-    }
-// if there isn't proceed to create sessions
-   await sessionModel.insertMany(updatedSessions);
+        // Checking each session with existing sessions to see if there are overlaps
+        try {
+            for (const s of updatedSessions) {
+                hasSessionConflict(existingSessions, s)
+            }
 
-   const user=await userModel.findOne({_id:userId})
-   user.addXP(50)
+            // if there isn't proceed to create sessions
+            await sessionModel.insertMany(updatedSessions);
 
-    res.status(200).json({message:"Schedule Created Successfully"})
+            const user = await userModel.findOne({ _id: userId })
+            if (user) user.addXP(50)
+
+            return res.status(200).json({ message: "Schedule Created Successfully" })
+        } catch (err) {
+            // Rollback created task and any partially created sessions
+            try {
+                await taskModel.deleteOne({ _id: newTask._id })
+            } catch (e) {
+                console.error('Failed to rollback created task after schedule error', e)
+            }
+
+            if (err instanceof HttpException) return next(err)
+            return next(new HttpException(err.message || 'Failed to create schedule', 400))
+        }
 })
 export const getSchedule = asyncHandler(async (req, res, next) => {
     const userId = req.user._id
@@ -174,6 +188,11 @@ export const getSchedule = asyncHandler(async (req, res, next) => {
         .populate("taskId")
         .populate("subjectId", "name")
         .sort({ startTime: 1 })
+
+    const tasks = await taskModel
+        .find({ userId })
+        .populate("subjectId", "name")
+        .sort({ dueDate: 1, createdAt: 1 })
 
     let totalHoursThisWeek = 0
     let spentHoursThisWeek = 0
@@ -258,6 +277,7 @@ export const getSchedule = asyncHandler(async (req, res, next) => {
     res.status(200).json({
         message: "Sessions Generated Successfully",
         sessions,
+        tasks,
         weekStart,
         weekEnd,
         metrics: {
@@ -326,6 +346,7 @@ export const editSession = asyncHandler(async (req, res, next) => {
 
             await session.save()
             await CheckSessionAchievements(userId);
+            await incrementWeeklyGoalIfNeeded(userId);
 
             return res.status(200).json({message:"Session Completed Successfully",session})
         }
@@ -467,6 +488,7 @@ export const updateSession = asyncHandler(async (req, res, next) => {
         }
         
         await CheckSessionAchievements(session.userId);
+        await incrementWeeklyGoalIfNeeded(session.userId);
 
         return res.status(200).json({ message: "Session marked as completed", session });
     }

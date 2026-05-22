@@ -8,32 +8,24 @@ import {
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { X,Loader2 } from "lucide-react";
-import api from "../../../middleware/api";
-import { useQuery,useMutation,useQueryClient } from "@tanstack/react-query";
+import { useMutation,useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import api from "../../../middleware/api";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-async function getTasks() {
-  const response = await api.get("/tasks");
-  return response.data?.tasks ?? [];
-}
 async function createSession(newSession){
   const {name,date,startTime,endTime,taskId}=newSession
   const response=await api.post('/sessions',{name,date,startTime,endTime,taskId})
   return response.data
 }
 
-function CreateSessionModal({ setAddModal }) {
+function CreateSessionModal({ setAddModal, tasks = [] }) {
   const { t } = useTranslation("schedule");
   const queryClient = useQueryClient();
  
   const today = toLocalDateInputValue();
   const[err,setError]=useState("")
-  const { data: tasks = [], isLoading, error } = useQuery({
-    queryKey: ["tasks"],
-    queryFn: getTasks,
-  });
 
   const [newSession, setNewSession] = useState({
     name: "",
@@ -49,9 +41,6 @@ function CreateSessionModal({ setAddModal }) {
       queryClient.invalidateQueries({
         queryKey:['schedule']
       })
-      queryClient.invalidateQueries({
-        queryKey:['tasks']
-      })
       setAddModal(false)
     },
     onError:(err)=>{
@@ -59,8 +48,6 @@ function CreateSessionModal({ setAddModal }) {
          setError(errorMsg);
        }
   })
-
-  console.log(newSession)
 
   const [taskSelection, setTask] = useState(false);
 
@@ -88,8 +75,8 @@ function CreateSessionModal({ setAddModal }) {
   };
 
   const selectedTaskName =
-    tasks.length>0 &&
-    tasks.find((task) => task._id === newSession.taskId)?.name ||
+    (tasks.length > 0 &&
+      tasks.find((task) => task._id === newSession.taskId)?.name) ||
     t("createSessionModal.selectTask");
 
   return (
@@ -97,7 +84,7 @@ function CreateSessionModal({ setAddModal }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-60"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -118,14 +105,10 @@ function CreateSessionModal({ setAddModal }) {
           </button>
           
         </div>
-    {error || err ? <p className="flex justify-center items-center text-center rounded-[16px] mb-6 p-3 bg-red-500/10 border border-red-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.15)] text-red-300">{error || err}</p>: ""}
+        {err ? <p className="flex justify-center items-center text-center rounded-2xl mb-6 p-3 bg-red-500/10 border border-red-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.15)] text-red-300">{err}</p>: ""}
 
         {/* LOADING */}
-        {isLoading ? (
-          <p className="text-white/50 text-sm text-center py-8">
-            {t("loading.tasks")}
-          </p>
-        ) : tasks.length > 0 ? (
+        {tasks.length > 0 ? (
           <div className="space-y-3">
             {/* SESSION NAME */}
                         <label htmlFor="NAME" className='text-[11px] text-[#B8A7E5] uppercase mb-1 block'>{t("createSessionModal.nameLabel")}</label>
@@ -176,7 +159,7 @@ function CreateSessionModal({ setAddModal }) {
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 5 }}
                       exit={{ opacity: 0, y: -5 }}
-                      className="absolute z-20 w-full bg-[#1B142D] border border-white/10 rounded-[12px] shadow-2xl p-1"
+                      className="absolute z-20 w-full bg-[#1B142D] border border-white/10 rounded-xl shadow-2xl p-1"
                     >
                       {tasks.map((opt) => (
                         <li key={opt._id}>
@@ -186,7 +169,7 @@ function CreateSessionModal({ setAddModal }) {
                               update("taskId", opt._id);
                               setTask(false);
                             }}
-                            className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-[8px] transition-colors ${
+                            className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
                               newSession.taskId === opt._id
                                 ? "bg-[#9B7EDE] text-white"
                                 : "text-white/70 hover:bg-white/5"
@@ -222,7 +205,7 @@ function CreateSessionModal({ setAddModal }) {
                   date: e.target.value,
                 }))
               }
-              className="w-full rounded-[10px] custom-date  border border-white/10 bg-white/5 px-3 py-2 text-sm text-white [color-scheme:dark]"
+              className="w-full rounded-[10px] custom-date  border border-white/10 bg-white/5 px-3 py-2 text-sm text-white scheme-dark"
             />
 
             {/* TIME */}
@@ -240,7 +223,7 @@ function CreateSessionModal({ setAddModal }) {
                     startTime: e.target.value,
                   }))
                 }
-                className="rounded-[10px] border custom-date border-white/10 bg-white/5 px-3 py-2 text-sm text-white [color-scheme:dark]"
+                className="rounded-[10px] border custom-date border-white/10 bg-white/5 px-3 py-2 text-sm text-white scheme-dark"
               />
 
 </div>
@@ -256,7 +239,7 @@ function CreateSessionModal({ setAddModal }) {
                     endTime: e.target.value,
                   }))
                 }
-                className="rounded-[10px] border custom-date border-white/10 bg-white/5 px-3 py-2 text-sm text-white [color-scheme:dark]"
+                className="rounded-[10px] border custom-date border-white/10 bg-white/5 px-3 py-2 text-sm text-white scheme-dark"
                 />
                 </div>
             </div>
@@ -288,7 +271,7 @@ function CreateSessionModal({ setAddModal }) {
             </div>
           </div>
         ) : (
-          <p className="flex justify-center items-center text-center rounded-[24px] p-8 bg-red-500/10 border border-red-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.15)] text-red-200">
+          <p className="flex justify-center items-center text-center rounded-3xl p-8 bg-red-500/10 border border-red-500/20 backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.15)] text-red-200">
             {t("createSessionModal.noTasksMessage")}
           </p>
         )}

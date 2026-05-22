@@ -1,42 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { motion } from "framer-motion";
-import SubjectRow from "./SubjectRow";
 import { FriendshipIcon, ElectricIcon, EmptyStarIcon } from "@/comp/ui/Icons";
 import { useTranslation } from "react-i18next";
-
-const subjects = [
-  {
-    name: "Data Structures",
-    friendSubject: "Physics 1",
-    youScore: 85,
-    friendScore: 88,
-    diff: -3,
-  },
-  {
-    name: "Web Development",
-    friendSubject: "Chemistry",
-    youScore: 72,
-    friendScore: 75,
-    diff: -3,
-  },
-  {
-    name: "Database Design",
-    friendSubject: "Biology",
-    youScore: 90,
-    friendScore: 92,
-    diff: -2,
-  },
-  {
-    name: "Algorithm Analysis",
-    friendSubject: "Biochemistry",
-    youGrade: "B",
-    friendGrade: "B",
-    youScore: 68,
-    friendScore: 70,
-    diff: -2,
-  },
-];
 
 const containerVariants = {
   hidden: {},
@@ -51,8 +17,59 @@ const itemVariants = {
   },
 };
 
-function SubjectComparison() {
-  const { t } = useTranslation("friends");
+function SubjectComparison({ meSubjects = [], friendSubjects = [], meTasks = [], friendTasks = [], friendName = "Friend", loading = false }) {
+  const { t, i18n } = useTranslation("friends");
+
+  const renderPersonSubjects = (subjectsList, ownerLabel, tasksForOwner = []) => {
+    if (!subjectsList || subjectsList.length === 0) {
+      return (
+        <div className="py-4 text-purple-300/60 text-sm">{t("searchFriends.noResults")}</div>
+      )
+    }
+
+    return subjectsList.map((subject) => {
+      const progress = subject.totalHours > 0 ? Math.min(100, (subject.hoursSpent / subject.totalHours) * 100) : 0
+      const tasks = (tasksForOwner || []).filter(
+        (task) => ((task.subjectId && (task.subjectId._id || task.subjectId).toString()) === subject.subjectId?.toString())
+      )
+
+      return (
+        <motion.div key={subject.subjectId} variants={itemVariants} className="flex flex-col gap-3 rounded-xl border border-[#9B7EDE]/10 bg-[#342C4B] p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-white font-semibold text-sm">{subject.subjectName}</p>
+              {i18n?.language?.toLowerCase?.().startsWith("ar") ? (
+                <p className="text-purple-300/50 text-xs">{t("progress.hoursPerWeek")} {subject.hoursPerWeek}</p>
+              ) : (
+                <p className="text-purple-300/50 text-xs">{subject.hoursPerWeek} {t("progress.hoursPerWeek")}</p>
+              )}
+            </div>
+            <p className="text-purple-300/60 text-xs text-right">{ownerLabel}</p>
+          </div>
+
+          <div className="rounded-lg bg-[#3D3555] p-3">
+            <div className="flex items-center justify-between text-xs text-purple-300/60 mb-2">
+              <span>{t("progress.hoursSpent")}</span>
+              <span>{subject.hoursSpent}/{subject.totalHours} hrs</span>
+            </div>
+            <div className="h-2 rounded-full bg-[#2A2440] overflow-hidden">
+              <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.7, ease: "easeOut" }} className="h-full rounded-full bg-[linear-gradient(90deg,#9B7EDE_0%,#7C5FBD_100%)]" />
+            </div>
+          </div>
+          {tasks && tasks.length > 0 && (
+            <div className="mt-2">
+              <p className="text-purple-300/60 text-xs mb-1">{t('searchFriends.matches')}</p>
+              <ul className="text-sm text-purple-100/90 list-disc list-inside">
+                {tasks.map((task) => (
+                  <li key={task._id} className="text-purple-100/90 text-xs">{task.name} — {task.hoursSpent || 0}/{task.totalHours || 0} hrs</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </motion.div>
+      )
+    })
+  }
 
   return (
     <div className="font-Inter mt-7 flex items-start justify-center">
@@ -73,16 +90,27 @@ function SubjectComparison() {
             {t("subjectComparison.title")}
           </h2>
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="flex flex-col gap-5"
-          >
-            {subjects.map((subject, i) => (
-              <SubjectRow key={subject.name} subject={subject} index={i} />
-            ))}
-          </motion.div>
+          {loading ? (
+            <div className="flex items-center justify-center py-8 text-purple-300/80">
+              {t("searchFriends.searchingTitle")}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-sm text-white font-semibold mb-3">{t("progress.you")}</h3>
+                <div className="flex flex-col gap-3">
+                  {renderPersonSubjects(meSubjects, t("progress.you"))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm text-white font-semibold mb-3">{friendName}</h3>
+                <div className="flex flex-col gap-3">
+                  {renderPersonSubjects(friendSubjects, friendName)}
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Action Buttons */}

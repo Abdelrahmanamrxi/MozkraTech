@@ -56,6 +56,10 @@
     "level": "Level",
     "rank": "Rank",
     "studyHours": "Study Hours",
+    "hoursPerWeek": "Hours / Week",
+    "hoursSpent": "Hours Spent",
+    "completedGoals": "Completed Goals",
+    "totalHours": "Total Hours",
     "goals": "Goals",
     "dayStreak": "Day Streak",
     "achievements": "Achievements",
@@ -67,9 +71,25 @@
     "subtitle": "You're ranked",
     "outOf": "out of",
     "studyHours": "Study Hours",
-    "goals": "Goals",
     "streak": "Streak",
-    "fullRankings": "Full Rankings"
+    "days": "days",
+    "fullRankings": "Full Rankings",
+    "loading": "Loading leaderboard...",
+    "refreshing": "Refreshing...",
+    "retry": "Retry",
+    "errorTitle": "Could not load leaderboard",
+    "errorMessage": "An error occurred while loading the leaderboard.",
+    "emptyTitle": "No friends yet",
+    "emptyDescription": "Add friends to see your leaderboard, compare progress, and compete together.",
+    "emptyCta": "Add Friends",
+    "me": "Me",
+    "unknownUser": "Unknown user",
+    "filters": {
+      "overallProgress": "Overall Progress",
+      "studyHours": "Study Hours",
+      "totalHours": "Total Hours",
+      "level": "Level"
+    }
   },
 
   "behind": "behind",
@@ -84,7 +104,8 @@
     "shareAchievement": "Share Achievement",
     "studyDesc": "Schedule a group study session with friends",
     "challengeDesc": "Create a study challenge and compete",
-    "shareDesc": "Celebrate your progress with friends"
+    "shareDesc": "Celebrate your progress with friends",
+    "empty":"No friends found matching your search"
   },
   "searchFriends": {
     "title": "Find And Add Friends",

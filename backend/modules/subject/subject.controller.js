@@ -32,6 +32,36 @@ export const createSubject = asyncHandler(async (req, res, next) => {
     .json({ message: "Subject created successfully", subject });
 });
 
+export const updateSubject = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const { subjectId } = req.params;
+  const { name, difficulty, interestLevel, subjectType, hoursPerWeek } =
+    req.body;
+
+  const subject = await SubjectModel.findOneAndUpdate(
+    { _id: subjectId, userId },
+    {
+      $set: {
+        name,
+        difficulty: difficulty.toLowerCase(),
+        interestLevel,
+        subjectType,
+        hoursPerWeek,
+      },
+    },
+    { new: true },
+  );
+
+  if (!subject) {
+    return next(new HttpException("Subject not found", 404));
+  }
+
+  return res.status(200).json({
+    message: "Subject updated successfully",
+    subject,
+  });
+});
+
 export const getUserSubjects = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
 

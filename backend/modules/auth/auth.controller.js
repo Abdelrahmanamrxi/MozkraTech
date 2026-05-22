@@ -121,6 +121,7 @@ export const login = asyncHandler(async (req, res, next) => {
     isDeleted: false,
     provider: "system",
   });
+
   if (!user) {
     return next(new HttpException("No User with Such Record Exists", 401));
   }

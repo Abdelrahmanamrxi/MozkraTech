@@ -267,11 +267,60 @@ export const WeeklyInsightIcon=()=>(
 </svg>
 )
   
-    export const InfinityIcon=()=>
+export const InfinityIcon=()=>
     (<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M20.1 5.06007L8.06004 12.9201C4.20004 15.4401 4.20004 21.0801 8.06004 23.6001L20.1 31.4601C22.26 32.8801 25.82 32.8801 27.98 31.4601L39.96 23.6001C43.8 21.0801 43.8 15.4601 39.96 12.9401L27.98 5.08007C25.82 3.64007 22.26 3.64007 20.1 5.06007Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M11.26 26.1599L11.24 35.5399C11.24 38.0799 13.2 40.7999 15.6 41.5999L21.98 43.7199C23.08 44.0799 24.9 44.0799 26.02 43.7199L32.4 41.5999C34.8 40.7999 36.76 38.0799 36.76 35.5399V26.2599" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M42.8 30V18" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>)
+
+
+export const ClockIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 3" />
+  </svg>
+);
+
+export const TargetIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="12" cy="12" r="1" fill="currentColor" />
+  </svg>
+);
+
+export const Search2Icon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <path d="M21 21l-4.35-4.35" />
+  </svg>
+);
 
 

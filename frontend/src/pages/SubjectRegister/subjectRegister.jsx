@@ -5,6 +5,7 @@ import {
   PlusIcon,
   X,
   Trash2,
+  Pencil,
   BookOpen,
   Target,
   Clock,
@@ -16,6 +17,19 @@ import { useDispatch } from "react-redux";
 import { setAccessToken } from "../../slices/authSlice";
 import { getPostAuthRedirectPath } from "../../utils/authRedirect";
 import api from "../../middleware/api";
+
+const normalizeDifficultyValue = (value) => {
+  const normalized = String(value || "medium").toLowerCase();
+  if (["easy", "medium", "hard"].includes(normalized)) return normalized;
+  return "medium";
+};
+
+const formatSubjectLabel = (value) => {
+  if (!value) return "";
+  return String(value)
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -114,7 +128,7 @@ const FormDropdown = ({ options, value, onChange, placeholder, isRTL }) => {
     >
       <div
         onClick={() => setOpen((v) => !v)}
-        className={`cursor-pointer w-full bg-white/10 border border-white/20 rounded-[12px] px-3 py-2.5 text-white text-sm flex items-center backdrop-blur-md hover:border-[#9B7EDE]/60 transition-all ${isRTL ? "flex-row-reverse" : "flex-row"} justify-between`}
+        className={`cursor-pointer w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-white text-sm flex items-center backdrop-blur-md hover:border-[#9B7EDE]/60 transition-all ${isRTL ? "flex-row-reverse" : "flex-row"} justify-between`}
       >
         <span className={!selected ? "text-white/40" : ""}>
           {selected ? selected.label : placeholder}
@@ -133,7 +147,7 @@ const FormDropdown = ({ options, value, onChange, placeholder, isRTL }) => {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="absolute mt-2 w-full bg-[#2F2844] border border-white/10 rounded-[14px] shadow-xl overflow-hidden z-[60]"
+            className="absolute mt-2 w-full bg-[#2F2844] border border-white/10 rounded-2xl shadow-xl overflow-hidden z-60"
           >
             {options.map((option, index) => (
               <div
@@ -160,49 +174,73 @@ const FormDropdown = ({ options, value, onChange, placeholder, isRTL }) => {
 
 // ─── SubjectCard ──────────────────────────────────────────────────────────────
 
-const SubjectCard = ({ subject, onRemove }) => (
+const SubjectCard = ({ subject, onRemove, onEdit, isEdit }) => (
   <motion.div
     initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, scale: 0.95 }}
-    className="flex items-center justify-between bg-[#2F2844]/80 border border-white/10 rounded-[16px] px-4 py-3"
+    className="flex items-center justify-between bg-[#2F2844]/80 border border-white/10 rounded-2xl px-4 py-3"
   >
     <div className="flex items-center gap-3">
-      <div className="w-3 h-3 rounded-full bg-[#9B7EDE] flex-shrink-0" />
+      <div className="w-3 h-3 rounded-full bg-[#9B7EDE] shrink-0" />
       <div>
         <p className="text-sm font-semibold text-white">{subject.name}</p>
         <p className="text-[10px] text-[#B8A7E5] mt-0.5">
-          {subject.difficulty} • {subject.hoursPerWeek}h/week •{" "}
-          {subject.subjectType}
+          {formatSubjectLabel(subject.difficulty)} • {subject.hoursPerWeek}h/week •{" "}
+          {formatSubjectLabel(subject.subjectType)}
         </p>
       </div>
     </div>
-    <motion.button
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={onRemove}
-      className="text-red-400 hover:text-red-300 transition-colors p-1 cursor-pointer"
-    >
-      <Trash2 size={14} />
-    </motion.button>
+    <div className="flex items-center gap-2">
+      {isEdit && onEdit && (
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onEdit}
+          className="text-[#B59EF7] hover:text-white transition-colors p-1 cursor-pointer"
+          type="button"
+          aria-label="Edit subject"
+        >
+          <Pencil size={14} />
+        </motion.button>
+      )}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onRemove}
+        className="text-red-400 hover:text-red-300 transition-colors p-1 cursor-pointer"
+        type="button"
+        aria-label="Delete subject"
+      >
+        <Trash2 size={14} />
+      </motion.button>
+    </div>
   </motion.div>
 );
 
 // ─── AddSubjectForm ───────────────────────────────────────────────────────────
 
-const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
-  const [name, setName] = useState("");
-  const [difficulty, setDifficulty] = useState("Medium");
-  const [hoursPerWeek, setHoursPerWeek] = useState("");
-  const [subjectType, setSubjectType] = useState("theoretical");
-  const [interestLevel, setInterestLevel] = useState(3);
+const AddSubjectForm = ({ onSubmit, onCancel, lang, initialSubject = null, submitLabel = "Add" }) => {
+  const [name, setName] = useState(initialSubject?.name || "");
+  const [difficulty, setDifficulty] = useState(
+    normalizeDifficultyValue(initialSubject?.difficulty),
+  );
+  const [hoursPerWeek, setHoursPerWeek] = useState(
+    initialSubject?.hoursPerWeek ? String(initialSubject.hoursPerWeek) : "",
+  );
+  const [subjectType, setSubjectType] = useState(
+    initialSubject?.subjectType || "theoretical",
+  );
+  const [interestLevel, setInterestLevel] = useState(
+    initialSubject?.interestLevel || 3,
+  );
 
   const isRTL = lang === "ar";
 
   const difficultyOptions = [
-    { value: "Easy", label: isRTL ? "سهل" : "Easy" },
-    { value: "Medium", label: isRTL ? "متوسط" : "Medium" },
-    { value: "Hard", label: isRTL ? "صعب" : "Hard" },
+    { value: "easy", label: isRTL ? "سهل" : "Easy" },
+    { value: "medium", label: isRTL ? "متوسط" : "Medium" },
+    { value: "hard", label: isRTL ? "صعب" : "Hard" },
   ];
 
   const typeOptions = [
@@ -219,7 +257,7 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
     const parsedHours = parseInt(hoursPerWeek, 10);
     if (!name.trim() || !Number.isFinite(parsedHours) || parsedHours < 1)
       return;
-    onAdd({
+    onSubmit({
       name: name.trim(),
       difficulty,
       hoursPerWeek: parsedHours,
@@ -228,12 +266,22 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
     });
   };
 
+  useEffect(() => {
+    setName(initialSubject?.name || "");
+    setDifficulty(normalizeDifficultyValue(initialSubject?.difficulty));
+    setHoursPerWeek(
+      initialSubject?.hoursPerWeek ? String(initialSubject.hoursPerWeek) : "",
+    );
+    setSubjectType(initialSubject?.subjectType || "theoretical");
+    setInterestLevel(initialSubject?.interestLevel || 3);
+  }, [initialSubject]);
+
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
-      className="mt-4 bg-[#2F2844]/80 border border-white/10 rounded-[16px] p-4 overflow-visible"
+      className="mt-4 bg-[#2F2844]/80 border border-white/10 rounded-2xl p-4 overflow-visible"
     >
       <div className="flex flex-col gap-3">
         <input
@@ -243,7 +291,7 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
           placeholder={
             isRTL ? "اسم المادة (مثلاً: رياضة)" : "Subject name (e.g. Calculus)"
           }
-          className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white placeholder-white/40 text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
+          className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/40 text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
         />
 
         <div className="flex flex-col lg:flex-row gap-3">
@@ -258,7 +306,7 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
             value={hoursPerWeek}
             onChange={(e) => setHoursPerWeek(e.target.value)}
             placeholder="h/week"
-            className="flex-1 bg-white/10 border border-white/20 rounded-[12px] px-3 py-2.5 text-white text-sm placeholder-white/40 focus:outline-none focus:border-[#9B7EDE]/60 transition-all [appearance:textfield]"
+            className="flex-1 bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-white text-sm placeholder-white/40 focus:outline-none focus:border-[#9B7EDE]/60 transition-all [appearance:textfield]"
           />
         </div>
 
@@ -290,9 +338,9 @@ const AddSubjectForm = ({ onAdd, onCancel, lang }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleAdd}
-            className="flex-1 py-2 bg-gradient-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-lg text-sm font-medium transition-all cursor-pointer"
+            className="flex-1 py-2 bg-linear-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-lg text-sm font-medium transition-all cursor-pointer"
           >
-            {isRTL ? "إضافة" : "Add"}
+            {submitLabel}
           </motion.button>
         </div>
       </div>
@@ -371,7 +419,7 @@ const SubjectRegister = ({ isEdit = false }) => {
   const [showAddSubject, setShowAddSubject] = useState(false);
   const [sessionDuration, setSessionDuration] = useState("60");
   const [breakDuration, setBreakDuration] = useState("15");
-  const [weeklyGoalHours, setHours] = useState("1");
+  const [weeklyGoalHours, setWeeklyGoalHours] = useState("1");
   const [preferredStartTime, setPreferredStartTime] = useState("08:00");
   const [preferredEndTime, setPreferredEndTime] = useState("22:00");
   const [freeDays, setFreeDays] = useState([
@@ -383,6 +431,7 @@ const SubjectRegister = ({ isEdit = false }) => {
   ]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [editingSubjectKey, setEditingSubjectKey] = useState(null);
 
   const dayOptions = [
     { value: "Monday", label: isRTL ? "الاثنين" : "Mon" },
@@ -437,7 +486,7 @@ const SubjectRegister = ({ isEdit = false }) => {
       setIsLoadingSubjects(false);
       setSessionDuration("60");
       setBreakDuration("15");
-      setHours("1");
+      setWeeklyGoalHours("1");
       setPreferredStartTime("08:00");
       setPreferredEndTime("22:00");
       setFreeDays(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]);
@@ -445,43 +494,42 @@ const SubjectRegister = ({ isEdit = false }) => {
     }
 
     let isActive = true;
-    const loadSubjects = async () => {
+    const loadPreferences = async () => {
       setIsLoadingSubjects(true);
       try {
-        const { data } = await api.get("/subjects");
-        console.log(data);
-        if (isActive)
-          setSubjects(Array.isArray(data?.subjects) ? data.subjects : []);
+        const { data } = await api.get("/user/get-profile?edit=true");
+        if (!isActive || !data) return;
+
+        const profileData = data?.data || {};
+        const subjectsFromProfile = profileData?.subjects;
+
+        if (Array.isArray(subjectsFromProfile) && subjectsFromProfile.length > 0) {
+          setSubjects(subjectsFromProfile);
+        }
+
+        const prefs = profileData?.preferences;
+
+        if (Number.isFinite(prefs?.timer?.sessionDuration))
+          setSessionDuration(String(prefs.timer.sessionDuration));
+        if (Number.isFinite(prefs?.timer?.breakDuration))
+          setBreakDuration(String(prefs.timer.breakDuration));
+        if (Number.isFinite(prefs?.weeklyStudyHours))
+          setWeeklyGoalHours(String(prefs.weeklyStudyHours));
+        else if (Number.isFinite(prefs?.weeklyGoalHours))
+          setWeeklyGoalHours(String(prefs.weeklyGoalHours));
+        if (prefs?.preferredTimeRange?.start)
+          setPreferredStartTime(prefs.preferredTimeRange.start);
+        if (prefs?.preferredTimeRange?.end)
+          setPreferredEndTime(prefs.preferredTimeRange.end);
+        if (Array.isArray(prefs?.freeDays) && prefs.freeDays.length > 0)
+          setFreeDays(prefs.freeDays);
       } catch (err) {
-        if (isActive) setSubjectsError("Failed to load subjects.");
+        if (isActive) setSubjectsError("Failed to load study preferences.");
       } finally {
         if (isActive) setIsLoadingSubjects(false);
       }
     };
-    const loadPreferences = async () => {
-      try {
-        const { data } = await api.post("/user/get-profile");
-        const user = data?.user;
-        if (!isActive || !user) return;
 
-        if (Number.isFinite(user?.timer?.sessionDuration))
-          setSessionDuration(String(user.timer.sessionDuration));
-        if (Number.isFinite(user?.timer?.breakDuration))
-          setBreakDuration(String(user.timer.breakDuration));
-        if (Number.isFinite(user?.weeklyGoalHours))
-          setHours(String(user.weeklyGoalHours));
-        if (user?.preferredTimeRange?.start)
-          setPreferredStartTime(user.preferredTimeRange.start);
-        if (user?.preferredTimeRange?.end)
-          setPreferredEndTime(user.preferredTimeRange.end);
-        if (Array.isArray(user?.freeDays) && user.freeDays.length > 0)
-          setFreeDays(user.freeDays);
-      } catch (err) {
-        if (isActive) setSubjectsError("Failed to load study preferences.");
-      }
-    };
-
-    loadSubjects();
     loadPreferences();
     return () => {
       isActive = false;
@@ -497,6 +545,36 @@ const SubjectRegister = ({ isEdit = false }) => {
     const tempId = `temp-${Date.now()}`;
     setSubjects((prev) => [...prev, { ...subject, tempId }]);
     setShowAddSubject(false);
+  };
+
+  const handleUpdateSubject = async (subject, updatedSubject) => {
+    const subjectKey = subject?._id || subject?.tempId;
+
+    if (!subjectKey) return;
+
+    if (subject?._id) {
+      try {
+        const { data } = await api.patch(`/subjects/${subject._id}`, updatedSubject);
+        if (data?.subject) {
+          setSubjects((prev) =>
+            prev.map((item) => (item._id === subject._id ? data.subject : item)),
+          );
+        }
+        setEditingSubjectKey(null);
+      } catch (err) {
+        setSubjectsError("Failed to update subject.");
+      }
+      return;
+    }
+
+    setSubjects((prev) =>
+      prev.map((item) =>
+        item.tempId === subject.tempId
+          ? { ...item, ...updatedSubject, tempId: subject.tempId }
+          : item,
+      ),
+    );
+    setEditingSubjectKey(null);
   };
 
   const handleRemoveSubject = async (subject) => {
@@ -537,7 +615,7 @@ const SubjectRegister = ({ isEdit = false }) => {
           end: preferredEndTime,
         },
         freeDays,
-        weeklyStudyHours: totalWeeklyHours,
+        weeklyStudyHours: normalizedWeeklyGoalHours,
         weeklyGoalHours: normalizedWeeklyGoalHours,
       });
       // Refresh access token so client sees updated isSubjectVerified claim
@@ -577,7 +655,7 @@ const SubjectRegister = ({ isEdit = false }) => {
         >
           {/* LEFT COLUMN */}
           <div className="flex flex-col gap-6 lg:w-[58%]">
-            <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-[24px] p-6">
+            <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-3xl p-6">
               <div
                 className={`flex flex-col lg:flex-row gap-5 lg:justify-between lg:items-center mb-6 ${isRTL ? "flex-row-reverse" : ""}`}
               >
@@ -601,22 +679,43 @@ const SubjectRegister = ({ isEdit = false }) => {
 
               <div className="flex flex-col gap-3">
                 <AnimatePresence>
-                  {subjects.map((subject, idx) => (
-                    <SubjectCard
-                      key={subject._id || subject.tempId || idx}
-                      subject={subject}
-                      onRemove={() => handleRemoveSubject(subject)}
-                    />
-                  ))}
+                  {subjects.map((subject, idx) => {
+                    const subjectKey = subject._id || subject.tempId || idx;
+                    const isEditing = isEdit && editingSubjectKey === subjectKey;
+
+                    return (
+                      <div key={subjectKey} className="flex flex-col gap-3">
+                        {isEditing ? (
+                          <AddSubjectForm
+                            initialSubject={subject}
+                            submitLabel={isRTL ? "حفظ التعديل" : "Save Changes"}
+                            onSubmit={(updatedSubject) =>
+                              handleUpdateSubject(subject, updatedSubject)
+                            }
+                            onCancel={() => setEditingSubjectKey(null)}
+                            lang={lang}
+                          />
+                        ) : (
+                          <SubjectCard
+                            subject={subject}
+                            isEdit={isEdit}
+                            onEdit={() => setEditingSubjectKey(subjectKey)}
+                            onRemove={() => handleRemoveSubject(subject)}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </AnimatePresence>
               </div>
 
               <AnimatePresence>
                 {showAddSubject && (
                   <AddSubjectForm
-                    onAdd={handleAddSubject}
+                    onSubmit={handleAddSubject}
                     onCancel={() => setShowAddSubject(false)}
                     lang={lang}
+                    submitLabel={isRTL ? "إضافة" : "Add"}
                   />
                 )}
               </AnimatePresence>
@@ -625,7 +724,7 @@ const SubjectRegister = ({ isEdit = false }) => {
 
           {/* RIGHT COLUMN */}
           <div className="flex flex-col gap-5 lg:w-[42%]">
-            <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-[24px] p-6">
+            <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-3xl p-6">
               <p
                 className={`text-lg font-semibold text-white mb-5 ${isRTL ? "text-right" : ""}`}
               >
@@ -649,7 +748,7 @@ const SubjectRegister = ({ isEdit = false }) => {
                         type="time"
                         value={preferredStartTime}
                         onChange={(e) => setPreferredStartTime(e.target.value)}
-                        className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
+                        className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
                       />
                     </div>
                     <div className="flex-1">
@@ -660,7 +759,7 @@ const SubjectRegister = ({ isEdit = false }) => {
                         type="time"
                         value={preferredEndTime}
                         onChange={(e) => setPreferredEndTime(e.target.value)}
-                        className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
+                        className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
                       />
                     </div>
                   </div>
@@ -714,7 +813,7 @@ const SubjectRegister = ({ isEdit = false }) => {
                   {
                     label: t.weeklyGoalHours,
                     val: weeklyGoalHours,
-                    set: setHours,
+                    set: setWeeklyGoalHours,
                     min: 1,
                   },
                 ].map((input, i) => (
@@ -732,7 +831,7 @@ const SubjectRegister = ({ isEdit = false }) => {
                           input.set(String(input.min));
                         }
                       }}
-                      className="w-full bg-white/10 border border-white/20 rounded-[12px] px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#9B7EDE]/60 transition-all"
                     />
                   </div>
                 ))}
@@ -740,7 +839,7 @@ const SubjectRegister = ({ isEdit = false }) => {
             </div>
 
             {/* Profile Summary */}
-            <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-[24px] p-6">
+            <div className="bg-[#3D3555]/60 border-t border-[#9B7EDE]/20 rounded-3xl p-6">
               <div
                 className={`flex items-center gap-3 mb-4 ${isRTL ? "flex-row-reverse" : ""}`}
               >
@@ -777,7 +876,7 @@ const SubjectRegister = ({ isEdit = false }) => {
               whileTap={{ scale: 0.98 }}
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full py-3.5 bg-gradient-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-[16px] font-semibold text-sm transition-all cursor-pointer disabled:opacity-70"
+              className="w-full py-3.5 bg-linear-to-r from-[#9B7EDE] to-[#B59EF7] text-white rounded-2xl font-semibold text-sm transition-all cursor-pointer disabled:opacity-70"
             >
               {isSaving ? t.saving : t.saveButton}
             </motion.button>
