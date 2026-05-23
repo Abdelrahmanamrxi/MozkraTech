@@ -56,7 +56,9 @@ export default function NavbarMobile({ profileImage }) {
     setNotifOpen(false);
   }, [location.pathname]);
 
-  const NAV_LINKS = [
+  const isLandingPage = location.pathname === "/";
+  
+  const NAV_LINKS = isLandingPage ? [] : [
     { label: t("navbar.dashboard"), icon: "Home", href: "/dashboard" },
     {
       label: t("navbar.progress"),
@@ -216,6 +218,7 @@ export default function NavbarMobile({ profileImage }) {
             </div>
 
             {/* Nav links */}
+            {NAV_LINKS.length > 0 && (
             <nav className="flex-1 px-4 pt-6 pb-4 flex flex-col gap-1.5 overflow-y-auto">
               <p
                 className="text-[0.63rem] font-semibold tracking-[0.15em] uppercase mb-3 pl-2"
@@ -344,6 +347,7 @@ export default function NavbarMobile({ profileImage }) {
                 );
               })}
             </nav>
+            )}
 
             {/* CTA Buttons */}
             <motion.div
@@ -356,9 +360,9 @@ export default function NavbarMobile({ profileImage }) {
                 damping: 30,
               }}
               className="px-4 pt-4 pb-8 flex flex-col gap-2.5"
-              style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ borderTop: isLandingPage ? "none" : "1px solid rgba(255,255,255,0.06)" }}
             >
-              {location.pathname !== "/" && (
+              {!isLandingPage && (
                 <NotificationsUtilityRow
                   notifOpen={notifOpen}
                   setNotifOpen={setNotifOpen}

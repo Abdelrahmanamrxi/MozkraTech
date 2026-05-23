@@ -70,8 +70,8 @@ const router = createBrowserRouter([
             element: <Friends />,
           },
           {
-            path:'/dashboard/messages',
-            element:<FriendsMessages/>
+            path: "/dashboard/messages",
+            element: <FriendsMessages />,
           },
           {
             path: "/dashboard/progress",

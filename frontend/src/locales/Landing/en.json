@@ -1,13 +1,13 @@
 {
   "hero": {
-    "left":"Weekly Updates",
-    "right":"AI Schedule",
+    "left": "Weekly Updates",
+    "right": "AI Schedule",
     "title": "Unlock your {{word}}",
     "word": "potential",
     "description": "The intelligent scheduling platform that adapts to your learning style. Plan smarter, study better, and achieve more with AI-powered insights.",
     "cta": "Get Started Free →"
   },
-  "features":{
+  "features": {
     "title": "Everything You Need to Succeed",
     "description": "Powerful features designed to help you plan better, study smarter, and achieve your academic goals.",
     "cards": [
@@ -37,42 +37,61 @@
       }
     ]
   },
-  "ai_section":{
-  "title": "AI Assistant",
-  "mainHeading": "Master Your Time,",
-  "mainHeadingHighlight": "Ace Your Goals",
-  "mainCard": {
-    "title": "Your Personal Study Coach",
-    "description": "Our advanced AI learns from your habits, energy levels, and performance to create personalized study plans that actually work for you"
-  },
-  "aiSuggestion": {
-    "label": "AI Suggestion",
-    "message": "You're most productive in the morning. I've scheduled your hardest subjects between 9-11 AM."
-  },
-  "secondaryCard":{
-    "title":"AI Suggestion",
-    "description": "You're most productive in the morning. I've scheduled your hardest subjects between 9-11 AM."
-  },
-  "cards": [
-    {
-      "header": "Weekly Insight",
-      "paragraph": "Your focus time increased by 23% this week! Keep up the momentum. 🎉"
+  "ai_section": {
+    "title": "AI Assistant",
+    "mainHeading": "Master Your Time,",
+    "mainHeadingHighlight": "Ace Your Goals",
+    "mainCard": {
+      "title": "Your Personal Study Coach",
+      "description": "Our advanced AI learns from your habits, energy levels, and performance to create personalized study plans that actually work for you"
     },
-    {
-      "header": "Smart Reminder",
-      "paragraph": "Your Algorithms exam is in 3 days. Want to add extra review sessions?"
+    "aiSuggestion": {
+      "label": "AI Suggestion",
+      "message": "You're most productive in the morning. I've scheduled your hardest subjects between 9-11 AM."
     },
-    {
-      "header": "Adaptive Learning",
-      "paragraph": "Adjusts difficulty and timing based on your progress"
-    }
-  ]
+    "secondaryCard": {
+      "title": "AI Suggestion",
+      "description": "You're most productive in the morning. I've scheduled your hardest subjects between 9-11 AM."
+    },
+    "cards": [
+      {
+        "header": "Weekly Insight",
+        "paragraph": "Your focus time increased by 23% this week! Keep up the momentum. 🎉"
+      },
+      {
+        "header": "Smart Reminder",
+        "paragraph": "Your Algorithms exam is in 3 days. Want to add extra review sessions?"
+      },
+      {
+        "header": "Adaptive Learning",
+        "paragraph": "Adjusts difficulty and timing based on your progress"
+      }
+    ]
   },
   "transform_section": {
     "heading": "Ready To Transform Your Study Routine?",
     "description": "Join students who are studying smarter, not harder. Start your free today — no credit card required.",
     "button": "Start Free Today"
+  },
+  "testimonials": {
+    "title": "What Our Students Say",
+    "description": "See how students are beating procrastination, cutting exam stress, and mastering their study schedules with AI-driven tracking.",
+    "reviews": [
+      {
+        "quote": "Balancing five subjects and a part-time job used to crush me. This app automatically breaks down my massive assignments into tiny, manageable daily tasks. The stress relief is unreal.",
+        "name": "Sarah Jenkins",
+        "role": "Sophomore, Biomedical Science"
+      },
+      {
+        "quote": "I used to waste hours setting up Notion templates or switching between Google Calendar and Todoist. Having an AI that automatically builds a realistic study plan around my exam dates changed everything.",
+        "name": "Alex Rivera",
+        "role": "Freshman, Computer Science"
+      },
+      {
+        "quote": "I am a chronic procrastinator, but the smart adaptivity feature here keeps me accountable. When I missed a deadline due to catching a cold, the AI instantly recalculated my entire week's schedule without making me feel guilty.",
+        "name": "Elena Rostova",
+        "role": "Final Year Law Student"
+      }
+    ]
   }
-
-
 }
