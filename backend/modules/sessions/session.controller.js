@@ -99,7 +99,7 @@ export const checkAvailableSessions=asyncHandler(async(req,res,next)=>{
 );
 console.log(recommendedSessions)
     
- res.status(200).json({message:"Generated Sessions Succesfully",recommendedSessions})
+ res.status(200).json({message:"Generated Sessions Successfully",recommendedSessions})
 
 })
 
