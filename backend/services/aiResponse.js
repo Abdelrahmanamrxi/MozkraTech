@@ -251,19 +251,19 @@ INVALID:
 };
 
 
-export const generateQuizResponse = async (
+export const generateQuizResponse = async ({
   pdfText,
   numberOfQuestions,
   questionType,
   difficulty,
   timeOption,
   userDuration
-) => {
+}) => {
   try {
 
     const response = await groq.chat.completions.create({
       model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      max_tokens: 2000,
+      max_tokens: 5000,
       messages: [
         {
           role: "system",

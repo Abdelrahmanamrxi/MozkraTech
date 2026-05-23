@@ -19,6 +19,7 @@ import sessionRouter from "./modules/sessions/session.route.js";
 import taskRouter from "./modules/task/task.routes.js";
 import achievementRouter from "./modules/achievement/achievement.route.js";
 import path from "path";
+import quizRouter from "./modules/quiz/quiz.route.js";
 
 const bootstrap = async (app, express) => {
   // 1. Body parsers
@@ -58,7 +59,8 @@ const bootstrap = async (app, express) => {
   app.use("/api/v1/notifications", notificationRouter);
   app.use("/api/v1/sessions", sessionRouter);
   app.use("/api/v1/tasks", taskRouter);
-  app.use('/api/v1/achievements',achievementRouter)
+  app.use('/api/v1/achievements', achievementRouter);
+  app.use('/api/v1/quiz', quizRouter);
 
   // 5- CRON Tasks
   updateMissedSessions()
