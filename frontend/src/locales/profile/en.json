@@ -55,6 +55,54 @@
       "computerScienceStudent": "Computer Science Student"
     }
   },
+  "gpaCalculator": {
+    "title": "GPA Calculator",
+    "subtitle": "Track your GPA with weighted credits.",
+    "summary": {
+      "currentGpa": "Current GPA",
+      "totalCourses": "Total Courses",
+      "totalCredits": "Total Credits",
+      "averageCredits": "Avg Credits/Course"
+    },
+    "form": {
+      "titleAdd": "Add Course",
+      "titleEdit": "Edit Course",
+      "courseName": "Course name",
+      "credits": "Credits",
+      "grade": "Grade",
+      "addButton": "Add Course",
+      "updateButton": "Update Course",
+      "cancelEdit": "Clear",
+      "errors": {
+        "nameRequired": "Course name is required",
+        "creditsRequired": "Credits must be greater than 0",
+        "gradeRequired": "Grade is required"
+      }
+    },
+    "list": {
+      "title": "Courses",
+      "empty": "No courses added yet. Start by adding your first course."
+    },
+    "scale": {
+      "title": "GPA Scale"
+    },
+    "interpretation": {
+      "title": "Interpretation",
+      "excellent": "Excellent",
+      "good": "Good",
+      "satisfactory": "Satisfactory",
+      "needsImprovement": "Needs Improvement",
+      "empty": "Add courses to see your interpretation."
+    },
+    "actions": {
+      "close": "Close",
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "fields": {
+      "gradePoints": "Grade points"
+    }
+  },
   "editProfile": {
     "title": "Edit Profile",
     "labels": {

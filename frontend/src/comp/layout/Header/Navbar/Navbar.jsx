@@ -1,13 +1,15 @@
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
-import { User } from "lucide-react";
+import { Bell, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../logo/Logo";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
 import { useState, useEffect, useRef } from "react";
 
 import { buildAssetUrl } from "../../../../utils/assetUrl";
+import Notifications from "../Notifications/Notifications";
 import { useNotificationUnreadCount } from "../../../../hooks/useNotifications";
 
 function Navbar({ profileImage }) {
@@ -17,14 +19,16 @@ function Navbar({ profileImage }) {
   const [currentLang, setCurrentLang] = useState(i18n.language || "en");
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
-  
+  const [notifOpen, setNotifOpen] = useState(false);
+  const bellRef = useRef(null);
+
   // Landing page section scroll links
   const sectionLinks = [
     { name: "About Us", sectionId: "hero" },
     { name: "Features", sectionId: "features" },
     { name: "Testimonials", sectionId: "testimonials" },
   ];
-  
+
   // Dashboard navigation links
   const dashboardLinks = [
     { name: t("navbar.dashboard"), to: "/dashboard" },
@@ -33,7 +37,7 @@ function Navbar({ profileImage }) {
     { name: t("navbar.friends"), to: "/dashboard/friends" },
     { name: t("navbar.Messages"), to: "/dashboard/messages" },
   ];
-  
+
   const links = isLandingPage ? sectionLinks : dashboardLinks;
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -103,7 +107,9 @@ function Navbar({ profileImage }) {
       {/* Nav links */}
       <nav className="relative flex gap-0 text-white font-blinker md:text-sm lg:text-base xl:text-lg">
         {links.map((link, i) => {
-          const isActive = isLandingPage ? false : location.pathname === link.to;
+          const isActive = isLandingPage
+            ? false
+            : location.pathname === link.to;
           const isHovered = hoveredIndex === i;
 
           return (
@@ -275,6 +281,24 @@ function Navbar({ profileImage }) {
 
         {isDashboard && (
           <>
+            {/* Notifications */}
+            <motion.button
+              ref={bellRef}
+              type="button"
+              onClick={() => setNotifOpen((prev) => !prev)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 cursor-pointer"
+              aria-label="Toggle notifications"
+            >
+              <Bell size={18} className="text-white/80" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[1.1rem] h-4 px-1 rounded-full flex items-center justify-center text-[0.65rem] font-semibold text-white bg-red-500 border border-white/20 shadow-[0_0_6px_rgba(0,0,0,0.3)]">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </motion.button>
+
             {/* Profile */}
             <Link to="/dashboard/myprofile">
               <motion.div
@@ -296,6 +320,17 @@ function Navbar({ profileImage }) {
           </>
         )}
       </div>
+
+      {notifOpen && typeof document !== "undefined"
+        ? createPortal(
+            <Notifications
+              setNotifications={setNotifOpen}
+              bellRef={bellRef}
+              isOpen={notifOpen}
+            />,
+            document.body,
+          )
+        : null}
     </motion.div>
   );
 }

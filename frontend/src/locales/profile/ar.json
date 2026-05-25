@@ -55,6 +55,54 @@
       "computerScienceStudent": "طالب علوم الحاسوب"
     }
   },
+  "gpaCalculator": {
+    "title": "حاسبة المعدل",
+    "subtitle": "تابع معدلك باستخدام الساعات المعتمدة.",
+    "summary": {
+      "currentGpa": "المعدل الحالي",
+      "totalCourses": "إجمالي المقررات",
+      "totalCredits": "إجمالي الساعات",
+      "averageCredits": "متوسط الساعات/مقرر"
+    },
+    "form": {
+      "titleAdd": "إضافة مقرر",
+      "titleEdit": "تعديل مقرر",
+      "courseName": "اسم المقرر",
+      "credits": "الساعات",
+      "grade": "التقدير",
+      "addButton": "إضافة مقرر",
+      "updateButton": "تحديث المقرر",
+      "cancelEdit": "مسح",
+      "errors": {
+        "nameRequired": "اسم المقرر مطلوب",
+        "creditsRequired": "يجب أن تكون الساعات أكبر من 0",
+        "gradeRequired": "التقدير مطلوب"
+      }
+    },
+    "list": {
+      "title": "المقررات",
+      "empty": "لا توجد مقررات بعد. ابدأ بإضافة أول مقرر."
+    },
+    "scale": {
+      "title": "سلم المعدل"
+    },
+    "interpretation": {
+      "title": "التفسير",
+      "excellent": "ممتاز",
+      "good": "جيد",
+      "satisfactory": "مقبول",
+      "needsImprovement": "بحاجة إلى تحسين",
+      "empty": "أضف مقررات لعرض التفسير."
+    },
+    "actions": {
+      "close": "إغلاق",
+      "delete": "حذف",
+      "edit": "تعديل"
+    },
+    "fields": {
+      "gradePoints": "نقاط التقدير"
+    }
+  },
   "editProfile": {
     "title": "تعديل الملف الشخصي",
     "labels": {

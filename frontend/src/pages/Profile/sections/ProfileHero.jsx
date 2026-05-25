@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../middleware/api";
 import ProfileImageCropper from "./ProfileImageCropper";
 import { buildAssetUrl } from "../../../utils/assetUrl";
+import GPACalculatorModal from "./GPACalculatorModal";
 
 const MAX_PROFILE_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_PROFILE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -307,12 +308,19 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
 
 function ProfileHero({ user, onUserChange, onUserRefresh }) {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showGpaModal, setShowGpaModal] = useState(false);
+  const gpaButtonRef = useRef(null);
   const { t } = useTranslation("profile");
   const navigate = useNavigate();
   const displayTitle = user.titleKey ? t(user.titleKey) : user.title;
   const profileImageUrl = user?.profileImage
     ? buildAssetUrl(user.profileImage)
     : "";
+
+  const handleCloseGpaModal = () => {
+    setShowGpaModal(false);
+    gpaButtonRef.current?.focus();
+  };
 
   const handleSaveProfile = async (form) => {
     const payload = {};
@@ -381,8 +389,8 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
       }));
     }
   };
-  console.log(user.bio)
-  
+  console.log(user.bio);
+
   return (
     <>
       <div className="bg-gradient-to-br from-[#9B7EDE]/60 to-[#7C5FBD]/40 border-t border-[#9B7EDE]/40 rounded-[24px] p-6 lg:p-8 font-Inter">
@@ -428,6 +436,8 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              ref={gpaButtonRef}
+              onClick={() => setShowGpaModal(true)}
               className="flex items-center gap-2 bg-white/15 border border-white/30 text-white text-sm px-4 py-2 rounded-full font-medium hover:bg-white/25 transition-all cursor-pointer"
             >
               <Calculator size={15} /> {t("hero.actions.gpaCalculator")}
@@ -459,6 +469,12 @@ function ProfileHero({ user, onUserChange, onUserRefresh }) {
             onClose={() => setShowEditModal(false)}
             onSave={handleSaveProfile}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showGpaModal && (
+          <GPACalculatorModal user={user} onClose={handleCloseGpaModal} />
         )}
       </AnimatePresence>
     </>
