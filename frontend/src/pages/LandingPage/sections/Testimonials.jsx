@@ -182,7 +182,8 @@ function CosmicMatrix({ nodeCount = 70 }) {
 
 // ─── React Bits: Glowing Character Cascade Title ────────────────────────
 function CascadingTitle({ text, className = "" }) {
-  const characters = Array.from(text);
+  const isArabicText = /\p{Script=Arabic}/u.test(text);
+  const segments = isArabicText ? text.split(/(\s+)/u) : Array.from(text);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -210,14 +211,14 @@ function CascadingTitle({ text, className = "" }) {
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
     >
-      {characters.map((char, index) => (
+      {segments.map((segment, index) => (
         <motion.span
           key={index}
           variants={letterVariants}
           style={{ display: "inline-block", whiteSpace: "pre" }}
           className="bg-gradient-to-b from-white via-[#f7ece1] to-[#9067c6] bg-clip-text text-transparent"
         >
-          {char}
+          {segment}
         </motion.span>
       ))}
     </motion.h2>

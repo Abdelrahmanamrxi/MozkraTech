@@ -9,7 +9,7 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import { ChevronLeft, ChevronRight, Zap, MessageSquare } from "lucide-react";
 import AiImage from "@/assets/ai.svg";
 import analytics from "@/assets/analytics.svg";
 import group from "@/assets/group.svg";
@@ -177,7 +177,15 @@ function AnimatedContent({
 // ─── Features Section ────────────────────────────────────────────────────
 export default function Features({ featureRef }) {
   const { t } = useTranslation();
-  const icons = [AiImage, analytics, Zap, group, schedule, timer];
+  const icons = [
+    AiImage,
+    analytics,
+    Zap,
+    group,
+    schedule,
+    timer,
+    MessageSquare,
+  ];
   const cards = t("features.cards", { returnObjects: true }) || [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
