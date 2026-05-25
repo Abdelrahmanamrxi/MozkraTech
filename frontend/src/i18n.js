@@ -17,6 +17,8 @@ import ProfileenTranslation from "./locales/profile/en.json";
 import ProfilearTranslation from "./locales/profile/ar.json";
 import AchievementsenTranslation from "./locales/achievements/en.json";
 import AchievementsarTranslation from "./locales/achievements/ar.json";
+import ChatbotenTranslation from "./locales/chatbot/en.json";
+import ChatbotarTranslation from "./locales/chatbot/ar.json";
 
 i18n
   .use(initReactI18next)
@@ -34,6 +36,7 @@ i18n
         friends: FriendsenTranslation,
         profile: ProfileenTranslation,
         achievements: AchievementsenTranslation,
+        chatbot: ChatbotenTranslation,
       },
       ar: {
         landing: LandingarTranslation,
@@ -44,9 +47,10 @@ i18n
         friends: FriendsarTranslation,
         profile: ProfilearTranslation,
         achievements: AchievementsarTranslation,
+        chatbot: ChatbotarTranslation,
       },
     },
-    ns: ["landing", "common", "dashboard", "progress", "schedule", "friends", "profile", "achievements"], // optional but explicit
+    ns: ["landing", "common", "dashboard", "progress", "schedule", "friends", "profile", "achievements", "chatbot"], // optional but explicit
     defaultNS: "landing",
     react: {
       useSuspense: true,

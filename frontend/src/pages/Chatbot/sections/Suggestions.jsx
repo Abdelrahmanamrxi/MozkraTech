@@ -1,18 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { motion } from "framer-motion";
-
-const SUGGESTIONS = [
-  "Help me create a study plan",
-  "What's the best way to study for exams?",
-  "Explain Data Structures concepts",
-  "How can I improve my focus?",
-  "Suggest a schedule for this week",
-  "Tips for time management",
-];
+import { useTranslation } from "react-i18next";
 function Suggestions({sendMessage}) {
+  const { t } = useTranslation("chatbot");
+  const items = t("suggestions.items", { returnObjects: true });
+  const suggestions = Array.isArray(items) ? items : [];
   return (
     <>
-       {SUGGESTIONS.map((s) => (
+       {suggestions.map((s) => (
                     <motion.button
                       key={s}
                       whileHover={{ scale: 1.02 }}

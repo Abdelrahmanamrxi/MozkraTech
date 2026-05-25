@@ -1,41 +1,44 @@
 /* eslint-disable no-unused-vars */
-import React from 'react'
-import { motion } from 'framer-motion';
-const FEATURES = [
-  {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-      </svg>
-    ),
-    title: "Smart Suggestions",
-    desc: "Get personalized study recommendations based on your progress",
-  },
-  {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-      </svg>
-    ),
-    title: "Subject Help",
-    desc: "Ask questions about any subject — I'm here to explain concepts",
-  },
-  {
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-      </svg>
-    ),
-    title: "24/7 Available",
-    desc: "I'm always here to help, whenever you need study support",
-  },
+import React from "react";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+
+const FEATURE_ICONS = [
+  (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path d="M2 17l10 5 10-5" />
+      <path d="M2 12l10 5 10-5" />
+    </svg>
+  ),
+  (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  ),
+  (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  ),
 ];
 function Features() {
+  const { t } = useTranslation("chatbot");
+  const items = t("features.items", { returnObjects: true });
+  const features = Array.isArray(items)
+    ? items.map((item, index) => ({
+        ...item,
+        icon: FEATURE_ICONS[index] || FEATURE_ICONS[0],
+      }))
+    : [];
+
   return (
      <>
-   {FEATURES.map((f, i) => (
+   {features.map((f, i) => (
        <motion.div
-       key={f.title}
+       key={`${f.title}-${i}`}
        initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25 + i * 0.07 }}

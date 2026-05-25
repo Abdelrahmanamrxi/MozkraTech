@@ -52,6 +52,20 @@ export const getChat = asyncHandler(async (req, res) => {
     .json({ message: "Chat retrieved successfully", chat: formattedChat });
 });
 
+export const deleteAiConversation=asyncHandler(async(req,res,next)=>{
+  const {conversationId}=req.params
+  const deletedChat=await conversationModel.findOneAndDelete({_id:conversationId})
+
+  if(!deletedChat)
+  return next(new HttpException("Conversation Doesn't Exist"),404)
+
+  await messageModel.deleteMany({
+    conversationId
+  })
+
+  res.status(200).json({message:"Conversation has been deleted"})
+
+})
 
 export const sendMessageToAi=asyncHandler(async(req,res,next)=>{
   const {message,conversationId}=req.body
@@ -125,6 +139,16 @@ export const sendMessageToAi=asyncHandler(async(req,res,next)=>{
 
     }
   ])
+
+  // Update conversation's lastMessageAt using the latest message's createdAt
+  const latestMessage = await messageModel.findOne({ conversationId: conversation._id }).sort({ createdAt: -1 })
+  if (latestMessage) {
+    await conversationModel.updateOne(
+      { _id: conversation._id },
+      { lastMessageAt: latestMessage.createdAt }
+    )
+  }
+
       res.status(200).json({
         conversationId:conversation._id,
         response:aiMessage.response,
@@ -135,17 +159,43 @@ export const sendMessageToAi=asyncHandler(async(req,res,next)=>{
 
 export const getAIChat=asyncHandler(async(req,res,next)=>{
   const {conversationId}=req.params
+  const {cursor}=req.query
   const userId=req.user._id
+  const LIMIT=20
 
-  const messages=await messageModel.find({
-    conversationId,
-    senderId:userId
-  }).sort({createdAt:-1})
+  const query={conversationId}
+
+  // Apply cursor pagination
+  if(cursor){
+    const parsedCursor=new Date(cursor)
+    if(!Number.isNaN(parsedCursor.getTime())){
+      query.createdAt={$lt:parsedCursor}
+    }
+  }
+
+  const messages=await messageModel.find(query)
+    .sort({createdAt:-1})
+    .limit(LIMIT+1) // Fetch one extra to determine if there are more messages
 
   if(!messages){
     return next(new HttpException("Couldn't find any messages matching your criteria",500))
   }
-  res.status(200).json({response:"Messages Sent Successfully",messages})
+
+  // Determine if there are more messages for nextCursor
+  let hasMore=false
+  let nextCursor=null
+  if(messages.length>LIMIT){
+    hasMore=true
+    messages.pop() // Remove the extra message
+    nextCursor=messages[messages.length-1].createdAt.toISOString()
+  }
+
+  res.status(200).json({
+    response:"Messages Sent Successfully",
+    messages,
+    hasMore,
+    nextCursor
+  })
 
 })
 export const getAllAIConversations=asyncHandler(async(req,res,next)=>{
@@ -154,7 +204,7 @@ export const getAllAIConversations=asyncHandler(async(req,res,next)=>{
    const conversations=await conversationModel.find({
     "participants.user":userId,
     participantType:"user-to-ai"
-   }).sort({createdAt:-1})
+   }).sort({lastMessageAt:1})
 
   res.status(200).json({conversations})
 })

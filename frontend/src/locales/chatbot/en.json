@@ -1,0 +1,71 @@
+{
+  "greeting": "Hello! I'm your AI study assistant. I can help you with scheduling, study tips, subject questions, and more. How can I help you today?",
+  "header": {
+    "status": "Online"
+  },
+  "suggestions": {
+    "label": "Suggestions",
+    "items": [
+      "Help me create a study plan",
+      "What's the best way to study for exams?",
+      "Explain Data Structures concepts",
+      "How can I improve my focus?",
+      "Suggest a schedule for this week",
+      "Tips for time management"
+    ]
+  },
+  "input": {
+    "placeholder": "Ask anything...",
+    "attach": "Attach file"
+  },
+  "chat": {
+    "assistantTitle": "AI Study Assistant"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "loadMessages": "Failed to load messages.",
+    "sendMessage": "Sorry, I couldn't send your message. Please try again."
+  },
+  "sidebar": {
+    "newChat": "New Conversation",
+    "recent": "Recent Conversations",
+    "noChats": "No chats found",
+    "back": "Back",
+    "loading": "Loading...",
+    "loadErrorTitle": "Failed to load conversations",
+    "loadErrorHint": "Please try again."
+  },
+  "deleteModal": {
+    "title": "Delete Conversation",
+    "description": "This action cannot be undone. All messages in this conversation will be permanently deleted.",
+    "conversationLabel": "Conversation",
+    "createdLabel": "Created",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "error": "Failed to delete conversation"
+  },
+  "typing": {
+    "label": "Thinking..."
+  },
+  "features": {
+    "items": [
+      {
+        "title": "Smart Suggestions",
+        "desc": "Get personalized study recommendations based on your progress"
+      },
+      {
+        "title": "Subject Help",
+        "desc": "Ask questions about any subject — I'm here to explain concepts"
+      },
+      {
+        "title": "24/7 Available",
+        "desc": "I'm always here to help, whenever you need study support"
+      }
+    ]
+  },
+  "preview": {
+    "title": "Document Preview",
+    "loading": "Loading preview..."
+  }
+}
