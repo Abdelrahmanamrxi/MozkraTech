@@ -50,7 +50,7 @@ const messageSchema = new mongoose.Schema(
       enum: ["text", "image", "file", "code", "suggestion"],
       default: "text",
     },
-    attachments: [
+    attachments: 
       {
         url: { type: String },
         filename: { type: String },
@@ -58,7 +58,7 @@ const messageSchema = new mongoose.Schema(
         size: { type: Number },
         metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
       },
-    ],
+    
     aiContext: {
       type: mongoose.Schema.Types.Mixed,
       default: {},
