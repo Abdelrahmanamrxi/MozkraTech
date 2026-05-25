@@ -124,7 +124,7 @@ export default function ChatSidebar({ isOpen, onClose,activeChat,setActiveChat }
               [&::-webkit-scrollbar-track]:bg-transparent">
               <AnimatePresence initial={false}>
 
-                {isLoading && <p className="flex flex-row gap-3 text-white font-Inter text-base items-center justify-center">{t("sidebar.loading")} <LoaderCircle/></p>}
+                {isLoading && <p className="flex flex-row gap-3 text-white font-Inter text-base items-center  justify-center">{t("sidebar.loading")} <LoaderCircle className="animate-spin"/></p>}
                 {error && (
                   <div className="px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-[11px] text-red-200">
                     <p className="font-semibold">{t("sidebar.loadErrorTitle")}</p>

@@ -105,45 +105,63 @@ function useChatbot({ t, timeLocale }) {
   }, [chatData, activeChat, DEFAULT_GREETING, timeLocale]);
 
   // ─── Sync server → local, preserving unconfirmed optimistic messages ───────
-  useEffect(() => {
-    if (!activeChat) {
-      setMessages(normalizedMessages);
+// useChatbot.js
+const activeChatRef = useRef(activeChat);
+
+useEffect(() => {
+  const didSwitch = activeChatRef.current !== activeChat;
+  activeChatRef.current = activeChat;
+
+  if (!activeChat) {
+    setMessages([DEFAULT_GREETING]);
+    setIsExpanded(false);
+    setIsTyping(false);
+    setSendError("");
+    setIsInitialLoad(true);
+    return;
+  }
+
+  if (didSwitch) {
+    setIsInitialLoad(true);
+    setIsExpanded(false);
+    setIsTyping(false);
+    setSendError("");
+
+    // ✅ If query is cached, data is already here — don't show greeting, fall through
+    if (chatIsLoading || normalizedMessages.length <= 1) {
+      setMessages([DEFAULT_GREETING]);
       return;
     }
+  }
 
+  if (chatIsLoading) return;
+  // Data is ready — merge server + unconfirmed optimistic messages
+  const hasServerMatch = (optimistic) =>
+    normalizedMessages.some((s) => {
+      if (s.role !== optimistic.role) return false;
+      if (s.content !== optimistic.content) return false;
+      if (!s.timestamp || !optimistic.timestamp) return false;
+      return Math.abs(s.timestamp - optimistic.timestamp) < 15_000;
+    });
+
+  setMessages((prev) => {
+    const unconfirmed = prev.filter((m) => m.isOptimistic && !hasServerMatch(m));
+    const combined = [...normalizedMessages, ...unconfirmed];
+    const seen = new Set();
+    const deduped = combined.filter((m) => {
+      const key = String(m.id);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return deduped.sort((a, b) =>
+      a.timestamp && b.timestamp ? a.timestamp - b.timestamp : 0
+    );
+  });
+}, [normalizedMessages, activeChat, chatIsLoading]);
     // A server message "matches" an optimistic one if same role + content
     // arrived within 15 s of when we sent it.
-    const hasServerMatch = (optimistic) =>
-      normalizedMessages.some((s) => {
-        if (s.role !== optimistic.role) return false;
-        if (s.content !== optimistic.content) return false;
-        if (!s.timestamp || !optimistic.timestamp) return false;
-        return Math.abs(s.timestamp - optimistic.timestamp) < 15_000;
-      });
-
-    setMessages((prev) => {
-      // Keep only optimistic messages that haven't been confirmed yet
-      const unconfirmed = prev.filter(
-        (m) => m.isOptimistic && !hasServerMatch(m)
-      );
-
-      const combined = [...normalizedMessages, ...unconfirmed];
-
-      // FIX: use a unique key for every message, including real temp IDs
-      const seen = new Set();
-      const deduped = combined.filter((m) => {
-        // m.id is always set: either a MongoDB _id string, or a Date.now() number
-        const key = String(m.id);
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-
-      return deduped.sort((a, b) =>
-        a.timestamp && b.timestamp ? a.timestamp - b.timestamp : 0
-      );
-    });
-  }, [normalizedMessages, activeChat]);
+  
 
   // ─── Mutation ──────────────────────────────────────────────────────────────
   const { mutate: sendMessageMutation, isPending: isSending } = useMutation({
@@ -296,33 +314,34 @@ function useChatbot({ t, timeLocale }) {
 
   // ─── Scroll tracking ───────────────────────────────────────────────────────
   const handleMessagesScroll = useCallback(() => {
-    if (!messagesContainerRef.current) return;
-
-    const { scrollTop, scrollHeight, clientHeight } =
-      messagesContainerRef.current;
-    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-
-    setUserNearBottom(distanceFromBottom < 100);
-
-    if (scrollTop < 100 && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
+  const container = e.currentTarget; // 👈 always the element that fired the event
+  const { scrollTop, scrollHeight, clientHeight } = container;
+  const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+  setUserNearBottom(distanceFromBottom < 100);
+  if (scrollTop < 100 && hasNextPage && !isFetchingNextPage) {
+    fetchNextPage();
+  }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // ─── Auto-scroll ───────────────────────────────────────────────────────────
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      if (!messagesEndRef.current) return;
 
-      if (isInitialLoad && normalizedMessages.length > 1) {
-        messagesEndRef.current.scrollIntoView({ behavior: "auto" });
-        setIsInitialLoad(false);
-      } else if (userNearBottom && !isInitialLoad) {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    });
-  }, [normalizedMessages, userNearBottom, isInitialLoad,isTyping]);
-
+const regularEndRef = useRef(null);
+const expandedEndRef = useRef(null);
+useEffect(() => {
+  if (chatIsLoading) return;
+  requestAnimationFrame(() => {
+    const target = isExpanded
+      ? expandedEndRef.current
+      : regularEndRef.current;
+    if (!target) return;
+    if (isInitialLoad) {
+      target.scrollIntoView({ behavior: "auto" });
+      setIsInitialLoad(false);
+    } else if (userNearBottom) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+}, [messages, userNearBottom, isInitialLoad, isTyping, chatIsLoading, isExpanded])
   // ─── Derived ───────────────────────────────────────────────────────────────
   const loadErrorMessage = chatError
     ? getErrorMessage(chatError, t("errors.loadMessages"))
@@ -370,6 +389,8 @@ function useChatbot({ t, timeLocale }) {
     isFetchingNextPage,
     // Scroll
     messagesContainerRef,
+    regularEndRef,
+    expandedEndRef,
     messagesEndRef,
     handleMessagesScroll,
     isInitialLoad,
