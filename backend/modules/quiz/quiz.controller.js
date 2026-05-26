@@ -5,6 +5,7 @@ import { writeFileSync, unlinkSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { createRequire } from 'module';
+import Quiz from "../../DB/models/quiz.model.js";
 
 const require = createRequire(import.meta.url);
 const pdfParse = require('pdf-parse');
@@ -51,16 +52,26 @@ export const generateQuizController = asyncHandler(async (req, res, next) => {
     // console.log(extractedText);
     // console.log("--- END OF TEXT, LENGTH:", extractedText.length);
 
-    const { numberOfQuestions, questionType, difficulty, timeOption, userDuration } = req.body;
+    const { numberOfQuestions, questionType, difficultyLevel, timeOption, userDuration } = req.body;
 
     const quizData = await generateQuizResponse({
         pdfText: extractedText,
         questionType,
-        difficulty,
+        difficultyLevel,
         numberOfQuestions: parseInt(numberOfQuestions, 10),
         timeOption,
-        userDuration: userDuration ? parseInt(userDuration, 10) : 0
     });
+
+
+    const quiz = await Quiz.create({
+        userId: req.user._id,
+        quizTitle: quizData.quizTitle,
+        difficultyLevel,
+        questionType,
+        durationMinutes: userDuration || quizData.durationMinutes,
+        numberOfQuestions: numberOfQuestions,
+        questions: quizData.questions
+    }); 
 
     res.status(200).json({
         success: true,
@@ -68,3 +79,5 @@ export const generateQuizController = asyncHandler(async (req, res, next) => {
         data: quizData
     });
 });
+
+

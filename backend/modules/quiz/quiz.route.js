@@ -9,6 +9,6 @@ const quizRouter = Router();
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-quizRouter.post("/", upload.single("file"), validation(generateQuizSchema), /* authentication, */ generateQuizController);
+quizRouter.post("/", upload.single("file"), validation(generateQuizSchema), authentication, generateQuizController);
 
 export default quizRouter;
