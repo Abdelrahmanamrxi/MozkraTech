@@ -81,3 +81,65 @@ export const generateQuizController = asyncHandler(async (req, res, next) => {
 });
 
 
+export const getAllQuizzes = asyncHandler(async (req, res, next) => {
+    const quizzes = await Quiz.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json({
+        success: true,
+        message: "Quizzes retrieved successfully",
+        data: quizzes
+    });
+});
+
+
+export const getQuizById = asyncHandler(async (req, res, next) => {
+    const quiz = await Quiz.findOne({ _id: req.params.quizId, userId: req.user._id });
+    if (!quiz) {
+        throw new HttpException("Quiz not found", 404);
+    }
+    res.status(200).json({
+        success: true,
+        message: "Quiz retrieved successfully",
+        data: quiz
+    });
+});
+
+export const deleteQuizById = asyncHandler(async (req, res, next) => {
+    const quiz = await Quiz.findOneAndDelete({ _id: req.params.quizId, userId: req.user._id });
+    if (!quiz) {
+        throw new HttpException("Quiz not found", 404);
+    }
+    res.status(200).json({
+        success: true,
+        message: "Quiz deleted successfully",
+    });
+});
+
+
+export const submitQuiz = asyncHandler(async (req, res, next) => { 
+
+    const { quizId } = req.params;
+
+    const { userAnswers, score, percentage, completedAt } = req.body;
+    const quiz = await Quiz.findOne({ _id: quizId, userId: req.user._id });
+    if (!quiz) {
+        throw new HttpException("Quiz not found", 404);
+    }
+    if (quiz.status === "completed") {
+        return res.status(400).json({
+            success: false,
+            message: "Quiz has already been submitted",
+        });
+    }
+    quiz.userAnswers = userAnswers;
+    quiz.score = score;
+    quiz.percentage = percentage;
+    quiz.status = "completed";
+    quiz.completedAt = completedAt;
+    await quiz.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Quiz submitted successfully",
+        data: quiz
+    }); 
+});

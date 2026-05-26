@@ -1,4 +1,5 @@
 import joi from 'joi';
+import { generalRules } from "../../utils/generalRules/index.js";
 
 export const generateQuizSchema = joi.object({
     body: joi.object({
@@ -11,4 +12,37 @@ export const generateQuizSchema = joi.object({
 
     query: joi.object().optional(),
     params: joi.object().optional()
+});
+
+
+
+
+
+export const quizIdSchema = joi.object({
+    params: joi.object({
+        quizId: generalRules.id.required(),
+    }),
+});
+
+
+
+export const submitQuizSchema = joi.object({
+    params: joi.object({
+        quizId: generalRules.id.required(),
+    }),
+    body: joi.object({
+        score: joi.number().integer().min(0).required(),
+        percentage: joi.number().min(0).max(100).required(),
+        completedAt: joi.date().required(),
+        userAnswers: joi.array().items(
+            joi.object({
+                questionNumber: joi.number().integer().min(1).required(),
+                selectedAnswer: joi.number().integer().min(0).required(), 
+                isCorrect: joi.boolean().required()
+            })
+        )
+    }).required(),
+
+
+
 });

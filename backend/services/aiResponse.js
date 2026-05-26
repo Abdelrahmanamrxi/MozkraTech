@@ -317,7 +317,7 @@ export const generateQuizResponse = async ({
                 items: {
                   type: "object",
                   additionalProperties: false,
-                  required: ["questionNumber", "questionText", "options", "correctAnswer", "explanation"],
+                  required: ["questionNumber", "questionText", "options", "correctAnswer", "correctAnswerIndex", "explanation"],
                   properties: {
                     questionNumber: { type: "number" },
                     questionText: { type: "string" },
@@ -330,6 +330,10 @@ export const generateQuizResponse = async ({
                     correctAnswer: {
                       type: "string",
                       description: "Must match exactly one of the strings inside the options array."
+                    },
+                    correctAnswerIndex: {
+                      type: "number",
+                      description: "The exact zero-based index of the correct answer inside the options array. For example: if correctAnswer matches options[0], this MUST be 0. If it matches options[1], this MUST be 1, and so on."
                     },
                     explanation: {
                       type: "string",

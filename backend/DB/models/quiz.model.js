@@ -20,6 +20,10 @@ const questionSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    correctAnswerIndex: {
+      type: Number,
+      default: null,
+    },
     explanation: {
       type: String,
       default: "",
@@ -36,9 +40,8 @@ const userAnswerSchema = new mongoose.Schema(
       required: true,
     },
     selectedAnswer: {
-      type: String,
+      type: Number,
       required: true,
-      trim: true,
     },
     isCorrect: {
       type: Boolean,
@@ -83,7 +86,6 @@ const quizSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["in_progress", "completed"],
-      default: "in_progress",
     },
     currentQuestionIndex: {
       type: Number,
@@ -105,11 +107,7 @@ const quizSchema = new mongoose.Schema(
     percentage: {
       type: Number,
       default: 0,
-    },
-    startedAt: {
-      type: Date,
-      default: Date.now,
-    },
+        },
     completedAt: {
       type: Date,
       default: null,
