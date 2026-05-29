@@ -11,6 +11,7 @@ import {
   ChevronRight,
   MessageCircleMore,
   Clock,
+  ClipboardList,
 } from "lucide-react";
 import i18n from "i18next";
 import Logo from "../../../../logo/Logo";
@@ -27,6 +28,7 @@ const iconMap = {
   Users,
   MessageCircleMore,
   Clock,
+  ClipboardList,
 };
 
 export default function NavbarMobile({ profileImage }) {
@@ -57,31 +59,42 @@ export default function NavbarMobile({ profileImage }) {
   }, [location.pathname]);
 
   const isLandingPage = location.pathname === "/";
-  
-  const NAV_LINKS = isLandingPage ? [] : [
-    { label: t("navbar.dashboard"), icon: "Home", href: "/dashboard" },
-    {
-      label: t("navbar.progress"),
-      icon: "ChartNoAxesCombined",
-      href: "/dashboard/progress",
-    },
-    {
-      label: t("navbar.schedule"),
-      icon: "Calendar",
-      href: "/dashboard/schedule",
-    },
-    {
-      label: t("navbar.timer", { defaultValue: "Timer" }),
-      icon: "Clock",
-      href: "/dashboard/timer",
-    },
-    { label: t("navbar.friends"), icon: "Users", href: "/dashboard/friends" },
-    {
-      label: t("navbar.Messages"),
-      icon: "MessageCircleMore",
-      href: "/dashboard/messages",
-    },
-  ];
+
+  const NAV_LINKS = isLandingPage
+    ? []
+    : [
+        { label: t("navbar.dashboard"), icon: "Home", href: "/dashboard" },
+        {
+          label: t("navbar.progress"),
+          icon: "ChartNoAxesCombined",
+          href: "/dashboard/progress",
+        },
+        {
+          label: t("navbar.schedule"),
+          icon: "Calendar",
+          href: "/dashboard/schedule",
+        },
+        {
+          label: t("navbar.quizzes"),
+          icon: "ClipboardList",
+          href: "/dashboard/quizzes",
+        },
+        {
+          label: t("navbar.timer", { defaultValue: "Timer" }),
+          icon: "Clock",
+          href: "/dashboard/timer",
+        },
+        {
+          label: t("navbar.friends"),
+          icon: "Users",
+          href: "/dashboard/friends",
+        },
+        {
+          label: t("navbar.Messages"),
+          icon: "MessageCircleMore",
+          href: "/dashboard/messages",
+        },
+      ];
 
   return (
     <>
@@ -219,134 +232,134 @@ export default function NavbarMobile({ profileImage }) {
 
             {/* Nav links */}
             {NAV_LINKS.length > 0 && (
-            <nav className="flex-1 px-4 pt-6 pb-4 flex flex-col gap-1.5 overflow-y-auto">
-              <p
-                className="text-[0.63rem] font-semibold tracking-[0.15em] uppercase mb-3 pl-2"
-                style={{ color: "rgba(141,134,201,0.5)" }}
-              >
-                {i18n.language === "en" ? "Navigation" : "القائمة"}
-              </p>
+              <nav className="flex-1 px-4 pt-6 pb-4 flex flex-col gap-1.5 overflow-y-auto">
+                <p
+                  className="text-[0.63rem] font-semibold tracking-[0.15em] uppercase mb-3 pl-2"
+                  style={{ color: "rgba(141,134,201,0.5)" }}
+                >
+                  {i18n.language === "en" ? "Navigation" : "القائمة"}
+                </p>
 
-              {NAV_LINKS.map(({ label, icon, href }, i) => {
-                const isActive = location.pathname === href;
-                const isHovered = hoveredIndex === i;
-                const Icon = iconMap[icon];
+                {NAV_LINKS.map(({ label, icon, href }, i) => {
+                  const isActive = location.pathname === href;
+                  const isHovered = hoveredIndex === i;
+                  const Icon = iconMap[icon];
 
-                return (
-                  <motion.div
-                    key={label}
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      delay: i * 0.04 + 0.03,
-                      type: "spring",
-                      stiffness: 450,
-                      damping: 32,
-                    }}
-                  >
-                    <Link
-                      to={href}
-                      onMouseEnter={() => setHoveredIndex(i)}
-                      onMouseLeave={() => setHoveredIndex(null)}
-                      className="flex items-center justify-between px-4 py-3.5 rounded-2xl no-underline"
-                      style={{
-                        background: isActive
-                          ? "rgba(144,103,198,0.2)"
-                          : isHovered
-                            ? "rgba(144,103,198,0.09)"
-                            : "rgba(255,255,255,0.03)",
-                        border: isActive
-                          ? "1px solid rgba(144,103,198,0.42)"
-                          : isHovered
-                            ? "1px solid rgba(144,103,198,0.22)"
-                            : "1px solid rgba(255,255,255,0.05)",
-                        transition:
-                          "background 0.15s ease, border-color 0.15s ease",
+                  return (
+                    <motion.div
+                      key={label}
+                      initial={{ opacity: 0, x: 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        delay: i * 0.04 + 0.03,
+                        type: "spring",
+                        stiffness: 450,
+                        damping: 32,
                       }}
                     >
-                      <span className="flex items-center gap-3.5">
-                        <span
-                          className="flex items-center justify-center w-9 h-9 rounded-[11px] relative overflow-hidden"
-                          style={{
-                            background: isActive
-                              ? "rgba(144,103,198,0.38)"
-                              : isHovered
-                                ? "rgba(144,103,198,0.22)"
-                                : "rgba(144,103,198,0.12)",
-                            border: "1px solid rgba(144,103,198,0.18)",
-                            transition: "background 0.15s ease",
-                          }}
-                        >
+                      <Link
+                        to={href}
+                        onMouseEnter={() => setHoveredIndex(i)}
+                        onMouseLeave={() => setHoveredIndex(null)}
+                        className="flex items-center justify-between px-4 py-3.5 rounded-2xl no-underline"
+                        style={{
+                          background: isActive
+                            ? "rgba(144,103,198,0.2)"
+                            : isHovered
+                              ? "rgba(144,103,198,0.09)"
+                              : "rgba(255,255,255,0.03)",
+                          border: isActive
+                            ? "1px solid rgba(144,103,198,0.42)"
+                            : isHovered
+                              ? "1px solid rgba(144,103,198,0.22)"
+                              : "1px solid rgba(255,255,255,0.05)",
+                          transition:
+                            "background 0.15s ease, border-color 0.15s ease",
+                        }}
+                      >
+                        <span className="flex items-center gap-3.5">
                           <span
-                            className="absolute top-0 left-0 right-0 h-1/2 rounded-t-[10px]"
+                            className="flex items-center justify-center w-9 h-9 rounded-[11px] relative overflow-hidden"
                             style={{
-                              background:
-                                "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
+                              background: isActive
+                                ? "rgba(144,103,198,0.38)"
+                                : isHovered
+                                  ? "rgba(144,103,198,0.22)"
+                                  : "rgba(144,103,198,0.12)",
+                              border: "1px solid rgba(144,103,198,0.18)",
+                              transition: "background 0.15s ease",
                             }}
-                          />
-                          {Icon ? (
-                            <Icon
-                              size={17}
+                          >
+                            <span
+                              className="absolute top-0 left-0 right-0 h-1/2 rounded-t-[10px]"
                               style={{
-                                color: isActive
-                                  ? "#d4b8f8"
-                                  : isHovered
-                                    ? "#b590e8"
-                                    : "#9067c6",
-                                position: "relative",
-                                zIndex: 1,
-                                transition: "color 0.15s ease",
+                                background:
+                                  "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
                               }}
                             />
-                          ) : null}
-                        </span>
+                            {Icon ? (
+                              <Icon
+                                size={17}
+                                style={{
+                                  color: isActive
+                                    ? "#d4b8f8"
+                                    : isHovered
+                                      ? "#b590e8"
+                                      : "#9067c6",
+                                  position: "relative",
+                                  zIndex: 1,
+                                  transition: "color 0.15s ease",
+                                }}
+                              />
+                            ) : null}
+                          </span>
 
-                        <span
-                          className="font-blinker text-[1rem] font-medium"
-                          style={{
-                            color: isActive
-                              ? "white"
-                              : isHovered
-                                ? "rgba(255,255,255,0.88)"
-                                : "rgba(255,255,255,0.58)",
-                            transition: "color 0.15s ease",
-                          }}
-                        >
-                          {label}
-                        </span>
-                      </span>
-
-                      <span className="flex items-center gap-2">
-                        {isActive && (
                           <span
-                            className="w-1.5 h-1.5 rounded-full"
+                            className="font-blinker text-[1rem] font-medium"
                             style={{
-                              background: "#9067c6",
-                              boxShadow: "0 0 6px 2px rgba(144,103,198,0.6)",
+                              color: isActive
+                                ? "white"
+                                : isHovered
+                                  ? "rgba(255,255,255,0.88)"
+                                  : "rgba(255,255,255,0.58)",
+                              transition: "color 0.15s ease",
+                            }}
+                          >
+                            {label}
+                          </span>
+                        </span>
+
+                        <span className="flex items-center gap-2">
+                          {isActive && (
+                            <span
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{
+                                background: "#9067c6",
+                                boxShadow: "0 0 6px 2px rgba(144,103,198,0.6)",
+                              }}
+                            />
+                          )}
+                          <ChevronRight
+                            size={15}
+                            style={{
+                              color: isActive
+                                ? "rgba(196,168,240,0.9)"
+                                : isHovered
+                                  ? "rgba(255,255,255,0.45)"
+                                  : "rgba(255,255,255,0.18)",
+                              transition:
+                                "color 0.15s ease, transform 0.15s ease",
+                              transform: isHovered
+                                ? "translateX(2px)"
+                                : "translateX(0)",
                             }}
                           />
-                        )}
-                        <ChevronRight
-                          size={15}
-                          style={{
-                            color: isActive
-                              ? "rgba(196,168,240,0.9)"
-                              : isHovered
-                                ? "rgba(255,255,255,0.45)"
-                                : "rgba(255,255,255,0.18)",
-                            transition:
-                              "color 0.15s ease, transform 0.15s ease",
-                            transform: isHovered
-                              ? "translateX(2px)"
-                              : "translateX(0)",
-                          }}
-                        />
-                      </span>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </nav>
+                        </span>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </nav>
             )}
 
             {/* CTA Buttons */}
@@ -360,7 +373,11 @@ export default function NavbarMobile({ profileImage }) {
                 damping: 30,
               }}
               className="px-4 pt-4 pb-8 flex flex-col gap-2.5"
-              style={{ borderTop: isLandingPage ? "none" : "1px solid rgba(255,255,255,0.06)" }}
+              style={{
+                borderTop: isLandingPage
+                  ? "none"
+                  : "1px solid rgba(255,255,255,0.06)",
+              }}
             >
               {!isLandingPage && (
                 <NotificationsUtilityRow

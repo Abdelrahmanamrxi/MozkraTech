@@ -1,0 +1,105 @@
+{
+  "hero": {
+    "tag": "AI Quiz Generator",
+    "title": "Test Your Knowledge",
+    "subtitle": "Transform your files and documents into interactive quizzes in moments. Upload a file, configure your settings, and let AI do the rest."
+  },
+  "stats": {
+    "totalQuizzes": "Total Quizzes",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "averageScore": "Average Score",
+    "percentage": "Percentage"
+  },
+  "generator": {
+    "sectionTitle": "Generate Quiz",
+    "title": "New AI-Powered Quiz",
+    "description": "Upload a PDF or PPTX file and our AI will generate custom questions based on your settings.",
+    "supportedFiles": "Supported Files",
+    "uploadLabel": "Upload File",
+    "chooseFile": "Choose File",
+    "noFileSelected": "No file selected",
+    "fileHint": "Accepted formats: PDF, PPTX — Max size 20 MB",
+    "types": {
+      "mcq": "MCQ",
+      "trueFalse": "True / False",
+      "mixed": "Mixed"
+    },
+    "questionType": "Question Type",
+    "difficulty": "Difficulty Level",
+    "numberOfQuestions": "Number of Questions",
+    "numberOfQuestionsPlaceholder": "e.g. 10",
+    "durationOption": "Duration Option",
+    "aiDefined": "AI Defined",
+    "userDefined": "I'll Define It",
+    "durationMinutes": "Duration (minutes)",
+    "durationPlaceholder": "e.g. 15",
+    "generateButton": "Generate Quiz",
+    "generating": "Generating...",
+    "fileRequired": "Please select a file before generating a quiz.",
+    "questionsInvalid": "Number of questions must be between 1 and 50.",
+    "durationRequired": "Duration must be between 1 and 60 minutes.",
+    "success": "Quiz generated successfully! You can find it in the history below.",
+    "error": "Failed to generate quiz. Please try again.",
+    "quickTipsTitle": "Quick Tips",
+    "tipSource": "Use clear, well-structured documents for the best question quality.",
+    "tipQuestions": "5–20 questions is recommended for a balanced quiz.",
+    "tipDuration": "Set the duration according to the difficulty of your quiz.",
+    "helpTitle": "How does it work?",
+    "helpDescription": "The AI analyses your file's content, extracts the key concepts, and crafts questions that match the difficulty level and type you selected."
+  },
+  "history": {
+    "sectionTitle": "Quiz History",
+    "title": "My Quizzes",
+    "filters": {
+      "all": "All",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    },
+    "statusCompleted": "Completed",
+    "statusInProgress": "In Progress",
+    "emptyTitle": "No quizzes yet",
+    "emptyDescription": "Generate your first quiz using the section above.",
+    "labelQuestions": "{{count}} questions",
+    "labelDuration": "{{minutes}} min",
+    "labelScore": "Score: {{score}}",
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "created": "Created",
+    "completed": "Completed",
+    "lastActivity": "Last Activity",
+    "review": "Review",
+    "start": "Start",
+    "delete": "Delete",
+    "submitSuccess": "Quiz submitted successfully!",
+    "deleteSuccess": "Quiz deleted successfully.",
+    "loadError": "Failed to load quizzes. Please try again.",
+    "labelScoreShort": "Score"
+  },
+  "attempt": {
+    "sectionTitle": "Quiz in Progress",
+    "description": "Question {{current}} of {{total}}",
+    "exit": "Exit",
+    "questionLabel": "Question",
+    "noQuestion": "No question available",
+    "progress": "{{current}} / {{total}}",
+    "correctAnswer": "Correct answer",
+    "selectedWrong": "Your answer was incorrect",
+    "explanationHint": "Read each option carefully before answering.",
+    "previousButton": "Previous",
+    "nextButton": "Next",
+    "submitButton": "Submit Quiz",
+    "submitting": "Submitting...",
+    "backToHistory": "Back to History",
+    "submitError": "Failed to submit quiz. Please try again.",
+    "unanswered": "Please answer all questions before submitting.",
+    "completedTitle": "Quiz Completed!",
+    "completedDesc": "Here is how you performed on this challenge."
+  },
+  "misc": {
+    "notAvailable": "N/A"
+  }
+}

@@ -34,6 +34,7 @@ function Navbar({ profileImage }) {
     { name: t("navbar.dashboard"), to: "/dashboard" },
     { name: t("navbar.progress"), to: "/dashboard/progress" },
     { name: t("navbar.schedule"), to: "/dashboard/schedule" },
+    { name: t("navbar.quizzes"), to: "/dashboard/quizzes" },
     { name: t("navbar.friends"), to: "/dashboard/friends" },
     { name: t("navbar.Messages"), to: "/dashboard/messages" },
   ];

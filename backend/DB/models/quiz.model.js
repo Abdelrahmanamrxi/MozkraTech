@@ -41,7 +41,7 @@ const userAnswerSchema = new mongoose.Schema(
     },
     selectedAnswer: {
       type: Number,
-      required: true,
+      default: null,
     },
     isCorrect: {
       type: Boolean,
@@ -107,7 +107,7 @@ const quizSchema = new mongoose.Schema(
     percentage: {
       type: Number,
       default: 0,
-        },
+    },
     completedAt: {
       type: Date,
       default: null,

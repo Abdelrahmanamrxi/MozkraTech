@@ -19,6 +19,8 @@ import AchievementsenTranslation from "./locales/achievements/en.json";
 import AchievementsarTranslation from "./locales/achievements/ar.json";
 import ChatbotenTranslation from "./locales/chatbot/en.json";
 import ChatbotarTranslation from "./locales/chatbot/ar.json";
+import QuizzesenTranslation from "./locales/Quizzes/en.json";
+import QuizzesarTranslation from "./locales/Quizzes/ar.json";
 
 i18n
   .use(initReactI18next)
@@ -37,6 +39,7 @@ i18n
         profile: ProfileenTranslation,
         achievements: AchievementsenTranslation,
         chatbot: ChatbotenTranslation,
+        quizzes: QuizzesenTranslation,
       },
       ar: {
         landing: LandingarTranslation,
@@ -48,9 +51,21 @@ i18n
         profile: ProfilearTranslation,
         achievements: AchievementsarTranslation,
         chatbot: ChatbotarTranslation,
+        quizzes: QuizzesarTranslation,
       },
     },
-    ns: ["landing", "common", "dashboard", "progress", "schedule", "friends", "profile", "achievements", "chatbot"], // optional but explicit
+    ns: [
+      "landing",
+      "common",
+      "dashboard",
+      "progress",
+      "schedule",
+      "friends",
+      "profile",
+      "achievements",
+      "chatbot",
+      "quizzes",
+    ], // optional but explicit
     defaultNS: "landing",
     react: {
       useSuspense: true,

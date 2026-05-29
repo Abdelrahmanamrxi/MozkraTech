@@ -21,6 +21,7 @@ import AISchedule from "./pages/AISchedule/AISchedule.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import FriendsMessages from "./pages/Friends/FriendsMessages/FriendsMessages.jsx";
 import Achievements from "./pages/Achievements/Achievements.jsx";
+import Quizzes from "./pages/Quizzes/Quizzes.jsx";
 const router = createBrowserRouter([
   // ✅ PUBLIC ROUTES WITH BODY LAYOUT
   {
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard/progress",
             element: <Progress />,
+          },
+          {
+            path: "/dashboard/quizzes",
+            element: <Quizzes />,
           },
           {
             path: "/dashboard/myprofile",

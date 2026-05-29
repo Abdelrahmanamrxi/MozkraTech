@@ -1,0 +1,105 @@
+{
+  "hero": {
+    "tag": "مولّد الاختبارات بالذكاء الاصطناعي",
+    "title": "اختبر معرفتك",
+    "subtitle": "حوّل ملفاتك ومستنداتك إلى اختبارات تفاعلية في لحظات. ارفع ملفاً، اضبط الإعدادات، ودع الذكاء الاصطناعي يتولى الباقي."
+  },
+  "stats": {
+    "totalQuizzes": "إجمالي الاختبارات",
+    "completed": "مكتملة",
+    "inProgress": "قيد التقدم",
+    "averageScore": "متوسط الدرجات",
+    "percentage": "النسبة المئوية"
+  },
+  "generator": {
+    "sectionTitle": "إنشاء اختبار",
+    "title": "اختبار جديد بالذكاء الاصطناعي",
+    "description": "ارفع ملف PDF أو PPTX وسيقوم الذكاء الاصطناعي بتوليد أسئلة مخصصة بناءً على إعداداتك.",
+    "supportedFiles": "الملفات المدعومة",
+    "uploadLabel": "رفع الملف",
+    "chooseFile": "اختيار ملف",
+    "noFileSelected": "لم يتم اختيار ملف",
+    "fileHint": "الصيغ المقبولة: PDF، PPTX — الحجم الأقصى 20 ميغابايت",
+    "types": {
+      "mcq": "اختيار من متعدد",
+      "trueFalse": "صح / خطأ",
+      "mixed": "مختلط"
+    },
+    "questionType": "نوع الأسئلة",
+    "difficulty": "مستوى الصعوبة",
+    "numberOfQuestions": "عدد الأسئلة",
+    "numberOfQuestionsPlaceholder": "مثال: 10",
+    "durationOption": "خيار المدة الزمنية",
+    "aiDefined": "يحددها الذكاء الاصطناعي",
+    "userDefined": "أحددها بنفسي",
+    "durationMinutes": "المدة (بالدقائق)",
+    "durationPlaceholder": "مثال: 15",
+    "generateButton": "توليد الاختبار",
+    "generating": "جارٍ التوليد...",
+    "fileRequired": "يرجى اختيار ملف قبل توليد الاختبار.",
+    "questionsInvalid": "يجب أن يكون عدد الأسئلة بين 1 و50.",
+    "durationRequired": "يجب أن تكون المدة بين 1 و60 دقيقة.",
+    "success": "تم توليد الاختبار بنجاح! يمكنك العثور عليه في السجل أدناه.",
+    "error": "تعذّر توليد الاختبار. يرجى المحاولة مرة أخرى.",
+    "quickTipsTitle": "نصائح سريعة",
+    "tipSource": "استخدم مستندات واضحة ومنظمة للحصول على أفضل جودة للأسئلة.",
+    "tipQuestions": "يُنصح باختيار 5 إلى 20 سؤالاً لاختبار متوازن.",
+    "tipDuration": "اضبط المدة وفقاً لمستوى صعوبة الاختبار.",
+    "helpTitle": "كيف يعمل؟",
+    "helpDescription": "يقوم الذكاء الاصطناعي بتحليل محتوى ملفك واستخلاص المفاهيم الرئيسية، ثم يصيغ أسئلة تناسب مستوى الصعوبة والنوع الذي اخترته."
+  },
+  "history": {
+    "sectionTitle": "سجل الاختبارات",
+    "title": "اختباراتي",
+    "filters": {
+      "all": "الكل",
+      "inProgress": "قيد التقدم",
+      "completed": "مكتملة"
+    },
+    "statusCompleted": "مكتمل",
+    "statusInProgress": "قيد التقدم",
+    "emptyTitle": "لا توجد اختبارات بعد",
+    "emptyDescription": "قم بتوليد اختبارك الأول من القسم أعلاه.",
+    "labelQuestions": "{{count}} سؤال",
+    "labelDuration": "{{minutes}} دقيقة",
+    "labelScore": "الدرجة: {{score}}",
+    "difficulty": {
+      "easy": "سهل",
+      "medium": "متوسط",
+      "hard": "صعب"
+    },
+    "created": "تاريخ الإنشاء",
+    "completed": "تاريخ الإكمال",
+    "lastActivity": "آخر نشاط",
+    "review": "مراجعة",
+    "start": "بدء",
+    "delete": "حذف",
+    "submitSuccess": "تم تسليم الاختبار بنجاح!",
+    "deleteSuccess": "تم حذف الاختبار بنجاح.",
+    "loadError": "تعذّر تحميل الاختبارات. يرجى المحاولة مرة أخرى.",
+    "labelScoreShort": "الدرجة"
+  },
+  "attempt": {
+    "sectionTitle": "جارٍ الاختبار",
+    "description": "السؤال {{current}} من {{total}}",
+    "exit": "خروج",
+    "questionLabel": "السؤال",
+    "noQuestion": "لا يوجد سؤال",
+    "progress": "{{current}} / {{total}}",
+    "correctAnswer": "الإجابة الصحيحة",
+    "selectedWrong": "إجابتك غير صحيحة",
+    "explanationHint": "اقرأ كل خيار بعناية قبل الإجابة.",
+    "previousButton": "السابق",
+    "nextButton": "التالي",
+    "submitButton": "تسليم الاختبار",
+    "submitting": "جارٍ التسليم...",
+    "backToHistory": "العودة إلى السجل",
+    "submitError": "تعذّر تسليم الاختبار. يرجى المحاولة مرة أخرى.",
+    "unanswered": "يرجى الإجابة على جميع الأسئلة قبل التسليم.",
+    "completedTitle": "اكتمل الاختبار!",
+    "completedDesc": "إليك أداؤك في هذا التحدي."
+  },
+  "misc": {
+    "notAvailable": "غير متاح"
+  }
+}
