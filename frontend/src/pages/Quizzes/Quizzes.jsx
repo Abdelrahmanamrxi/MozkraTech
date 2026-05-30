@@ -80,7 +80,6 @@ function Quizzes() {
       return data?.data ?? [];
     },
     retry: 1,
-    staleTime: 30 * 1000,
   });
 
   const normalizedQuizzes = useMemo(() => {
@@ -95,6 +94,7 @@ function Quizzes() {
         baseList.unshift(justGeneratedOrSubmittedQuiz);
       }
     }
+    console.log(baseList)
     return baseList.map((quiz) => ({
       ...quiz,
       status: quiz.status ?? "in_progress",
@@ -386,7 +386,7 @@ function Quizzes() {
         console.error("Failed to save progress:", err);
       }
     }
-
+    window.location.reload()
     setViewMode("list");
     setActiveQuizId(null);
     setCurrentQuestionIndex(0);
