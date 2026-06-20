@@ -1,4 +1,23 @@
 {
+  "loading":{
+    "default": "Loading...",
+    "signup": "Creating account...",
+    "login": "Welcome back...",
+    "forgotPassword": "Loading...",
+    "dashboard": "Loading dashboard...",
+    "chatbot": "Starting AI assistant...",
+    "schedule": "Loading schedule...",
+    "friends": "Loading friends...",
+    "messages": "Loading messages...",
+    "timer": "Preparing focus mode...",
+    "progress": "Loading progress...",
+    "subjectRegister": "Setting up subjects...",
+    "profile": "Loading profile...",
+    "myProfile": "Loading your profile...",
+    "aiSchedule": "Generating AI schedule...",
+    "achievements": "Loading achievements...",
+    "quizzes": "Loading quizzes..."
+  },
   "navbar": {
     "home": "Home",
     "features": "Features",

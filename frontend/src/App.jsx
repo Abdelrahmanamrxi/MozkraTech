@@ -14,47 +14,47 @@ const LandingPage = load(
 
 const SignupPage = load(
   () => import("./pages/SignupPage/index.jsx"),
-  "Loading..."
+  "loading.default"
 );
 
 const LoginPage = load(
   () => import("./pages/LoginPage/LoginPage"),
-  "Welcome back..."
+  "loading.default"
 );
 
 const ForgetPassword = load(
   () => import("./pages/ForgetPassword"),
-  "Loading..."
+  "loading.default"
 );
 
 const Home = load(
   () => import("./pages/Dashboard/Dashboard.jsx"),
-  "Loading dashboard..."
+  "loading.dashboard"
 );
 
 const Chatbot = load(
   () => import("./pages/Chatbot/Chatbot"),
-  "Starting AI assistant..."
+  "loading.chatbot"
 );
 
 const Schedule = load(
   () => import("./pages/Schedule/Schedule.jsx"),
-  "Loading schedule..."
+  "loading.schedule"
 );
 
 const Friends = load(
   () => import("./pages/Friends/Friends.jsx"),
-  "Loading friends..."
+  "loading.friends"
 );
 
 const FriendsMessages = load(
   () => import("./pages/Friends/FriendsMessages/FriendsMessages.jsx"),
-  "Loading messages..."
+  "loading.messages"
 );
 
 const Timer = load(
   () => import("./pages/Timer/Timer.jsx"),
-  "Preparing focus mode..."
+  "loading.timer"
 );
 
 const Progress = load(
@@ -64,32 +64,28 @@ const Progress = load(
 
 const SubjectRegister = load(
   () => import("./pages/SubjectRegister/subjectRegister.jsx"),
-  "Setting up subjects..."
+  "loading.subjectRegister"
 );
 
 const PeopleProfile = load(
   () => import("./pages/PeopleProfile/PeopleProfile.jsx"),
-  "Loading profile..."
+  "loading.myProfile"
 );
 
-const AISchedule = load(
-  () => import("./pages/AISchedule/AISchedule.jsx"),
-  "Generating AI schedule..."
-);
 
 const Profile = load(
   () => import("./pages/Profile/Profile.jsx"),
-  "Loading your profile..."
+  "loading.profile"
 );
 
 const Achievements = load(
   () => import("./pages/Achievements/Achievements.jsx"),
-  "Loading achievements..."
+  "loading.achievements"
 );
 
 const Quizzes = load(
   () => import("./pages/Quizzes/Quizzes.jsx"),
-  "Loading quizzes..."
+  "loading.quizzes"
 );
 const router = createBrowserRouter([
   // ✅ PUBLIC ROUTES WITH BODY LAYOUT
@@ -176,10 +172,6 @@ const router = createBrowserRouter([
       {
         path: "/edit-subjects",
         element: <SubjectRegister isEdit />,
-      },
-      {
-        path: "/schedule-generation",
-        element: <AISchedule />,
       },
       {
         path: "/dashboard/timer",

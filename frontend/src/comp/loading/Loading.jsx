@@ -1,7 +1,9 @@
 import React from "react";
 import { Loader } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function Loading({ message }) {
+    const {t,i18n}=useTranslation(['common'])
   return (
     <div className="min-h-screen main-bg flex flex-col items-center justify-center text-white relative overflow-hidden">
 
@@ -16,7 +18,7 @@ function Loading({ message }) {
 
         {/* Message */}
         <p className="text-lg font-poppins font-medium tracking-wide text-white/90 text-center">
-          {message || "Loading..."}
+          {t(message || "loading.default")}
         </p>
 
         {/* Subtext */}

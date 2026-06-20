@@ -5,7 +5,7 @@ import useCountUp from "@/hooks/useCountUp";
 import Dots from "@/comp/ui/Dots";
 import ProgressBar from "@/comp/ui/ProgressBar";
 import { useTranslation } from "react-i18next";
-
+import { Link } from "react-router";
 export default function TodaysSummary({ dashboardData, isLoading = false }) {
   const { t, i18n } = useTranslation(["dashboard"]);
   const locale = i18n.language === "ar" ? "ar-EG" : "en-US";
@@ -83,6 +83,7 @@ export default function TodaysSummary({ dashboardData, isLoading = false }) {
     </Card>
 
     {/* Next Deadline */}
+    <Link to="/dashboard/schedule">
     <Card variant="dark" delay={100} className="justify-between relative overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
         <div className="flex items-center gap-2">
@@ -94,7 +95,7 @@ export default function TodaysSummary({ dashboardData, isLoading = false }) {
         <span
           className="text-xs font-semibold px-2 py-0.5 rounded-full self-start sm:self-auto"
           style={{ background: "rgba(255,255,255,0.18)", color: "#f7ece1" }}
-        >
+          >
           {t("summary.nextDeadline.sub")}
         </span>
       </div>
@@ -131,8 +132,11 @@ export default function TodaysSummary({ dashboardData, isLoading = false }) {
         </div>
       )}
     </Card>
+          </Link>
 
     {/* Achievements */}
+    <Link to="/dashboard/achievements">
+
     <Card variant="purple" delay={200} className="relative overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
         <div className="flex items-center gap-2">
@@ -155,6 +159,7 @@ export default function TodaysSummary({ dashboardData, isLoading = false }) {
         {t("summary.achievements.total", { count: achievementsValue })}
       </div>
     </Card>
+    </Link>
 
     {/* Study Hours */}
     <Card variant="light" delay={300} className="relative overflow-hidden">
