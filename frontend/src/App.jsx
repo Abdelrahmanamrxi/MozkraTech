@@ -1,27 +1,96 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { createBrowserRouter } from "react-router-dom";
 import { useEffect } from "react";
-import LandingPage from "./pages/LandingPage/LandingPage";
-import SignupPage from "./pages/SignupPage/index.jsx";
-import LoginPage from "./pages/LoginPage/LoginPage";
-import ForgetPassword from "./pages/ForgetPassword";
-import Home from "./pages/Dashboard/Dashboard.jsx";
-import Chatbot from "./pages/Chatbot/Chatbot";
-import "./App.css";
-import Schedule from "./pages/Schedule/Schedule.jsx";
-import Friends from "./pages/Friends/Friends.jsx";
-import Timer from "./pages/Timer/Timer.jsx";
-import Progress from "./pages/Progress/Progress.jsx";
-import SubjectRegister from "./pages/SubjectRegister/subjectRegister.jsx";
+import { useTranslation } from "react-i18next";
 import Body from "./comp/layout/Body.jsx";
+import "./App.css"
 import ProtectedRoute from "./comp/auth/ProtectedRoute.jsx";
 import ErrorFallback from "./comp/error/ErrorFallback.jsx";
-import PeopleProfile from "./pages/PeopleProfile/PeopleProfile.jsx";
-import AISchedule from "./pages/AISchedule/AISchedule.jsx";
-import Profile from "./pages/Profile/Profile.jsx";
-import FriendsMessages from "./pages/Friends/FriendsMessages/FriendsMessages.jsx";
-import Achievements from "./pages/Achievements/Achievements.jsx";
-import Quizzes from "./pages/Quizzes/Quizzes.jsx";
+import { load } from "./comp/loading/pageLoader.jsx"; // helper above
+import { RouterProvider } from "react-router-dom";
+const LandingPage = load(
+  () => import("./pages/LandingPage/LandingPage"),
+  "Loading..."
+);
+
+const SignupPage = load(
+  () => import("./pages/SignupPage/index.jsx"),
+  "Loading..."
+);
+
+const LoginPage = load(
+  () => import("./pages/LoginPage/LoginPage"),
+  "Welcome back..."
+);
+
+const ForgetPassword = load(
+  () => import("./pages/ForgetPassword"),
+  "Loading..."
+);
+
+const Home = load(
+  () => import("./pages/Dashboard/Dashboard.jsx"),
+  "Loading dashboard..."
+);
+
+const Chatbot = load(
+  () => import("./pages/Chatbot/Chatbot"),
+  "Starting AI assistant..."
+);
+
+const Schedule = load(
+  () => import("./pages/Schedule/Schedule.jsx"),
+  "Loading schedule..."
+);
+
+const Friends = load(
+  () => import("./pages/Friends/Friends.jsx"),
+  "Loading friends..."
+);
+
+const FriendsMessages = load(
+  () => import("./pages/Friends/FriendsMessages/FriendsMessages.jsx"),
+  "Loading messages..."
+);
+
+const Timer = load(
+  () => import("./pages/Timer/Timer.jsx"),
+  "Preparing focus mode..."
+);
+
+const Progress = load(
+  () => import("./pages/Progress/Progress.jsx"),
+  "Loading progress..."
+);
+
+const SubjectRegister = load(
+  () => import("./pages/SubjectRegister/subjectRegister.jsx"),
+  "Setting up subjects..."
+);
+
+const PeopleProfile = load(
+  () => import("./pages/PeopleProfile/PeopleProfile.jsx"),
+  "Loading profile..."
+);
+
+const AISchedule = load(
+  () => import("./pages/AISchedule/AISchedule.jsx"),
+  "Generating AI schedule..."
+);
+
+const Profile = load(
+  () => import("./pages/Profile/Profile.jsx"),
+  "Loading your profile..."
+);
+
+const Achievements = load(
+  () => import("./pages/Achievements/Achievements.jsx"),
+  "Loading achievements..."
+);
+
+const Quizzes = load(
+  () => import("./pages/Quizzes/Quizzes.jsx"),
+  "Loading quizzes..."
+);
 const router = createBrowserRouter([
   // ✅ PUBLIC ROUTES WITH BODY LAYOUT
   {
