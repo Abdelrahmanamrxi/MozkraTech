@@ -65,7 +65,7 @@ function LoginPage() {
         }
       );
       dispatch(setAccessToken(response.data.accessToken));
-      navigate(getPostAuthRedirectPath(response.data.accessToken));
+      navigate(getPostAuthRedirectPath(response.data.accessToken),{replace:true});
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || "Login Failed";
       setErrors((prev) => ({ ...prev, login: message }));
@@ -94,7 +94,7 @@ function LoginPage() {
         withCredentials:true
       })
       dispatch(setAccessToken(response.data.accessToken))
-      navigate(getPostAuthRedirectPath(response.data.accessToken))
+      navigate(getPostAuthRedirectPath(response.data.accessToken),{replace:true})
     }
     catch(err){
           const message = err?.response?.data?.message || err.message || "Login Failed";

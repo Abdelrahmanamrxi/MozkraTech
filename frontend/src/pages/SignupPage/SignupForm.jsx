@@ -42,7 +42,7 @@ function SignupForm({ isRtl, t }) {
   } = useSignupForm(t);
 
 const handleOtpSubmitWithRedirect = async (e) => {
-  await handleOtpSubmit(e, () => navigate("/subject-register"));
+  await handleOtpSubmit(e, () => navigate("/subject-register",{replace:true}));
 };
 
 // Handle Google sign-up success - receives credential with ID token
@@ -75,7 +75,7 @@ const handleGoogleSuccess = async (credentialResponse) => {
     }
     // Save access token
     dispatch(setAccessToken(response.data.accessToken));
-    navigate(getPostAuthRedirectPath(response.data.accessToken));
+    navigate(getPostAuthRedirectPath(response.data.accessToken),{replace:true});
   } catch (err) {
     const message = err?.response?.data?.message || err.message || "Registration failed";
    // console.error("Google signup error:", err);

@@ -85,8 +85,8 @@ export const signUp = asyncHandler(async (req, res, next) => {
 export const confirmEmail = asyncHandler(async (req, res, next) => {
   const { email, code } = req.body;
   const user = await userModel.findOne({ email });
-
-  if (!user || user.isVerified) {
+  console.log(email,code)
+  if (!user || !user.isVerified) {
     return next(new HttpException("email not exist or already verified"));
   }
 
@@ -229,7 +229,7 @@ export const logout = asyncHandler(async (req, res) => {
 });
 
 // ----------------------------------forget password-------------------------------------------
-export const forgetPassword = asyncHandler(async (req, res, next) => {
+export const resetPasswordEmailCheck = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
   const user = await userModel.findOne({
     email,
@@ -240,7 +240,7 @@ export const forgetPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(
       new HttpException(
-        "Email Doesn't exist or not verified or logged in with google",
+        "We couldn't find email that you're looking for",
         400,
       ),
     );
@@ -258,19 +258,6 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new HttpException("User Doesn't exist", 400));
   }
-  if (
-    !user.OTPPassword ||
-    !user.OTPPasswordExpiresAt ||
-    user.OTPPasswordExpiresAt < new Date()
-  ) {
-    return next(new HttpException("OTP has expired or is invalid"), 400);
-  }
-
-  // compare code
-  const isCodeValid = await bcrypt.compare(code, user.OTPPassword);
-  if (!isCodeValid) {
-    return next(new HttpException("Code Is Invalid"), 400);
-  }
   const hashedPassword = await bcrypt.hash(
     newPassword,
     +process.env.SALT_ROUNDS,
@@ -282,7 +269,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   await user.save();
   await userModel.updateOne(
     { email },
-    { $unset: { OTPPassword: 0, OTPPasswordExpiresAt: 0 } },
+    { $unset: { OTPEmail: 0, OTPEmailExpiresAt: 0 } },
   );
   return res.status(200).json({ message: "password reset success" });
 });
@@ -405,6 +392,7 @@ export const signUpWithGoogle = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ message: "Sign up with Google Successful", accessToken });
 });
+
 
 // ----------------------------------loginWithGoogle-------------------------------------------
 export const loginWithGoogle = asyncHandler(async (req, res, next) => {

@@ -134,6 +134,7 @@ function App() {
     document.dir = i18n.language === "ar" ? "rtl" : "ltr";
   }, [i18n.language]);
 
+
   return <RouterProvider router={router} />;
 }
 

@@ -17,11 +17,11 @@ import {
   login,
   refreshToken,
   logout,
-  forgetPassword,
   resetPassword,
   signUpWithGoogle,
   loginWithGoogle,
   resendOTP,
+  resetPasswordEmailCheck
 } from "./auth.controller.js";
 const authRouter = Router();
 
@@ -35,10 +35,10 @@ authRouter.post("/login", validation(loginSchema), login);
 // refresh-token should use cookie-based refresh token only, not the access-token auth middleware
 authRouter.post("/refresh-token", refreshToken);
 authRouter.post("/logout", logout);
-authRouter.patch(
+authRouter.post(
   "/forget-password",
   validation(forgetPasswordSchema),
-  forgetPassword,
+  resetPasswordEmailCheck,
 );
 authRouter.patch(
   "/reset-password",

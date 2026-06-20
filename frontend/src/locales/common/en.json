@@ -4,7 +4,8 @@
     "features": "Features",
     "Messages": "Messages",
     "pricing": "Pricing",
-    "about": "About",
+    "about": "About Us",
+    "testimonials":"Testimonials",
     "dashboard": "Dashboard",
     "progress": "Progress",
     "schedule": "Schedule",
@@ -35,8 +36,8 @@
         "system_welcome": "Welcome {{name}}, start studying by creating your first task!",
         "system_welcome_back": "Welcome back {{name}}, your account has been restored successfully!",
         "system_announcement": "{{name}}",
-        "streak_milestone_reached": "{{name}}: {{description}} {{icon}}!!",
-        "achievement_unlocked": "{{name}}: {{description}} {{icon}}!!",
+        "streak_milestone_reached": "{{name}}: {{description}} {{icon}}!",
+        "achievement_unlocked": "{{name}}: {{description}} {{icon}}!",
         "message_received": "{{name}} sent you a message"
       }
     }
@@ -126,11 +127,26 @@
     "didntReceiveCode": "Didn't receive code?",
     "resend": "Resend",
     "useDifferentEmail": "Use different email",
+    "resetPassword": "Reset Password",
+    "resetPasswordSubtitle": "Enter a new password to reset your account",
+    "newPasswordPlaceholder": "New Password",
+    "confirmPasswordPlaceholder": "Confirm Password",
+    "expiresIn": "Expires in",
+    "otpExpiredMsg": "OTP has expired",
+    "resetting": "Resetting...",
     "errors": {
       "emailRequired": "Email is required",
       "validEmail": "Please enter a valid email",
       "otpRequired": "OTP is required",
-      "otpDigits": "OTP must be 4 digits"
+      "otpDigits": "OTP must be 4 digits",
+      "otpExpired": "OTP has expired",
+      "invalidOtp": "Invalid OTP",
+      "passwordRequired": "Password is required",
+      "passwordLength": "Password must be at least 8 characters",
+      "confirmPasswordRequired": "Confirm password is required",
+      "passwordsMismatch": "Passwords do not match",
+      "resetFailed": "Failed to reset password",
+      "resendFailed": "Failed to resend OTP"
     }
   }
 }

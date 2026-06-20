@@ -1,6 +1,8 @@
 {
   "navbar": {
     "home": "الرئيسية",
+    "testimonials":"آراء العملاء",
+  
     "features": "المميزات",
     "pricing": "الأسعار",
     "Messages": "الرسائل",
@@ -35,8 +37,8 @@
         "system_welcome": "مرحبًا {{name}}، ابدأ الدراسة بإنشاء مهمتك الأولى!",
         "system_welcome_back": "مرحبًا بعودتك {{name}}، تم استعادة حسابك بنجاح!",
         "system_announcement": "{{name}}",
-        "streak_milestone_reached": "{{name}}: {{description}} {{icon}}!!",
-        "achievement_unlocked": "{{name}}: {{description}} {{icon}}!!",
+        "streak_milestone_reached": "{{name}}: {{description}} {{icon}}!",
+        "achievement_unlocked": "{{name}}: {{description}} {{icon}}!",
         "message_received": "أرسل لك {{name}} رسالة"
       }
     }
@@ -126,11 +128,26 @@
     "didntReceiveCode": "لم تستلم الرمز؟",
     "resend": "إعادة الإرسال",
     "useDifferentEmail": "استخدم بريدًا إلكترونيًا آخر",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "resetPasswordSubtitle": "أدخل كلمة مرور جديدة لإعادة تعيين حسابك",
+    "newPasswordPlaceholder": "كلمة المرور الجديدة",
+    "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+    "expiresIn": "ينتهي في",
+    "otpExpiredMsg": "انتهت صلاحية الرمز",
+    "resetting": "جارٍ إعادة التعيين...",
     "errors": {
       "emailRequired": "البريد الإلكتروني مطلوب",
       "validEmail": "يرجى إدخال بريد إلكتروني صحيح",
       "otpRequired": "الرمز مطلوب",
-      "otpDigits": "يجب أن يكون الرمز مكونًا من 4 أرقام"
+      "otpDigits": "يجب أن يكون الرمز مكونًا من 4 أرقام",
+      "otpExpired": "انتهت صلاحية الرمز",
+      "invalidOtp": "رمز غير صحيح",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+      "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
+      "passwordsMismatch": "كلمات المرور غير متطابقة",
+      "resetFailed": "فشل إعادة تعيين كلمة المرور",
+      "resendFailed": "فشل إعادة إرسال الرمز"
     }
   }
 }

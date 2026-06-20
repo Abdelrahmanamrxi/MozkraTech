@@ -51,7 +51,7 @@ function ProtectedRoute() {
     return (
       <Navigate
         to="/login"
-        replace
+        replace={true}
         state={{ message: 'Please Login To Start Accessing' }}
       />
     );
@@ -61,11 +61,11 @@ function ProtectedRoute() {
   const isOnSubjectRegister = location.pathname === "/subject-register";
 
   if (redirectPath === "/subject-register" && !isOnSubjectRegister) {
-    return <Navigate to="/subject-register" replace />;
+    return <Navigate to="/subject-register" replace={true} />;
   }
 
   if (redirectPath === "/dashboard" && isOnSubjectRegister) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/dashboard" replace={true} />;
   }
 
   return <Outlet />;

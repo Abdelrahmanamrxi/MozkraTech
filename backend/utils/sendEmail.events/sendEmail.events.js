@@ -38,7 +38,7 @@ eventEmitter.on("forgetPassword", async (data) => {
     const expiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
 
     //update otp and expiry
-    await userModel.updateOne({email}, {OTPPassword: hashedOtp, OTPPasswordExpiresAt: expiresAt});
+    await userModel.updateOne({email}, {OTPEmail: hashedOtp, OTPEmailExpiresAt: expiresAt});
     
     await sendEmail(email, "forget password", html({code: otp, message: "forget password"}));
 });

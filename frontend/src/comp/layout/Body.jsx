@@ -1,5 +1,6 @@
 import Header from "./Header/Header";
 import Footer from "./Footer/Footer";
+import { useEffect } from "react";
 import { useLocation } from "react-router";
 import { TimerIcon } from "../ui/Icons";
 import { Bot } from "lucide-react";
@@ -8,6 +9,16 @@ import { Link } from "react-router";
 import { Outlet } from "react-router";
 export default function Body() {
   const location=useLocation()
+  
+    useEffect(()=>{
+      window.scrollTo({
+        top:0,
+        behavior:'smooth'
+      })
+  
+    },[location.pathname])
+
+
   return (
     <div>
       <Header  />

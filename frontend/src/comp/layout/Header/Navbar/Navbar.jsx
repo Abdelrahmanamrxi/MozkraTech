@@ -24,9 +24,9 @@ function Navbar({ profileImage }) {
 
   // Landing page section scroll links
   const sectionLinks = [
-    { name: "About Us", sectionId: "hero" },
-    { name: "Features", sectionId: "features" },
-    { name: "Testimonials", sectionId: "testimonials" },
+    { name:t('navbar.about'), sectionId: "hero" },
+    { name: t("navbar.features"), sectionId: "features" },
+    { name: t("navbar.testimonials"), sectionId: "testimonials" },
   ];
 
   // Dashboard navigation links
@@ -70,13 +70,13 @@ function Navbar({ profileImage }) {
       initial={{ opacity: 0 }}
       animate={{
         opacity: 1,
-        width: scrolled ? "88%" : "100%",
-        top: scrolled ? 12 : "auto",
-        left: scrolled ? "7.5%" : "auto",
-        borderRadius: scrolled ? 18 : 0,
-        paddingLeft: scrolled ? 16 : 0,
-        paddingRight: scrolled ? 16 : 0,
-        paddingTop: scrolled ? 8 : 10,
+        width: scrolled  ? "88%" : "100%",
+        top: scrolled  ? 12 : "auto",
+        left: scrolled  ? "7.5%" : "auto",
+        borderRadius: scrolled  ? 18 : 0,
+        paddingLeft: scrolled  ? 16 : 0,
+        paddingRight: scrolled  ? 16 : 0,
+        paddingTop: scrolled  ? 8 : 10,
         paddingBottom: scrolled ? 8 : 10,
       }}
       transition={{
