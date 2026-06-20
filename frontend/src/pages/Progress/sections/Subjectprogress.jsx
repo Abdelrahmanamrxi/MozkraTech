@@ -1,16 +1,14 @@
-/* eslint-disable no-unused-vars */
 import React from "react";
-import { Card } from "@/comp/ui/TopCard";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 function SubjectRow({ subject, index }) {
   const { i18n } = useTranslation();
-  const lang = i18n.language === "ar" ? "ar" : "en";
   const labels = {
     en: { hourUnit: "h" },
     ar: { hourUnit: "س" },
   };
+  const lang = i18n.language === "ar" ? "ar" : "en";
 
   return (
     <motion.div
@@ -19,27 +17,29 @@ function SubjectRow({ subject, index }) {
       transition={{ delay: 0.1 * index, duration: 0.4, ease: "easeOut" }}
       className="flex flex-col gap-2"
     >
-      <div className="flex flex-row items-center justify-between">
-        <div className="flex flex-row items-center gap-3">
-          {/* Dot */}
+      <div className="flex flex-row items-center justify-between gap-4">
+        <div className="flex min-w-0 flex-row items-center gap-3">
           <div
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
             style={{
               background:
                 subject.progress >= 85 ? "#9067c6" : "rgba(255,255,255,0.4)",
             }}
           />
-          <p className="font-blinker text-base text-white">{subject.name}</p>
+          <p className="truncate font-blinker text-base text-white">
+            {subject.name}
+          </p>
         </div>
 
-        <div className="flex flex-row items-center gap-3">
-          <span className="inline-flex items-center gap-2 font-blinker text-sm text-white/60">
-            <span>{subject.hoursStudied}/{subject.totalHours}</span>
+        <div className="flex flex-shrink-0 flex-row items-center gap-3">
+          <span className="inline-flex items-center gap-1 font-blinker text-sm text-white/60">
+            <span>
+              {subject.hoursStudied}/{subject.totalHours}
+            </span>
             <span>{labels[lang].hourUnit}</span>
           </span>
-          {/* Grade badge */}
           <span
-            className="font-blinker text-xs font-semibold px-2 py-0.5 rounded-full"
+            className="rounded-full px-2 py-0.5 font-blinker text-xs font-semibold"
             style={{
               background: "rgba(144, 103, 198, 0.25)",
               color: "#c4b5fd",
@@ -48,14 +48,13 @@ function SubjectRow({ subject, index }) {
           >
             {subject.grade}
           </span>
-          <span className="font-blinker text-sm text-white font-semibold w-10 text-right">
+          <span className="w-10 text-right font-blinker text-sm font-semibold text-white">
             {subject.progress}%
           </span>
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${subject.progress}%` }}
@@ -77,21 +76,27 @@ function SubjectRow({ subject, index }) {
   );
 }
 
-export default function SubjectProgress({ mockProgressData }) {
+export default function SubjectProgress({ progressData }) {
   const { i18n } = useTranslation();
   const lang = i18n.language === "ar" ? "ar" : "en";
   const labels = {
-    en: { title: "Subject Progress" },
-    ar: { title: "تقدم الموضوع" },
+    en: { title: "Subject Progress", empty: "No subjects have progress yet." },
+    ar: { title: "تقدم المواد", empty: "لا يوجد تقدم في المواد بعد." },
   };
+  const subjects = progressData?.subjects ?? [];
 
   return (
-    <div className="p-6 bg-[#3d3555] border border-[#9B7EDE]/20 rounded-[24px]">
-      <p className="font-poppins text-lg font-semibold mb-5">
+    <div className="rounded-[24px] border border-[#9B7EDE]/20 bg-[#3d3555] p-6">
+      <p className="mb-5 font-poppins text-lg font-semibold">
         {labels[lang].title}
       </p>
       <div className="flex flex-col gap-5">
-        {mockProgressData.subjects.map((subject, index) => (
+        {subjects.length === 0 && (
+          <p className="font-blinker text-sm text-white/50">
+            {labels[lang].empty}
+          </p>
+        )}
+        {subjects.map((subject, index) => (
           <SubjectRow key={subject.name} subject={subject} index={index} />
         ))}
       </div>
