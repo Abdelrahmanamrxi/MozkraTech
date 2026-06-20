@@ -3,7 +3,7 @@ import React from "react";
 import LiquidGlassButton from "@/comp/ui/LiquidGlassButton.jsx";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-
+import { BookOpen,CalendarDays  } from "lucide-react";
 import {
   CalenderIcon,
   WeeklyReportIcon,
@@ -54,18 +54,18 @@ function WelcomeBanner({ dashboardData }) {
         <div className="flex flex-row mt-3 lg:mt-0 items-center gap-3">
           <Link to="/dashboard/schedule">
             <LiquidGlassButton
-              className="px-2 py-1 text-sm gap-2 lg:px-6 lg:py-2 lg:text-base lg:gap-2.5"
-              icon={CalenderIcon}
+              className="px-2 py-1 text-sm gap-2 lg:px-7 lg:py-4 lg:text-base lg:gap-2.5"
+              icon={CalendarDays}
             >
               {t("weekly.schedule")}
             </LiquidGlassButton>
           </Link>
-          <Link to="/weeklyreport">
+          <Link to="/dashboard/timer">
             <LiquidGlassButton
-              icon={WeeklyReportIcon}
-              className="bg-white text-primary px-2 py-1 text-sm gap-2 lg:px-6 lg:py-2 lg:text-base lg:gap-2.5"
+              icon={BookOpen}
+              className="bg-white text-primary px-2 py-1 text-sm gap-2 lg:px-7 lg:py-4 lg:text-base lg:gap-2.5"
             >
-              {t("weekly.report")}
+              {t("weekly.secondary")}
             </LiquidGlassButton>
           </Link>
         </div>

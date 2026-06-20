@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import axios from "axios";
+import Loading from "../loading/Loading";
 import { setAccessToken, removeAccessToken, setRefreshing } from "../../slices/authSlice";
 import { getPostAuthRedirectPath } from "../../utils/authRedirect";
 
@@ -44,7 +45,7 @@ function ProtectedRoute() {
   }, [accessToken, backendUrl, bootstrapped, dispatch]);
 
   if (!accessToken && (isRefreshing || !bootstrapped)) {
-    return <div>Loading...</div>;
+    return <Loading message={"Loading data.."}/>;
   }
 
   if (!accessToken) {

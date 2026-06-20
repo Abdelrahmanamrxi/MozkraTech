@@ -52,7 +52,7 @@ export default function Body() {
       </> 
     )}
       </div>
-      <Footer />
+     {location.pathname==="/" && (<Footer />)}
    
     </div>
   );
