@@ -169,7 +169,7 @@ export default function QuizzesGenerator({
               <input
                 type="number"
                 min="1"
-                max="50"
+                max="30"
                 value={form.numberOfQuestions}
                 onChange={(event) =>
                   onFormChange("numberOfQuestions", event.target.value)
@@ -216,11 +216,13 @@ export default function QuizzesGenerator({
             <div className="space-y-3 rounded-3xl border border-white/10 bg-white/5 p-5">
               <label className="label text-sm font-medium text-slate-300">
                 {t("generator.durationMinutes")}
+                <span className="text-rose-400">*</span>
               </label>
               <input
                 type="number"
                 min="1"
                 max="60"
+                required={form.timeOption === "user_defined"}
                 value={form.userDuration}
                 onChange={(event) =>
                   onFormChange("userDuration", event.target.value)
