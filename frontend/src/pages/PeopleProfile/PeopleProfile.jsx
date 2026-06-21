@@ -80,7 +80,8 @@ function PeopleProfile() {
       t("badges.tenDayStreak"),
     ],
     bio: d.user.bio ? d.user.bio : t("fallback.bio"),
-    profileImage:d.user.profileImage
+    profileImage:d.user.profileImage,
+    achievements:d.user.achievements ?? []
   };
 
   const progressRing = user.xpProgress;

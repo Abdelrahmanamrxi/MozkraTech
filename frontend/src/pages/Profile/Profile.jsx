@@ -28,6 +28,7 @@ function Profile() {
       profileImage: dbUser.profileImage,
       currentStreak: dbUser.currentStreak ?? 0,
       level: dbUser.level ?? 1,
+
       memberSince: createdAt
         ? createdAt.toLocaleDateString(undefined, {
             month: "long",

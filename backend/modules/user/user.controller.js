@@ -263,6 +263,7 @@ export const getProfileByID = asyncHandler(async (req, res, next) => {
       new HttpException("User Not Found or Deleted or Not Verified", 404),
     );
   }
+  const achievements=await achievementModel.find({userId:user._id})
 
   // ---------------- friendship check ----------------
   const friendship = await friendshipModel.findOne({
@@ -345,7 +346,8 @@ export const getProfileByID = asyncHandler(async (req, res, next) => {
       bio: user.bio,
       summary: user.summary,
       subjects: user.subjects,
-      profileImage:user.profileImage
+      profileImage:user.profileImage,
+      achievements
     };
   } else if (isPending) {
     safeUser = {
@@ -403,6 +405,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
     subjectModel.countDocuments({ userId: user._id }),
     achievementModel.countDocuments({ userId: user._id }),
   ]);
+  
 
   const studyHours = tasks.reduce((sum, t) => sum + (t.hoursSpent || 0), 0);
 

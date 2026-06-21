@@ -16,6 +16,25 @@ async function declineFriend(id) {
   });
   return response.data;
 }
+function setBadgeColor(type) {
+  if (type === "common") {
+    return "border-white/25 bg-white/25";
+  }
+
+  if (type === "rare") {
+    return "bg-green-500/12 border-green-500/25";
+  }
+
+  if (type === "epic") {
+    return "bg-purple-500/12 border-purple-500/25";
+  }
+
+  if (type === "legendary") {
+    return "bg-orange-500/12 border-orange-500/25";
+  }
+
+  return "";
+}
 
 async function addFriend(id) {
   const response = await api.post(`friends/request`, { receiverId: id });
@@ -142,12 +161,12 @@ export default function PeopleProfileSidebar({
           )}
 
           <div className="flex flex-wrap gap-2">
-            {user.badges.map((badge) => (
+            {user.achievements.map((badge) => (
               <span
-                key={badge}
-                className="rounded-full border border-white/25 bg-white/12 px-3 py-1 text-[10px] font-Inter font-bold uppercase tracking-wider text-slate-100 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/20"
+                key={badge._id}
+               className={`rounded-full border-2 ${setBadgeColor(badge.badge)} px-3 py-1 text-[10px] font-Inter font-bold uppercase tracking-wider text-slate-100 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/20`}
               >
-                {badge}
+                {badge.name}
               </span>
             ))}
           </div>

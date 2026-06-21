@@ -172,9 +172,12 @@ function Home() {
     const upComingSchedule = sessions
       .filter((session) => {
         const status = session.status ?? "scheduled";
-        if (!allowedStatuses.has(status)) return false;
-        const startDate = new Date(session.startTime);
-        return startDate >= startOfTomorrow;
+        if(status==="scheduled"){
+          if (!allowedStatuses.has(status)) return false;
+          const startDate = new Date(session.startTime);
+          return startDate >= startOfTomorrow;
+        }
+        return false
       })
       .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
       .slice(0, 3)
