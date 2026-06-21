@@ -155,7 +155,7 @@ function Progress() {
     isAchievementsLoading;
 
   return (
-    <div className="text-white main-background lg:p-15 p-5 sm:p-8">
+    <div className="text-white pt-10 main-background lg:p-15 p-5 sm:p-8">
       <ProgressBanner />
 
       {isLoading ? (

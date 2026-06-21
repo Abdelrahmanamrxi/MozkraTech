@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import {
   PlusIcon,
   X,
+  ArrowLeft,
   Trash2,
   Pencil,
   BookOpen,
@@ -642,7 +644,9 @@ const SubjectRegister = ({ isEdit = false }) => {
 
   return (
     <div className="min-h-screen main-background">
-      <section className="min-h-screen p-7 lg:p-14 pt-12 lg:pt-16">
+       {isEdit &&<button onClick={()=>{navigate(-1)}} className="text-white  cursor-pointer hover:underline mb-8 absolute top-5 text-sm left-5 flex flex-row gap-3 font-Inter  items-center" to="-1"><ArrowLeft size={15}/> Back </button>}
+      <section className="min-h-screen p-7 lg:p-14 pt-12 lg:pt-18">
+       
         <div
           className={`flex flex-col font-Inter gap-2 mb-8 ${isRTL ? "text-right" : ""}`}
         >
