@@ -348,7 +348,7 @@ export const generateQuizResponse = async ({
       }
     });
     const content = response.choices[0].message.content;
-    console.log("AI Raw Content:", content);
+  /*   console.log("AI Raw Content:", content); */
 
     if (!content) {
       throw new HttpException("Error While Generating Quiz Response", 500);

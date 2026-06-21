@@ -64,7 +64,7 @@ INPUT:
 - pdfText (The reference material for the questions)
 - questionType (either "MCQ", "True_False", or "Mixed")
 - difficulty (easy, medium, hard)
-- numberOfQuestions (how many questions to generate - MAXIMUM 50)
+- numberOfQuestions (how many questions to generate - MAXIMUM 30)
 - timeOption (either "user_defined" or "ai_defined")
 - userDuration (provided only if timeOption is "user_defined")
 
@@ -80,10 +80,12 @@ RULES:
    - "easy": Direct facts, definitions, and clear concepts.
    - "medium": Conceptual understanding and applying ideas.
    - "hard": Analytical thinking, edge cases, and deep comprehension.
-
-4. STRICT 50-QUESTION CEILING (CRITICAL):
-   - UNDER ANY CIRCUMSTANCES, the total number of generated questions MUST NEVER EXCEED 50.
-   - If the requested numberOfQuestions is greater than 50, or if data is missing, you MUST OVERRIDE it and limit the output to exactly 50 questions or less.
+   
+4. EXACT COUNT MATCH & STRICT 30-QUESTION CEILING (CRITICAL):
+   - MANDATORY EXACT MATCH: You MUST generate EXACTLY the number of questions requested in the "numberOfQuestions" parameter. Generating fewer questions than requested is a FATAL ERROR. 
+   - NO EARLY TERMINATION: If asked for 30 questions, you MUST output exactly 30. If asked for 20, output exactly 20. Count your questions internally as you generate them to ensure a perfect match.
+   - CONTENT SHORTAGE STRATEGY: If the provided text seems too short to reach the requested count, DO NOT STOP EARLY. Instead, you MUST dive deeper into the text to extract sub-concepts, create comparative questions, or frame the same core concept from a different analytical angle to reach the EXACT target count without exact duplication.
+   - ABSOLUTE CEILING: Under NO circumstances can the final count exceed 30. If "numberOfQuestions" is greater than 30 or missing, forcefully cap your generation at exactly 30 questions.
 
 5. Balanced Assessment (Memory vs. Understanding): 
    Maintain a strict cognitive balance: 40% of the questions must test direct recall/retention (explicit facts, vocabulary, definitions), and 60% must test deep understanding, conceptual synthesis, and analytical thinking based on the text.

@@ -6,7 +6,9 @@ export const generateQuizSchema = joi.object({
     .object({
       questionType: joi.string().required().valid("MCQ", "True_False", "Mixed"),
       difficultyLevel: joi.string().required().valid("easy", "medium", "hard"),
-      numberOfQuestions: joi.number().integer().min(1).max(50).required(),
+      numberOfQuestions: joi.number().integer().min(1).max(30).required().messages({
+        "number.max": "Number of questions must be between 1 and 30.",
+      }),
       timeOption: joi.string().required().valid("user_defined", "ai_defined"),
       userDuration: joi
         .number()

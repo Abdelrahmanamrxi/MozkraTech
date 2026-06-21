@@ -74,7 +74,7 @@ export const generateQuizController = asyncHandler(async (req, res, next) => {
     difficultyLevel,
     questionType,
     durationMinutes: userDuration || quizData.durationMinutes,
-    numberOfQuestions: numberOfQuestions,
+    numberOfQuestions: quizData.questions.length,
     questions: quizData.questions,
   });
 
