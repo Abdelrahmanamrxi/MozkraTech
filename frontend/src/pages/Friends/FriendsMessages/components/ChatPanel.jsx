@@ -410,9 +410,7 @@ function MessageComposer({
           placeholder={t("messages.inputPlaceholder")}
           className="flex-1 bg-transparent text-white placeholder-[rgba(184,167,229,0.35)] text-sm outline-none min-w-0"
         />
-        <button className="text-purple-300/60 hover:text-purple-300 transition-colors shrink-0">
-          <EmojiIcon />
-        </button>
+     
         <Motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.94 }}
