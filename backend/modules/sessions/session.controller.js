@@ -127,19 +127,18 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
     totalDuration:(new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60)
     }));
 
-    // Retrieve Old Sessions To Check For no overlaps
+   
     const existingSessions=await sessionModel.find({
         userId,
         status:'scheduled'
     }).select("startTime endTime name")    
 
-        // Checking each session with existing sessions to see if there are overlaps
+       
         try {
             for (const s of updatedSessions) {
                 hasSessionConflict(existingSessions, s)
             }
 
-            // if there isn't proceed to create sessions
             await sessionModel.insertMany(updatedSessions);
 
             const user = await userModel.findOne({ _id: userId })
@@ -147,7 +146,7 @@ export const createSchedule=asyncHandler(async(req,res,next)=>{
 
             return res.status(200).json({ message: "Schedule Created Successfully" })
         } catch (err) {
-            // Rollback created task and any partially created sessions
+            
             try {
                 await taskModel.deleteOne({ _id: newTask._id })
             } catch (e) {
