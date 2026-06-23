@@ -122,81 +122,102 @@ export const generateAISessionResponse = async (userId, userPreferences, subject
     throw new HttpException("Error Sending Response", 500)
   }
 }
-export const generateAvailableSessions = async (
-  {
-
-    existingSessions,
-    dueDate,
-    totalHours,
-    studyHours,
-    subjectId,
-    name,
-    currentDateTime,
-    freeDays,
-    timeRange
-  }
-) => {
-  try {
-    const response = await groq.chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      max_tokens: 1000,
-      messages: [
-        {
-          role: "system",
-          content: generateAvailableSessionsPrompt
-        },
-        {
-          role: "user",
-          content:  `
-Generate an optimized study schedule.
-
-IMPORTANT:
-- totalHours is the ENTIRE schedule total.
-- studyHours is ONLY the MAXIMUM allowed PER DAY.
-- The FINAL TOTAL of ALL session durations combined MUST equal exactly ${totalHours} hours.
-- Never generate more than ${totalHours} total hours.
-- Prefer fewer longer sessions.
-- Minimize number of days.
-
-CURRENT TIME:
-${currentDateTime}
-
-DEADLINE:
-${dueDate}
-
-ALLOWED DAYS:
-${JSON.stringify(freeDays)}
-
-TIME WINDOW:
-${JSON.stringify(timeRange)}
-
-BLOCKED SLOTS:
-${existingSessions
-  .map(
-    (s) =>
-      `- ${s.startTime} → ${s.endTime}`
-  )
-  .join("\n")}
-
-PARAMETERS:
-${JSON.stringify({
+export const generateAvailableSessions = async ({
+  existingSessions,
+  dueDate,
   totalHours,
   studyHours,
   subjectId,
-  name
-})}
+  name,
+  currentDateTime,
+  freeDays,
+  timeRange,
+}) => {
+  const MAX_RETRIES = 3;
 
-VALID EXAMPLE:
-If totalHours = 3 and studyHours = 3:
-VALID:
-- one 3-hour session
-- three 1-hour sessions
+  function validateSessions(sessions) {
+    const violations = [];
 
-INVALID:
-- 3h Monday + 3h Tuesday = 6h
+    // check total hours
+    const total = sessions.reduce((sum, s) => {
+      const start = new Date(s.startTime);
+      const end = new Date(s.endTime);
+      return sum + (end - start) / (1000 * 60 * 60);
+    }, 0);
 
-`
-        }
+    if (Math.abs(total - totalHours) > 0.1) {
+      violations.push(`Total hours is ${total.toFixed(2)} but must be exactly ${totalHours}`);
+    }
+
+    // check daily limit
+    const dayMap = {};
+    for (const s of sessions) {
+      const day = s.startTime.slice(0, 10);
+      const start = new Date(s.startTime);
+      const end = new Date(s.endTime);
+      const hours = (end - start) / (1000 * 60 * 60);
+      dayMap[day] = (dayMap[day] || 0) + hours;
+    }
+    for (const [day, hours] of Object.entries(dayMap)) {
+      if (hours > studyHours + 0.1) {
+        violations.push(`Day ${day} has ${hours.toFixed(2)}h which exceeds studyHours limit of ${studyHours}h`);
+      }
+    }
+
+    // check all sessions are after currentDateTime
+    for (const s of sessions) {
+      if (new Date(s.startTime) <= new Date(currentDateTime)) {
+        violations.push(`Session ${s.startTime} starts before or at currentDateTime ${currentDateTime}`);
+      }
+    }
+
+    // check all sessions end before dueDate
+    for (const s of sessions) {
+      if (new Date(s.endTime) >= new Date(dueDate)) {
+        violations.push(`Session ending ${s.endTime} goes beyond dueDate ${dueDate}`);
+      }
+    }
+
+    return violations;
+  }
+
+  function buildViolationHint(violations) {
+    return `\n\nPREVIOUS ATTEMPT VIOLATIONS — fix ALL of these:\n${violations.map((v) => `- ${v}`).join("\n")}`;
+  }
+
+  async function callGroq(violationHint = "") {
+    const response = await groq.chat.completions.create({
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      max_tokens: 5000,
+      messages: [
+        {
+          role: "system",
+          content: generateAvailableSessionsPrompt,
+        },
+        {
+          role: "user",
+          content: `
+Generate an optimized study schedule.
+
+CURRENT TIME: ${currentDateTime}
+DEADLINE: ${dueDate}
+TOTAL HOURS TO SCHEDULE: ${totalHours}
+MAX HOURS PER DAY: ${studyHours}
+ALLOWED DAYS: ${JSON.stringify(freeDays)}
+TIME WINDOW: ${JSON.stringify(timeRange)}
+
+BLOCKED SLOTS:
+${existingSessions.map((s) => `- ${s.startTime} → ${s.endTime}`).join("\n") || "none"}
+
+SUBJECT:
+${JSON.stringify({ subjectId, name })}
+
+HOUR SPLIT REMINDER:
+- If ${totalHours} <= ${studyHours}: generate ONE session of exactly ${totalHours}h
+- If ${totalHours} > ${studyHours}: split across days, each day max ${studyHours}h, total must equal ${totalHours}h exactly
+${violationHint}
+          `,
+        },
       ],
       response_format: {
         type: "json_schema",
@@ -214,42 +235,75 @@ INVALID:
                 items: {
                   type: "object",
                   additionalProperties: false,
-                  required: [
-                    "subjectId",
-                    "name",
-                    "startTime",
-                    "endTime"
-                  ],
+                  required: ["subjectId", "name", "startTime", "endTime"],
                   properties: {
                     subjectId: { type: "string" },
                     name: { type: "string" },
                     startTime: { type: "string", format: "date-time" },
-                    endTime: { type: "string", format: "date-time" }
-                  }
-                }
+                    endTime: { type: "string", format: "date-time" },
+                  },
+                },
               },
-              reasonForResponse: {
-                type: "string"
-              }
-            }
-          }
-        }
-      }
+              reasonForResponse: { type: "string" },
+            },
+          },
+        },
+      },
     });
 
     const content = response.choices[0].message.content;
+    if (!content) throw new HttpException("Error While Generating Sessions", 500);
 
-    if (!content) {
-      throw new HttpException("Error While Generating Sessions", 500);
+    try {
+      return JSON.parse(content);
+    } catch {
+      throw new HttpException("Parsing JSON Error", 500);
+    }
+  }
+
+  try {
+    let parsed;
+    let violationHint = "";
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      parsed = await callGroq(violationHint);
+
+      const violations = validateSessions(parsed.sessions);
+      console.log(`Attempt ${attempt}: ${violations.length} violation(s)`, violations);
+
+      if (violations.length === 0) return parsed;
+
+      violationHint = buildViolationHint(violations);
     }
 
-    return JSON.parse(content);
+    // deterministic fix — force total hours to match exactly
+    console.warn("All retries failed, applying deterministic fix");
+
+    const fixedSessions = [];
+    let remaining = totalHours;
+
+    for (const s of parsed.sessions) {
+      if (remaining <= 0) break;
+      const start = new Date(s.startTime);
+      const end = new Date(s.endTime);
+      const duration = (end - start) / (1000 * 60 * 60);
+      const allowed = Math.min(duration, remaining, studyHours);
+      const fixedEnd = new Date(start.getTime() + allowed * 60 * 60 * 1000);
+      fixedSessions.push({
+        ...s,
+        endTime: fixedEnd.toISOString(),
+      });
+      remaining -= allowed;
+    }
+
+    parsed.sessions = fixedSessions;
+    return parsed;
 
   } catch (err) {
-    throw new HttpException(err, 500);
+    console.error(err.message);
+    throw new HttpException(err.message || "Error Sending Response", 500);
   }
 };
-
 
 export const generateQuizResponse = async ({
   pdfText,

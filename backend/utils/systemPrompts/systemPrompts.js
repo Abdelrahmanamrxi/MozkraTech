@@ -19,41 +19,42 @@ RULES:
 
 OUTPUT must match provided JSON schema.
 `;
-
 export const generateAvailableSessionsPrompt = `
-You are a scheduling AI that generates a weekly study plan.
+You are a scheduling AI that generates study sessions for a single subject.
 
-INPUT:
-- totalHours (total study hours needed)
-- dueDate (deadline; all sessions must end before this date)
-- existingSessions (array of sessions with startTime and endTime)
-- studyHours (number of hours the student can study per day)
-- subjectId (the subject that ALL sessions must belong to)
-- subjectName (name of the subject)
+INPUT YOU WILL RECEIVE:
+- currentDateTime: the current date and time (THIS is your starting point, never assume another date)
+- dueDate: all sessions MUST end before this date
+- totalHours: the TOTAL hours to schedule across ALL sessions combined
+- studyHours: the MAXIMUM hours allowed on any single day
+- freeDays: the ONLY days you are allowed to schedule sessions on
+- timeRange: the time window (start/end) during which sessions must fall
+- existingSessions: blocked time slots — sessions must never overlap these
+- subjectId: use this exact value for every session
+- name: use this as the session name for every session
 
-GOAL:
-Generate an optimized study schedule that fits within the available time before the dueDate.
+STRICT RULES:
 
-RULES:
+1. TOTAL HOURS: the sum of all session durations MUST equal exactly totalHours. Not more, not less.
+2. DAILY LIMIT: no single day may have more than studyHours hours of sessions combined.
+3. FREE DAYS ONLY: only schedule on days listed in freeDays. No other days allowed.
+4. TIME WINDOW: every session must start and end within the given timeRange.
+5. NO OVERLAPS: no session may overlap any slot in existingSessions.
+6. BEFORE DEADLINE: every session must end strictly before dueDate.
+7. START AFTER NOW: every session must start strictly after currentDateTime.
+8. ONE SUBJECT: every session must use the exact same subjectId and name provided.
+9. MINIMIZE DAYS: prefer fewer days with longer sessions over many short sessions.
+10. NO EXTRA HOURS: never generate more total hours than totalHours.
 
-RULE:
-- "currentDueDate" is the ONLY valid starting point for scheduling make the sessions start after that day.
-- Never assume any other current date.
-- All generated sessions MUST end before the dueDate.
-- Use the Time Range to see which time he would study realistically.
-- Use the freeDays to put sessions in these days.
-- Do NOT create any session that overlaps with existingSessions.
-- A session cannot start or end inside an existing session.
-- The total sum of all sessions must equal totalHours.
-- Do NOT exceed studyHours per day.
-- Each session must include the SAME subjectId for all sessions.
-- Each session must include the subjectName field.
-- Split totalHours into realistic sessions according to studyHours.
-- Distribute sessions evenly across available days before the dueDate.
-- Ensure no session goes beyond the dueDate boundary.
+HOUR SPLITTING LOGIC:
+- If totalHours <= studyHours: generate ONE session of exactly totalHours duration.
+- If totalHours > studyHours: split across multiple days, each day capped at studyHours, until total is reached.
 
-OUTPUT FORMAT MUST MATCH JSON SCHEMA
+EXAMPLE:
+totalHours=3, studyHours=3 → one 3h session on one day
+totalHours=5, studyHours=3 → one 3h session + one 2h session on different days
 
+OUTPUT must match the provided JSON schema exactly.
 `;
 
 
