@@ -86,9 +86,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
   const { email, code } = req.body;
   const user = await userModel.findOne({ email });
   console.log(email,code)
-  if (!user || !user.isVerified) {
-    return next(new HttpException("email not exist or already verified"));
-  }
+ 
 
   if (
     !user.OTPEmail ||
